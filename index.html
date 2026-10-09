@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aakif — Software Engineer</title>
+<meta name="description" content="Aakif — software engineer building backend systems, AI agent infrastructure and full-stack products.">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  // set theme before paint to avoid flash
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = t;
+    } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+  })();
+  tailwind.config = {
+    darkMode: ['selector', '[data-theme="dark"]'],
+    theme: {
+      extend: {
+        colors: {
+          page: 'var(--page)', surface: 'var(--surface)', card: 'var(--card)',
+          raised: 'var(--raised)', line: 'var(--line)',
+          ink: 'var(--ink)', muted: 'var(--muted)', faint: 'var(--faint)',
+        },
+        fontFamily: {
+          sans: ['-apple-system','BlinkMacSystemFont','"SF Pro Text"','Inter','Segoe UI','system-ui','sans-serif'],
+          mono: ['"SF Mono"','ui-monospace','"JetBrains Mono"','Menlo','monospace'],
+        },
+        letterSpacing: { tightest: '-0.045em' },
+      }
+    }
+  }
+</script>
+<style>
+  :root[data-theme="light"] {
+    --page:#ffffff; --surface:#f6f6f7; --card:#ffffff; --raised:#f0f0f2; --line:#e3e3e6;
+    --ink:#0a0a0b; --muted:#56565e; --faint:#8b8b94;
+    --glow: .22;
+  }
+  :root[data-theme="dark"] {
+    --page:#08080a; --surface:#0e0e11; --card:#131317; --raised:#1b1b20; --line:#26262d;
+    --ink:#f4f4f6; --muted:#a0a0ab; --faint:#6e6e7a;
+    --glow: .30;
+  }
+  html { background: var(--page); }
+  body { -webkit-font-smoothing: antialiased; }
+  ::selection { background: #a855f7; color:#fff; }
+
+  /* scroll reveal */
+  .rv { opacity:0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .rv.in { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    .rv { opacity:1 !important; transform:none !important; transition:none; }
+    .aurora { animation:none !important; }
+  }
+
+  /* hero aurora — the only "big" visual, kept cheap */
+  .aurora { filter: blur(90px); opacity: var(--glow); animation: drift 24s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate3d(-4%,0,0) scale(1); } to { transform: translate3d(4%,-3%,0) scale(1.12); } }
+
+  .grid-bg {
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 20%, transparent 72%);
+  }
+  .grad-text { background-image: linear-gradient(100deg,#fb923c,#f43f5e 38%,#a855f7 68%,#38bdf8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  a:focus-visible, button:focus-visible { outline:2px solid #a855f7; outline-offset:3px; border-radius:6px; }
+
+  /* link underline */
+  .ul { position:relative; }
+  .ul::after { content:''; position:absolute; left:0; bottom:-2px; height:1px; width:100%; background:currentColor; transform:scaleX(0); transform-origin:left; transition:transform .35s cubic-bezier(.2,.7,.2,1); }
+  .ul:hover::after { transform:scaleX(1); }
+</style>
+</head>
+
+<body class="bg-page text-ink font-sans antialiased">
+
+<!-- ░░ NAV ░░ -->
+<header class="fixed top-0 inset-x-0 z-50 border-b border-line/70 bg-page/70 backdrop-blur-xl backdrop-saturate-150">
+  <nav class="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <a href="#top" class="group flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+      <span class="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-rose-500 to-violet-600 text-[11px] font-bold text-white">A</span>
+      Aakif
+    </a>
+    <div class="hidden items-center gap-7 text-[13.5px] text-muted md:flex">
+      <a href="#work" class="ul transition-colors hover:text-ink">Work</a>
+      <a href="#stack" class="ul transition-colors hover:text-ink">Stack</a>
+      <a href="#more" class="ul transition-colors hover:text-ink">Archive</a>
+      <a href="#contact" class="ul transition-colors hover:text-ink">Contact</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="theme" type="button" aria-label="Toggle colour theme"
+        class="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-colors hover:bg-raised hover:text-ink">
+        <svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+        <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20.5 14.3A8.6 8.6 0 1 1 9.7 3.5a7 7 0 0 0 10.8 10.8Z"/></svg>
+      </button>
+      <a href="https://github.com/Aakif9866" target="_blank" rel="noopener"
+        class="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-page transition-opacity hover:opacity-85">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ░░ HERO ░░ -->
+<section id="top" class="relative overflow-hidden pt-36 pb-24">
+  <div class="pointer-events-none absolute inset-0 grid-bg opacity-60"></div>
+  <div class="pointer-events-none absolute -top-40 left-1/2 h-[460px] w-[900px] -translate-x-1/2">
+    <div class="aurora h-full w-full rounded-full bg-[conic-gradient(from_210deg,#fb923c,#f43f5e,#a855f7,#38bdf8,#fb923c)]"></div>
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <div class="rv inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3 py-1 text-[12.5px] text-muted backdrop-blur">
+      <span class="relative flex h-1.5 w-1.5"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span></span>
+      Open to software engineering roles
+    </div>
+
+    <h1 class="rv mt-7 max-w-4xl text-[62px] font-semibold leading-[1.03] tracking-tightest">
+      I build the <span class="grad-text">unglamorous parts</span><br>that make software hold up.
+    </h1>
+
+    <p class="rv mt-7 max-w-2xl text-[19px] leading-relaxed text-muted">
+      Software engineer working across backend systems, AI agent infrastructure and full-stack products.
+      Most of what I build is about the layer underneath the demo — routing, guardrails, storage, sync, tests.
+      Everything below links to the actual repository.
+    </p>
+
+    <div class="rv mt-9 flex flex-wrap items-center gap-3">
+      <a href="#work" class="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
+        Selected work
+        <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="mailto:aakif9866@gmail.com" class="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+        aakif9866@gmail.com
+      </a>
+    </div>
+
+    <dl class="rv mt-16 grid max-w-3xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line bg-line">
+      <div class="bg-card px-6 py-5">
+        <dt class="text-[12px] uppercase tracking-wider text-faint">Primary languages</dt>
+        <dd class="mt-1.5 text-[16px] font-medium">Python · TypeScript</dd>
+      </div>
+      <div class="bg-card px-6 py-5">
+        <dt class="text-[12px] uppercase tracking-wider text-faint">Focus</dt>
+        <dd class="mt-1.5 text-[16px] font-medium">Backend · AI systems</dd>
+      </div>
+      <div class="bg-card px-6 py-5">
+        <dt class="text-[12px] uppercase tracking-wider text-faint">Public repositories</dt>
+        <dd class="mt-1.5 text-[16px] font-medium">49 <span class="text-faint">· via GitHub API</span></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<!-- ░░ WORK ░░ -->
+<section id="work" class="border-t border-line bg-surface py-24">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv flex items-end justify-between gap-6">
+      <div>
+        <p class="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">01 — Selected work</p>
+        <h2 class="mt-3 text-[40px] font-semibold tracking-tightest">Things I actually shipped</h2>
+      </div>
+      <p class="hidden max-w-xs text-right text-[14px] leading-relaxed text-muted md:block">
+        Descriptions are the repositories' own. Nothing here is a mock-up.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+
+      <!-- FEATURED -->
+      <a href="https://github.com/Aakif9866/Agentic-AI-" target="_blank" rel="noopener"
+         class="rv group relative col-span-full flex flex-col justify-between overflow-hidden rounded-2xl border border-line bg-card p-8 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/10 lg:col-span-2">
+        <div class="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-violet-500/15 blur-3xl transition-opacity duration-500 group-hover:opacity-100 opacity-50"></div>
+        <div class="relative">
+          <div class="flex items-center gap-2">
+            <span class="rounded-full bg-violet-500/12 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-violet-500 dark:text-violet-400">Flagship</span>
+            <span class="font-mono text-[11.5px] text-faint">Python</span>
+          </div>
+          <h3 class="mt-5 text-[30px] font-semibold tracking-tight">Agentic&nbsp;AI</h3>
+          <p class="mt-3 max-w-xl text-[16px] leading-relaxed text-muted">
+            Hands-on journey through agentic AI, from LLM basics to production multi-agent systems.
+            LangChain, LangGraph, MCP, RAG, guardrails, evals and deployment — built from scratch and measured.
+          </p>
+        </div>
+        <div class="relative mt-7 flex flex-wrap gap-1.5">
+          <span class="rounded-md border border-line bg-raised px-2 py-1 font-mono text-[11.5px] text-muted">LangGraph</span>
+          <span class="rounded-md border border-line bg-raised px-2 py-1 font-mono text-[11.5px] text-muted">MCP</span>
+          <span class="rounded-md border border-line bg-raised px-2 py-1 font-mono text-[11.5px] text-muted">RAG</span>
+          <span class="rounded-md border border-line bg-raised px-2 py-1 font-mono text-[11.5px] text-muted">Guardrails</span>
+          <span class="rounded-md border border-line bg-raised px-2 py-1 font-mono text-[11.5px] text-muted">Evals</span>
+        </div>
+      </a>
+
+      <!-- side card -->
+      <a href="https://github.com/Aakif9866/ChatWithSherlock" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-sky-500/50 hover:shadow-2xl hover:shadow-sky-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-sky-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">Python</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">ChatWithSherlock</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Multi-provider LLM gateway with intelligent routing, failover, rate-limit handling, and a Sherlock Holmes chatbot demo.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Routing</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Failover</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/MiniStore" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/50 hover:shadow-2xl hover:shadow-amber-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-amber-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">TypeScript</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">MiniStore</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Production-style object storage platform built with MinIO, Node.js, PostgreSQL, Docker, monitoring, load testing and DevOps practices.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">MinIO</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">PostgreSQL</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Docker</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/PULSEIQ" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">Python</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">PULSEIQ</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            AI-powered self-service analytics platform for uploading datasets, exploring insights, generating visualisations and querying data in natural language.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">NL→SQL</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Dataviz</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/Doorman" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-rose-500/50 hover:shadow-2xl hover:shadow-rose-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-rose-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">JavaScript</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">Doorman</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Prompt-injection guardrails for an AI hiring agent — the security layer in front of an LLM that is allowed to act.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">LLM security</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/Local-Devops-Assistant" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-cyan-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">Python</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">Local DevOps Assistant</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            A Python MCP server that lets AI assistants inspect and diagnose local Docker development environments through structured tools.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">MCP</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Docker</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/Rwap" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-indigo-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">TypeScript</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">Rwap</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Lightweight, reusable analytics platform for tracking unique visitors, sessions, page views and basic usage across projects.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Analytics</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/WildCity" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-lime-500/50 hover:shadow-2xl hover:shadow-lime-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-lime-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">TypeScript</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">WildCity</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Browser-based 3D game where players explore real-world cities and a simulated ecosystem. React, Three.js and OpenStreetMap.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Three.js</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">OSM</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://github.com/Aakif9866/Karma-Farming-Autobot" target="_blank" rel="noopener"
+         class="rv group relative overflow-hidden rounded-2xl border border-line bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-500/10">
+        <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-orange-500/15 blur-3xl"></div>
+        <div class="relative">
+          <span class="font-mono text-[11.5px] text-faint">TypeScript</span>
+          <h3 class="mt-4 text-[21px] font-semibold tracking-tight">Karma Farming Autobot</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed text-muted">
+            Reddit trend-intelligence agent that discovers viral discussions, memes and content opportunities across communities.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Reddit API</span>
+            <span class="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">Agents</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ░░ STACK ░░ -->
+<section id="stack" class="border-t border-line py-24">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv">
+      <p class="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Stack</p>
+      <h2 class="mt-3 text-[40px] font-semibold tracking-tightest">What I reach for</h2>
+      <p class="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
+        Grouped by where it sits in a system. Each of these appears in a repository above, not on a certificate.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <div class="rv rounded-2xl border border-line bg-card p-6 transition-colors hover:border-rose-500/40">
+        <div class="h-1 w-9 rounded-full bg-gradient-to-r from-rose-500 to-orange-400"></div>
+        <h3 class="mt-4 text-[15px] font-semibold uppercase tracking-wider">Languages</h3>
+        <ul class="mt-4 space-y-2 text-[14.5px] text-muted">
+          <li>Python</li><li>TypeScript / JavaScript</li><li>SQL</li>
+        </ul>
+      </div>
+      <div class="rv rounded-2xl border border-line bg-card p-6 transition-colors hover:border-violet-500/40">
+        <div class="h-1 w-9 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400"></div>
+        <h3 class="mt-4 text-[15px] font-semibold uppercase tracking-wider">AI&nbsp;systems</h3>
+        <ul class="mt-4 space-y-2 text-[14.5px] text-muted">
+          <li>LangChain · LangGraph</li><li>MCP servers</li><li>RAG &amp; retrieval</li><li>Guardrails · evals</li>
+        </ul>
+      </div>
+      <div class="rv rounded-2xl border border-line bg-card p-6 transition-colors hover:border-sky-500/40">
+        <div class="h-1 w-9 rounded-full bg-gradient-to-r from-sky-500 to-cyan-400"></div>
+        <h3 class="mt-4 text-[15px] font-semibold uppercase tracking-wider">Backend&nbsp;&amp;&nbsp;data</h3>
+        <ul class="mt-4 space-y-2 text-[14.5px] text-muted">
+          <li>Node.js · Django REST</li><li>PostgreSQL · MongoDB</li><li>REST APIs · auth</li><li>MinIO object storage</li>
+        </ul>
+      </div>
+      <div class="rv rounded-2xl border border-line bg-card p-6 transition-colors hover:border-emerald-500/40">
+        <div class="h-1 w-9 rounded-full bg-gradient-to-r from-emerald-500 to-lime-400"></div>
+        <h3 class="mt-4 text-[15px] font-semibold uppercase tracking-wider">Frontend&nbsp;&amp;&nbsp;ops</h3>
+        <ul class="mt-4 space-y-2 text-[14.5px] text-muted">
+          <li>React · Next.js · Tailwind</li><li>Three.js</li><li>Docker · CI/CD</li><li>Monitoring · load testing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ ARCHIVE ░░ -->
+<section id="more" class="border-t border-line bg-surface py-24">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rv">
+      <p class="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">03 — Archive</p>
+      <h2 class="mt-3 text-[40px] font-semibold tracking-tightest">Also on the shelf</h2>
+      <p class="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
+        Smaller builds and learning projects. Listed because they are real, not because they are polished.
+      </p>
+    </div>
+
+    <ul class="rv mt-10 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+      <li><a href="https://github.com/Aakif9866/Django-Unchained" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">Django&nbsp;Unchained</span>
+        <span class="flex-1 truncate text-[14px] text-muted">Full-stack notes app — React, Django REST, MongoDB, security &amp; performance testing, Docker, CI/CD</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">Python</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+      <li><a href="https://github.com/Aakif9866/mern-blog" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">mern-blog</span>
+        <span class="flex-1 truncate text-[14px] text-muted">Full-stack MERN blog</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">JavaScript</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+      <li><a href="https://github.com/Aakif9866/comment-toxicity-model" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">Comment&nbsp;toxicity</span>
+        <span class="flex-1 truncate text-[14px] text-muted">Deep learning + text analysis with a Gradio demo</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">Jupyter</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+      <li><a href="https://github.com/Aakif9866/youtube-clone113" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">TubeClone</span>
+        <span class="flex-1 truncate text-[14px] text-muted">YouTube clone with React, MUI and YouTube Data API v3</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">JavaScript</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+      <li><a href="https://github.com/Aakif9866/movie-website" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">IMDB&nbsp;clone</span>
+        <span class="flex-1 truncate text-[14px] text-muted">Next.js + Tailwind with dark mode, deployed on Vercel</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">JavaScript</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+      <li><a href="https://github.com/Aakif9866/chat-app" target="_blank" rel="noopener" class="group flex items-center gap-5 px-6 py-4 transition-colors hover:bg-raised">
+        <span class="w-40 shrink-0 text-[15px] font-medium">chat-app</span>
+        <span class="flex-1 truncate text-[14px] text-muted">Realtime chat with React, Firebase and Zustand</span>
+        <span class="shrink-0 font-mono text-[11.5px] text-faint">JavaScript</span>
+        <svg class="h-3.5 w-3.5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a></li>
+    </ul>
+
+    <a href="https://github.com/Aakif9866?tab=repositories" target="_blank" rel="noopener"
+       class="rv mt-7 inline-flex items-center gap-2 text-[14px] font-medium text-muted transition-colors hover:text-ink">
+      All 49 repositories on GitHub
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ░░ CONTACT ░░ -->
+<section id="contact" class="relative overflow-hidden border-t border-line py-28">
+  <div class="pointer-events-none absolute -bottom-52 left-1/2 h-[380px] w-[760px] -translate-x-1/2">
+    <div class="aurora h-full w-full rounded-full bg-[conic-gradient(from_30deg,#38bdf8,#a855f7,#f43f5e,#fb923c,#38bdf8)]"></div>
+  </div>
+  <div class="relative mx-auto max-w-3xl px-6 text-center">
+    <p class="rv font-mono text-[12px] uppercase tracking-[0.18em] text-faint">04 — Contact</p>
+    <h2 class="rv mt-4 text-[46px] font-semibold leading-tight tracking-tightest">
+      Hiring, or just <span class="grad-text">curious how it works?</span>
+    </h2>
+    <p class="rv mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-muted">
+      Happy to walk through any of these systems — the architecture, the tradeoffs, and the parts that broke first.
+    </p>
+    <div class="rv mt-9 flex flex-wrap items-center justify-center gap-3">
+      <a href="mailto:aakif9866@gmail.com"
+         class="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[14.5px] font-medium text-page transition-opacity hover:opacity-85">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg>
+        aakif9866@gmail.com
+      </a>
+      <a href="https://github.com/Aakif9866" target="_blank" rel="noopener"
+         class="inline-flex items-center gap-2 rounded-full border border-line bg-card px-6 py-3 text-[14.5px] font-medium transition-colors hover:bg-raised">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.88-1.4-3.88-1.4-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.76.4-1.27.73-1.56-2.56-.3-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.48.11-3.08 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.6.23 2.78.12 3.07.74.82 1.18 1.85 1.18 3.11 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .3.2.66.8.55A11.5 11.5 0 0 0 23.5 12A11.5 11.5 0 0 0 12 .5Z"/></svg>
+        Aakif9866
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-line py-9">
+  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 text-[13px] text-faint md:flex-row">
+    <p>© <span id="yr">2026</span> Aakif. Built with Tailwind CSS. Repository data from the GitHub API.</p>
+    <a href="#top" class="ul transition-colors hover:text-ink">Back to top</a>
+  </div>
+</footer>
+
+<script>
+  // theme toggle
+  document.getElementById('theme').addEventListener('click', function () {
+    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // scroll reveal — stagger siblings a little
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e, i) {
+      if (!e.isIntersecting) return;
+      e.target.style.transitionDelay = (i * 60) + 'ms';
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+</script>
+</body>
+</html>
