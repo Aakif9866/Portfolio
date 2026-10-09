@@ -1,0 +1,117 @@
+# ROLE & GOAL
+You are building my personal developer portfolio (Aakif, GitHub: Aakif9866) as a production-quality full-stack app. Its purpose is to help me get a software engineering job. It must read as a premium site built by a real engineer, not an AI template, and every feature must exist to demonstrate real skill (frontend, UX, PostgreSQL, auth, RLS, external APIs, CRUD, testing, security, CI/CD, documentation).
+
+# HARD RULES
+1. Never ship a feature that doesn't work end-to-end. No fake buttons, dashboards, analytics, GitHub data, loading states, placeholder CRUD, decorative settings, "coming soon" items, or mock API responses presented as real. If something can't be done reliably, document the limitation and either remove it or build a smaller version that genuinely works.
+2. Every feature needs a real purpose. Don't add complexity for appearances.
+3. Never invent achievements, employment details, metrics, or project capabilities. Use my resume and repo contents as the only source. Missing metric -> "Not measured" or omit.
+4. Never overwrite .env, expose secrets, or destroy working code. Reuse good existing infrastructure.
+5. Never reset or delete unrelated work. Work on branch `portfolio-v2` (never on main) with logical commits.
+6. Finish V1 completely before starting V2. Do not mix unfinished V2 work into V1.
+
+# WORKING PROTOCOL
+- Phase 0 (no code): audit the whole repo (Next.js version, App Router layout, TS and Tailwind config, components, design system, Supabase setup, .env keys (names only), migrations, auth, dependencies, tests, MCP config, agent skills). Then present a written plan: findings, what to reuse, schema gaps, phased task list, risks, and open questions. Wait for my approval before implementing.
+- Build the foundation first (schema, RLS, auth, design system). Do not start with the hero.
+- At the end of every phase: run lint, typecheck, tests, and review the diff. Report results honestly, including failures.
+- If an input I reference as "supplied" (architecture_diagrams model, privacy-preserving visitor ID design, GitHub schema, database architecture) is not in the repo, stop and ask instead of guessing.
+
+# TOOLING
+- Supabase MCP (I will run this myself if not configured):
+  claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp?features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching"
+  Use it with the Supabase agent skills for schema inspection, migrations, RLS verification, auth, and security checks.
+- Design skills: use the frontend-design skill (anthropics/claude-code plugins) and, if suitable, ui-ux-pro-max-skill for hierarchy, responsiveness, accessibility, interaction, typography, and consistency.
+- Don't install tools beyond what's needed.
+
+# DESIGN SYSTEM (build before pages)
+Create a shared system and reusable components so every page feels like one product: typography, spacing, colors, borders, shadows, radii, buttons, cards, badges, inputs, dialogs, navigation, section headers, code blocks, tables, markdown, status indicators.
+- Light mode: layered neutrals, subtle accents, strong contrast, soft borders, restrained shadows.
+- Dark mode: NOT black + white text. Use stepped surfaces (page -> section -> card -> elevated -> interactive), tasteful accents, dimensional but not neon. One consistent palette across both modes.
+- Motion (Framer Motion / Motion for React): page transitions, section reveals, nav, hover, modals/drawers, diagram interaction. Subtle and fast. No heavy parallax, constant movement, bouncing, giant animated backgrounds, or per-element animation. Respect prefers-reduced-motion.
+- Hover: project cards lift, borders transition, thumbnails scale slightly, links animate underline, tech nodes respond, GitHub cards reveal useful metadata. Don't glow everything.
+- Responsive: design deliberately for 320, 375, 390, 768, 1024, 1440+. Mobile layouts designed independently where needed. No horizontal overflow.
+- Accessibility: keyboard navigation, visible focus, semantic HTML, ARIA only where needed, sufficient contrast, accessible forms and dialogs.
+
+# V1 - COMPLETE PORTFOLIO
+
+## Public routes (create only routes that are fully implemented)
+/, /projects, /projects/[slug], /articles, /articles/[slug], /lab, /lab/[slug], /experience, /system, /about
+
+## Homepage (concise, not a resume dump)
+Nav, hero, short intro, selected projects, tech/skills, experience, GitHub, articles, contact, footer.
+Hero must say within seconds who I am, what I do, what kind of engineer I am, and where to explore. Use real resume info; technical, confident copy; no clichés ("passionate visionary", "building the future").
+
+## Projects (core of the site)
+Dedicated case study per significant project. Fields: title, thesis, summary, type, status, role, team, dates, technologies, GitHub, demo, hero image, sections, milestones, architecture, lessons. Sections: Overview, Problem, Why, How, Architecture, Data Model, API, Frontend, Backend, Infrastructure, Performance, Testing, Decisions, Challenges, Results, Future, Lessons. Render only sections that have content.
+For each important technology, concisely cover: What, Why (in this project), How (in the architecture), Tradeoff (alternatives), Interview (what I should be able to explain). Professional, not a tutorial.
+
+## Architecture diagrams
+Interactive diagrams from the supplied `architecture_diagrams` model. Nodes: id, label, tech, x, y, explanation. Edges: from, to, label. Must depict real architecture. Provide a usable mobile representation.
+
+## Technology system (/system)
+From the `technologies` table, grouped: Languages, Frontend, Backend, Database, AI/ML, Infrastructure, Testing, Tooling. Each covers what it is, why I use it, where I used it, related projects.
+
+## Experience
+From `timeline_entries` (work + education), reverse chronological, current role first. Don't invent missing details.
+
+## Articles
+Markdown with headings, lists, code blocks with syntax highlighting, links, blockquotes, tables. Metadata: topic, tags, difficulty, reading time, publish date, review date, tested-with. Show "REVIEW NEEDED" if not reviewed in 6 months. Every save creates an `article_revisions` row; admin can list revisions with timestamps and restore. No extra version-control complexity.
+
+## Lab
+Experiments with hypothesis, status, outcome, related project, dates. Failed and abandoned experiments may be published.
+
+## Admin (/admin)
+- Exactly one admin: aakif9866@gmail.com. Supabase Auth. No public registration, no role-promotion UI, no second-admin flow.
+- Authorization enforced by the database (RLS), never by a client-side flag.
+- Sections: Dashboard, Site Content, Projects, Project Sections, Technologies, Experience, Articles, Lab, Diagrams, GitHub, Analytics, Settings.
+- Real CRUD persisted to Supabase:
+  - Projects: create/read/update/delete, publish, archive, reorder, feature
+  - Sections: create/edit/delete, reorder, publish/hide
+  - Technologies and Experience: create/edit/delete/reorder
+  - Articles: create/edit/delete, publish, archive, restore revision
+  - Site config: edit, save, group
+
+## Database and RLS
+Use the supplied Supabase/PostgreSQL schema; don't casually redesign it. Tables: profiles, site_config, projects, project_sections, project_milestones, architecture_diagrams, technologies, project_technologies, experiments, articles, article_revisions, sources, claims, claim_sources, topics, tags, article_tags, project_tags, timeline_entries, timeline_technologies, analytics_events, plus the GitHub tables.
+RLS on every table. Public reads published content only. Admin gets appropriate CRUD. Analytics, GitHub credentials, sync logs, and (where appropriate) revisions are private.
+
+## Analytics
+Track one thing: unique portfolio visitors (optionally visitors over time), stored in `analytics_events` using the supplied privacy-preserving visitor ID design. Never store IPs, full user agents, PII, or full referrer URLs. No large dashboard.
+
+## GitHub
+Connect https://github.com/Aakif9866 and populate repo info from the API (don't hand-copy metadata). Key repos: Agentic-AI, Karma-Farming-Autobot, Local-Devops-Assistant, Rwap, ChatWithSherlock, PULSEIQ, MiniStore, WildCity, Doorman, Django-Unchained, information-Retrieval-System, mern-blog. These are source material only; don't invent capabilities.
+Separate auto-synced GitHub metadata from my curated presentation (feature, hide, assign to project, order, choose display fields). Key everything on GitHub's numeric repo ID, never the name.
+
+## V1 acceptance criteria (all must be true)
+Homepage, light and dark mode, responsive layouts, and animations work; admin login and CRUD work; draft/published states work; RLS works; case studies, Markdown, diagrams, GitHub data, visitor counting, articles, and experience work; no fake functionality; production build, lint, typecheck, and tests all pass.
+
+# V2 - ENGINEERING UPGRADE (only after V1 is stable)
+1. CI/CD: GitHub Actions on PR: install -> lint -> typecheck -> unit -> E2E -> build. Deploy only after required checks pass. Don't claim deployment automation unless the workflow actually deploys.
+2. Testing: unit tests (business logic/utilities), integration tests (Supabase where practical), Playwright E2E covering: visitor flow (home -> projects -> case study -> GitHub); admin flow (login -> create -> draft -> publish -> edit -> verify public page); security (anon can't reach admin, anon can't read drafts, non-admin can't modify content). Include RLS tests.
+3. Security: headers, CSP, secure cookies, server-side authorization, input validation, rate limiting, protected privileged routes, secret protection. Nothing decorative.
+4. GitHub sync engine: scheduled + manual sync, retries, rate-limit awareness, sync status, error logging, idempotent upserts, last-successful-sync, results recorded in `github_syncs`. Failed syncs must be visible to the admin. Make it genuinely incremental (use timestamps/sync state, skip unchanged data) or don't call it incremental. Scheduled sync only if scheduling infrastructure is configured.
+5. Observability: use an established error-monitoring tool; track server errors, failed syncs, failed admin operations, unexpected API errors. Don't build a platform.
+6. Performance: measure Lighthouse, Core Web Vitals, server response time, query performance, bundle size; fix real bottlenecks only (Server Components, caching, image optimization, dynamic imports, pagination, indexes where justified). No "highly optimized" claims without data.
+7. Database engineering: review indexes, FKs, query patterns, RLS performance, N+1s with EXPLAIN where useful. No blind indexes.
+8. Caching: only with measurable benefit and correct invalidation; prefer built-in Next.js/Supabase mechanisms over Redis unless justified.
+9. Error handling: loading, error, empty, and success states on key flows; admin can tell succeeded / failed / partially succeeded; no swallowed errors.
+10. Validation: schema validation (e.g. Zod) for admin forms, project data, article metadata, GitHub responses, analytics payloads. Never trust external data.
+11. Docs: ARCHITECTURE.md (system, frontend, DB, auth, RLS, GitHub, analytics, deployment, testing), SECURITY.md (auth, authorization, RLS, secrets, analytics privacy, GitHub credentials, security testing), DECISIONS.md (non-trivial decisions only, e.g. why Supabase, PostgreSQL, RLS, Next.js, server-side sync, no Redis, Markdown, JSONB diagrams). Must match the actual implementation.
+12. Case study upgrades for selected projects: real architecture diagram, data flow, security, performance (measured), testing, tradeoffs, failure modes, lessons.
+13. Interview Notes per major project, with answers grounded in the actual implementation (e.g. why PostgreSQL, how RLS protects data, how sync avoids duplicates, how auth differs from authorization). No generic textbook answers.
+14. Metrics: only real ones (coverage, latency, load-test, repo activity, Lighthouse); otherwise "Not measured" or omit.
+15. Deployment docs: describe only the real deployment pipeline; don't claim AWS/Vercel/etc. unless used.
+
+## V2 acceptance criteria
+PR checks pass in CI; unit and E2E tests run; RLS/security tests run; manual GitHub sync works and failed syncs are recorded; performance is measured; real errors are detectable; docs match the code; invalid data is rejected; important failures are visible to users/admin.
+
+# FINAL REVIEW (before declaring done)
+Review from four perspectives and report findings honestly:
+1. Recruiter: in 30 seconds, who I am, what I build, my stack, where I worked, my projects.
+2. Senior engineer: within minutes, architecture, DB decisions, security, testing, integrations, tradeoffs, production thinking.
+3. UI/UX designer: consistent spacing/type/color, excellent light and dark modes, subtle motion, good responsive behavior, meaningful hovers, no clutter.
+4. Interviewer: does the site naturally prompt questions (why RLS, how does sync work, how are drafts protected, how did you test it, what did you measure)?
+
+Principle: simple to understand, deep when explored, beautiful without being flashy, sophisticated without being over-engineered. Everything visible on the site must correspond to something real in the codebase. Optimize for "this person can actually build software," not for a screenshot.
+
+# START NOW
+Begin with the Phase 0 repo audit and planning output only. Do not write feature code until I approve the plan.
