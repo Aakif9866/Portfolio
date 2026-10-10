@@ -47,7 +47,12 @@ export type DiagramNode = { id: string; label: string; tech?: string; x: number;
 export type DiagramEdge = { from: string; to: string; label?: string };
 export type Diagram = {
   id: string; project_id: string; title: string; description: string | null;
-  nodes: DiagramNode[]; edges: DiagramEdge[]; position: number;
+  nodes: DiagramNode[]; edges: DiagramEdge[]; position: number; image_url?: string | null;
+};
+
+export type Milestone = {
+  id: string; project_id: string; label: string; title: string; body_md: string | null;
+  occurred_on: string | null; reference_url: string | null; position: number;
 };
 
 export const SECTION_ORDER = [

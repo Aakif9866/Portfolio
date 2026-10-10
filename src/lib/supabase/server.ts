@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 /** Request-scoped client. Carries the user's session, so RLS applies. */
@@ -28,4 +29,13 @@ export function supabasePublic() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { cookies: { getAll: () => [], setAll: () => {} } },
   );
+}
+
+/**
+ * service_role client — bypasses RLS. Server-only, no cookies, no session.
+ * The one deliberate exception to "no public writes": the visit counter in
+ * middleware runs with no signed-in user, so it has to go around RLS.
+ */
+export function supabaseService() {
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 }

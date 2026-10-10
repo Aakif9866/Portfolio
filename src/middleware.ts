@@ -1,9 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { recordVisit } from "@/lib/visits";
 
 /** Refreshes the Supabase session cookie and bounces anon users off /admin. */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
+
+  // Real navigations only: not admin/login, not a Link prefetch.
+  const { pathname } = request.nextUrl;
+  if (!pathname.startsWith("/admin") && pathname !== "/login" && !request.headers.get("next-router-prefetch")) {
+    await recordVisit();
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +28,6 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin") && !user) {
     const url = request.nextUrl.clone();

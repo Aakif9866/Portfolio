@@ -5,7 +5,9 @@ import { SiteConfigRow } from "./row";
 export default async function AdminSettings() {
   const { supabase } = await requireAdmin();
   const { data } = await supabase.from("site_config").select("*").order("group").order("position");
-  const rows = (data ?? []) as { key: string; value: string | null; label: string | null; description: string | null; group: string | null; position: number }[];
+  // visit_count is internal bookkeeping for the visit counter, not public copy — keep it off this page.
+  const rows = ((data ?? []) as { key: string; value: string | null; label: string | null; description: string | null; group: string | null; position: number }[])
+    .filter((r) => r.key !== "visit_count");
 
   const groups = [...new Set(rows.map((r) => r.group ?? "general"))];
 

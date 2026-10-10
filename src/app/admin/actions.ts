@@ -206,6 +206,43 @@ export async function restoreRevision(formData: FormData): Promise<ActionResult>
   return saveArticle(fd);
 }
 
+/**
+ * project_technologies is a pure join table (project_id, technology_id) with
+ * no `id` column, so it can't go through saveRow/deleteRow's `.eq("id", …)`.
+ */
+export async function addProjectTech(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const project_id = String(formData.get("project_id") ?? "");
+  const technology_id = String(formData.get("technology_id") ?? "");
+  if (!project_id || !technology_id) return { ok: false, message: "Pick a technology." };
+
+  const { error } = await supabase
+    .from("project_technologies")
+    .upsert({ project_id, technology_id }, { onConflict: "project_id,technology_id" });
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/projects");
+  revalidatePath("/system");
+  return { ok: true, message: "Tagged." };
+}
+
+export async function removeProjectTech(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const project_id = String(formData.get("project_id") ?? "");
+  const technology_id = String(formData.get("technology_id") ?? "");
+
+  const { error } = await supabase
+    .from("project_technologies")
+    .delete()
+    .eq("project_id", project_id)
+    .eq("technology_id", technology_id);
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/projects");
+  revalidatePath("/system");
+  return { ok: true, message: "Untagged." };
+}
+
 export async function signOut() {
   const { supabase } = await requireAdmin();
   await supabase.auth.signOut();

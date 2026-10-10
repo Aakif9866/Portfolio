@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { saveRow } from "../actions";
 import { NewRowPanel, RowActions, StateChip, type Field } from "../ui";
-import type { Project } from "@/lib/types";
+import { TechTags } from "./tech-tags";
+import type { Project, Technology } from "@/lib/types";
 
 const FIELDS: Field[] = [
   { name: "title", label: "Title", type: "text" },
@@ -23,14 +25,27 @@ const FIELDS: Field[] = [
 
 export default async function AdminProjects() {
   const { supabase } = await requireAdmin();
-  const { data, error } = await supabase.from("projects").select("*").order("position");
+  const [{ data, error }, { data: techRows }, { data: linkRows }] = await Promise.all([
+    supabase.from("projects").select("*").order("position"),
+    supabase.from("technologies").select("*").order("category").order("position"),
+    supabase.from("project_technologies").select("project_id, technology_id"),
+  ]);
   const projects = (data ?? []) as Project[];
+  const allTech = (techRows ?? []) as Technology[];
+  const techById = Object.fromEntries(allTech.map((t) => [t.id, t]));
+  const taggedIdsByProject: Record<string, string[]> = {};
+  for (const l of (linkRows ?? []) as { project_id: string; technology_id: string }[]) {
+    (taggedIdsByProject[l.project_id] ??= []).push(l.technology_id);
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-[26px] font-semibold tracking-tight">Projects</h1>
-        <p className="mt-1.5 text-[13.5px] text-muted">{projects.length} rows. Drafts are invisible to anonymous visitors.</p>
+        <p className="mt-1.5 text-[13.5px] text-muted">
+          {projects.length} rows. Drafts are invisible to anonymous visitors. Technology not
+          listed yet? <Link href="/admin/technologies" className="text-accent hover:underline">Add it here</Link> first.
+        </p>
       </div>
 
       {error && <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3.5 py-2.5 text-[13px] text-rose-500">{error.message}</p>}
@@ -51,6 +66,15 @@ export default async function AdminProjects() {
               </div>
             </div>
             <p className="mt-2.5 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{p.thesis}</p>
+
+            <div className="mt-4 border-t border-line pt-3.5">
+              <TechTags
+                projectId={p.id}
+                tagged={(taggedIdsByProject[p.id] ?? []).map((id) => techById[id]).filter(Boolean)}
+                available={allTech.filter((t) => !(taggedIdsByProject[p.id] ?? []).includes(t.id))}
+              />
+            </div>
+
             <div className="mt-4 border-t border-line pt-3.5">
               <RowActions table="projects" row={p as unknown as Record<string, unknown>} fields={FIELDS} action={saveRow} />
             </div>

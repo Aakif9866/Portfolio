@@ -4,7 +4,7 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://avatars.githubusercontent.com https://opengraph.githubassets.com",
+  "img-src 'self' data: https:",
   "font-src 'self'",
   `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} https://api.github.com`,
   "frame-ancestors 'none'",

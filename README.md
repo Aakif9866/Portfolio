@@ -28,6 +28,8 @@ Required env (`.env.local`):
 ```
 Browser
   │
+  ├─ every request ──── middleware ──► service-role client ──► +1 site_config.visit_count
+  │
   ├─ public routes ──── Server Components ──► anon Supabase client ──► Postgres
   │                     ISR, revalidate 300                             │
   │                                                                  RLS: state = 'published'
@@ -75,7 +77,7 @@ Schema already existed in Supabase; this app was written against it rather than 
 | `projects` | case studies, with `state` (draft/published/archived) and ordering |
 | `project_sections` | 17 canonical section kinds; only `published` ones render, in canonical order |
 | `project_milestones` | dated timeline entries per project |
-| `architecture_diagrams` | `nodes`/`edges` JSONB, rendered as an interactive SVG |
+| `architecture_diagrams` | `nodes`/`edges` JSONB rendered as an interactive SVG, plus an optional `image_url` (a pasted screenshot — click to open full size) |
 | `technologies` + `project_technologies` | the `/system` page and per-project tech lists |
 | `articles` + `article_revisions` | notes; every save snapshots the previous body |
 | `experiments` | `/lab`; failed and abandoned experiments stay published |
@@ -93,6 +95,10 @@ Schema already existed in Supabase; this app was written against it rather than 
   snapshots — restore is undoable.
 - **Diagrams degrade to an ordered list under 768px.** A 900px canvas is unreadable on a
   phone and pinch-zoom is not a design.
+- **A diagram image is independent of the node graph.** Either alone is enough to render
+  something; both can coexist (image above, interactive graph below). Clicking the image
+  opens it full size in a lightbox, since a pasted screenshot is usually much larger than
+  the card it's shown in.
 
 ## Design system
 
@@ -105,15 +111,45 @@ flash.
 Motion is CSS-only: `IntersectionObserver` adds a class, `prefers-reduced-motion` disables
 all of it. No animation library.
 
-## What is deliberately not here
+## Visit counter
 
-- **Analytics.** The visitor-counting design needs an `analytics_events` table that does
-  not exist in this Supabase project. Rather than ship a dashboard with no data behind it,
-  there is none.
-- **GitHub sync.** Same reason — the `github_*` tables are not in the schema. Repository
-  links are plain links.
-- **CI/CD, E2E tests, error monitoring.** V2 items in the brief, not built. The security
-  check script is real and runs; nothing here claims test coverage it does not have.
+The only metric this site tracks is a single number: total page views. It is one row in the
+existing `site_config` table (`key = 'visit_count'`) — no `analytics_events` table, no
+per-visitor identity, no IP or user-agent stored, nothing to leak, and no third-party service
+with its own quota to hit. `middleware.ts` increments it with the service_role client (the one
+deliberate exception to "no public writes") on every real navigation — admin, login and
+Link-prefetch requests are excluded. The admin dashboard and public footer both just read the
+same row. The increment is read-then-write, not atomic, which can drop a count under
+concurrent hits; fine at portfolio traffic, and the fix if that ever changes is a Postgres
+RPC, not a new service.
 
-Empty tables produce an honest empty state that says the page is wired to the database,
-rather than placeholder content.
+## Status
+
+### Done
+
+- **Full admin CMS** — every table has a working editor: projects, case-study sections (17
+  canonical kinds), technologies, per-project technology tagging (add/remove, free-form),
+  articles with revision history, experiments, experience, architecture diagrams (JSON
+  graph and/or a pasted image, both editable and addable from `/admin/diagrams`), project
+  milestones, and site copy. Nothing here is read-only or needs a direct database edit.
+- **Visit counter** — one number, one `site_config` row, no third-party analytics service.
+- **Public filtering** — `/projects` filters by technology tag via a plain `?tech=` query
+  param link, built from real per-project tags.
+- **Real content** — 9 projects and 7 experiments, written from each project's actual
+  README/docs (test counts, security findings, honest "not yet verified" sections carried
+  over, not invented). Empty tables (where a project genuinely has none of a given section)
+  still produce an honest empty state rather than placeholder copy.
+
+### What's next
+
+- **GitHub sync.** The `github_*` tables are not in the schema. Repository links are plain
+  links, not live stars/activity.
+- **CI/CD, E2E tests, error monitoring.** V2 items in the original brief, not built. The
+  security check script is real and runs; nothing here claims test coverage it does not
+  have.
+- **Image uploads.** Diagram images are pasted URLs (e.g. uploaded once to Supabase
+  Storage) rather than a file-picker in the admin — fine for occasional use, would need a
+  real upload widget if this becomes a frequent workflow.
+- A few of the thinner-README projects (Karma Farming Autobot, MiniStore, RWAP) have
+  lighter write-ups than the deeply-documented ones (PulseIQ, Klyro, ChatWithSherlock,
+  Groundtruth) simply because their source repos had less to draw from.

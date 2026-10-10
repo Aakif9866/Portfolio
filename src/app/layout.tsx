@@ -3,6 +3,7 @@ import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { supabasePublic } from "@/lib/supabase/server";
+import { getVisitCount } from "@/lib/visits";
 
 export const metadata: Metadata = {
   title: { default: "Aakif — Software Engineer", template: "%s · Aakif" },
@@ -40,7 +41,7 @@ async function searchIndex() {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const items = await searchIndex();
+  const [items, visits] = await Promise.all([searchIndex(), getVisitCount()]);
   return (
     <html lang="en" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <Nav searchItems={items} />
         <main id="main">{children}</main>
-        <Footer />
+        <Footer visits={visits} />
       </body>
     </html>
   );

@@ -7,7 +7,7 @@ type Action = (fd: FormData) => Promise<ActionResult>;
 
 /* ── field descriptors ───────────────────────────────────────────────────── */
 export type Field =
-  | { name: string; label: string; type: "text" | "url" | "date" | "number" }
+  | { name: string; label: string; type: "text" | "url" | "date" | "number"; hint?: string }
   | { name: string; label: string; type: "textarea"; rows?: number; hint?: string }
   | { name: string; label: string; type: "markdown"; rows?: number; hint?: string }
   | { name: string; label: string; type: "json"; rows?: number; hint?: string }

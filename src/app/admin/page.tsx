@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
+import { getVisitCount } from "@/lib/visits";
 
 const CARDS = [
   { table: "projects", label: "Projects", href: "/admin/projects", accent: "#a855f7" },
   { table: "project_sections", label: "Case study sections", href: "/admin/sections", accent: "#38bdf8" },
+  { table: "architecture_diagrams", label: "Architecture diagrams", href: "/admin/diagrams", accent: "#818cf8" },
+  { table: "project_milestones", label: "Milestones", href: "/admin/milestones", accent: "#a3e635" },
   { table: "technologies", label: "Technologies", href: "/admin/technologies", accent: "#fbbf24" },
   { table: "articles", label: "Articles", href: "/admin/articles", accent: "#34d399" },
   { table: "experiments", label: "Experiments", href: "/admin/lab", accent: "#f43f5e" },
@@ -12,6 +15,7 @@ const CARDS = [
 
 export default async function Dashboard() {
   const { supabase, user } = await requireAdmin();
+  const visits = await getVisitCount();
 
   const counts = await Promise.all(
     CARDS.map(async (c) => {
@@ -30,6 +34,14 @@ export default async function Dashboard() {
         <h1 className="text-[26px] font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-1.5 text-[13.5px] text-muted">
           Signed in as {user.email}. Every write below goes through row-level security as this user.
+        </p>
+      </div>
+
+      <div className="card ring-grad rounded-2xl p-5">
+        <p className="text-[13px] text-muted">Site visits</p>
+        <p className="mt-1 text-[28px] font-semibold tracking-tight">{visits.toLocaleString()}</p>
+        <p className="mt-1 font-mono text-[11.5px] text-faint">
+          site_config.visit_count, +1 per real page view
         </p>
       </div>
 

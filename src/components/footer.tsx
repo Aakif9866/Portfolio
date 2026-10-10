@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Footer() {
+export function Footer({ visits }: { visits: number }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin") || pathname === "/login") return null;
   return (
@@ -39,7 +39,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[12.5px] text-faint">
           <p>© {new Date().getFullYear()} Aakif. Next.js · Supabase · Tailwind CSS.</p>
-          <p className="font-mono">Content served from PostgreSQL with row-level security.</p>
+          <p className="font-mono">{visits.toLocaleString()} visits · content served from PostgreSQL with row-level security.</p>
         </div>
       </div>
     </footer>

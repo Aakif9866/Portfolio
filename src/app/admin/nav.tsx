@@ -9,6 +9,8 @@ const GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
     links: [
       { href: "/admin/projects", label: "Projects" },
       { href: "/admin/sections", label: "Case study sections" },
+      { href: "/admin/diagrams", label: "Architecture diagrams" },
+      { href: "/admin/milestones", label: "Milestones" },
       { href: "/admin/technologies", label: "Technologies" },
       { href: "/admin/articles", label: "Articles" },
       { href: "/admin/lab", label: "Experiments" },
