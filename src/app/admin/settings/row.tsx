@@ -1,47 +1,48 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useId, useState } from "react";
 import type { ActionResult } from "../actions";
+import { BTN, Banner, INPUT } from "../ui";
 
-type Row = { key: string; value: string | null; label: string | null; description: string | null };
+type Setting = { key: string; label: string; group: string; multiline: boolean; usedOn: string; help: string };
 
-export function SiteConfigRow({ row, action }: { row: Row; action: (fd: FormData) => Promise<ActionResult> }) {
-  const [result, submit, pending] = useActionState(
-    async (_p: ActionResult | null, fd: FormData) => action(fd),
-    null,
-  );
-
-  const long = (row.value ?? "").length > 90;
+export function SiteConfigRow({
+  setting, value, exists, action,
+}: { setting: Setting; value: string; exists: boolean; action: (fd: FormData) => Promise<ActionResult> }) {
+  const id = useId();
+  const [dirty, setDirty] = useState(false);
+  const [result, submit, pending] = useActionState(async (_p: ActionResult | null, fd: FormData) => {
+    const r = await action(fd);
+    if (r.ok) setDirty(false);
+    return r;
+  }, null);
 
   return (
-    <form action={submit} className="card rounded-xl p-4">
+    <form action={submit} onInput={() => setDirty(true)} className="card rounded-xl p-5">
       {/* site_config is keyed on `key`, not an id — upsert by primary key. */}
       <input type="hidden" name="__table" value="site_config" />
-      <input type="hidden" name="key" value={row.key} />
+      <input type="hidden" name="key" value={setting.key} />
+      <input type="hidden" name="label" value={setting.label} />
+      <input type="hidden" name="group" value={setting.group} />
 
-      <label htmlFor={row.key} className="block text-[13px] font-medium">
-        {row.label ?? row.key}
-        <span className="ml-2 font-mono text-[11px] font-normal text-faint">{row.key}</span>
-      </label>
-      {row.description && <p className="mt-1 text-[12px] text-muted">{row.description}</p>}
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <label htmlFor={id} className="text-[14px] font-medium">{setting.label}</label>
+        <span className="text-[12.5px] text-muted">Shown on: {setting.usedOn}</span>
+      </div>
+      <p id={`${id}-help`} className="mt-1 text-[12.5px] text-muted">
+        {setting.help}{!exists && " Not set yet — the built-in default is in use."}
+      </p>
 
-      {long ? (
-        <textarea id={row.key} name="value" defaultValue={row.value ?? ""} rows={6}
-          className="mt-2 w-full rounded-lg border border-line bg-surface px-3 py-2 font-mono text-[12.5px] text-ink outline-none focus:border-accent" />
+      {setting.multiline ? (
+        <textarea id={id} name="value" defaultValue={value} rows={10} aria-describedby={`${id}-help`} className={`${INPUT} mt-2.5 font-mono text-[13px]`} />
       ) : (
-        <input id={row.key} name="value" defaultValue={row.value ?? ""}
-          className="mt-2 w-full rounded-lg border border-line bg-surface px-3 py-2 text-[13.5px] text-ink outline-none focus:border-accent" />
+        <input id={id} name="value" defaultValue={value} aria-describedby={`${id}-help`} type={setting.key === "contact.email" ? "email" : "url"} className={`${INPUT} mt-2.5`} />
       )}
 
-      <div className="mt-3 flex items-center gap-3">
-        <button disabled={pending} className="rounded-lg bg-ink px-3.5 py-1.5 text-[12.5px] font-medium text-page transition-opacity hover:opacity-85 disabled:opacity-50">
-          {pending ? "Saving…" : "Save"}
-        </button>
-        {result && (
-          <span className={`text-[12.5px] ${result.ok ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-            {result.message}
-          </span>
-        )}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button disabled={pending} className={BTN.primary}>{pending ? "Saving…" : "Save"}</button>
+        {dirty && !pending && <span className="text-[12.5px] text-amber-600 dark:text-amber-400">Unsaved changes</span>}
       </div>
+      {result && (!result.ok || !dirty) && <div className="mt-3"><Banner result={result} /></div>}
     </form>
   );
 }

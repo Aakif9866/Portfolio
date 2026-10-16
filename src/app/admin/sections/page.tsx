@@ -1,86 +1,60 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { saveRow } from "../actions";
-import { NewRowPanel, RowActions, StateChip, type Field } from "../ui";
+import { AdminHeader, NewRowPanel, RowActions, StateChip } from "../ui";
+import { projectOptions } from "../checks";
+import { FIELDS } from "@/lib/admin-fields";
 import { SECTION_ORDER, SECTION_LABEL } from "@/lib/types";
 import type { Project, ProjectSection } from "@/lib/types";
-
-function fields(projects: Project[]): Field[] {
-  return [
-    { name: "project_id", label: "Project", type: "select", options: projects.map((p) => p.id) },
-    { name: "kind", label: "Section", type: "select", options: SECTION_ORDER },
-    { name: "heading", label: "Custom heading", type: "text" },
-    { name: "position", label: "Position", type: "number" },
-    { name: "body_md", label: "Body", type: "markdown", rows: 16, hint: "markdown — headings, lists, code fences, tables" },
-  ];
-}
 
 export default async function AdminSections() {
   const { supabase } = await requireAdmin();
   const [{ data: projectRows }, { data: sectionRows }] = await Promise.all([
-    supabase.from("projects").select("*").order("position"),
+    supabase.from("projects").select("id, title").order("position"),
     supabase.from("project_sections").select("*").order("position"),
   ]);
-
-  const projects = (projectRows ?? []) as Project[];
+  const projects = (projectRows ?? []) as Pick<Project, "id" | "title">[];
   const sections = (sectionRows ?? []) as ProjectSection[];
-  const title = Object.fromEntries(projects.map((p) => [p.id, p.title]));
-  const F = fields(projects);
+  const options = projectOptions(projects);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[26px] font-semibold tracking-tight">Case study sections</h1>
-        <p className="mt-1.5 text-[13.5px] text-muted">
-          {sections.length} sections across {projects.length} projects. Only{" "}
-          <span className="font-mono">published</span> sections render, and they render in canonical
-          order regardless of insert order.
-        </p>
-      </div>
-
-      <div className="card rounded-2xl p-5">
-        <p className="text-[13px] text-muted">
-          Project ids for the dropdown:{" "}
-          {projects.map((p) => (
-            <span key={p.id} className="mr-3 inline-block font-mono text-[11.5px] text-faint">
-              {p.title} = {p.id.slice(0, 8)}…
-            </span>
-          ))}
-        </p>
-      </div>
-
-      <NewRowPanel table="project_sections" fields={F} action={saveRow} label="New section" />
+      <AdminHeader
+        title="Case-study sections"
+        description="Every project's write-up sections in one place. It's usually easier to edit them inside a project — use “Open project”."
+      />
+      <NewRowPanel table="project_sections" fields={FIELDS.project_sections} projects={options} action={saveRow} label="Add a section" />
 
       {projects.map((p) => {
         const mine = sections
           .filter((s) => s.project_id === p.id)
           .sort((a, b) => SECTION_ORDER.indexOf(a.kind as never) - SECTION_ORDER.indexOf(b.kind as never));
         return (
-          <section key={p.id}>
-            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-faint">
-              {p.title} <span className="font-mono font-normal">{mine.length}</span>
-            </h2>
+          <section key={p.id} aria-labelledby={`p-${p.id}`}>
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id={`p-${p.id}`} className="text-[15px] font-semibold">{p.title} <span className="font-normal text-muted">· {mine.length}</span></h2>
+              <Link href={`/admin/projects/${p.id}?tab=case-study`} className="text-[13px] text-accent hover:underline">Open project</Link>
+            </div>
             {mine.length === 0 ? (
-              <p className="mt-2 text-[13px] text-faint">No sections — this case study renders only its header.</p>
+              <p className="mt-2 text-[13.5px] text-muted">No sections yet.</p>
             ) : (
               <ul className="mt-3 space-y-2">
                 {mine.map((s) => (
                   <li key={s.id} className="card rounded-xl p-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[14.5px] font-medium">{s.heading ?? SECTION_LABEL[s.kind] ?? s.kind}</span>
                       <StateChip state={s.state} />
-                      <span className="font-mono text-[11px] text-faint">{s.kind} · pos {s.position}</span>
                     </div>
-                    <p className="mt-2 line-clamp-2 font-mono text-[11.5px] leading-relaxed text-faint">
-                      {s.body_md?.slice(0, 180) ?? "empty"}
-                    </p>
+                    <p className="mt-1.5 line-clamp-1 text-[13px] text-muted">{s.body_md?.trim() || "No content yet."}</p>
                     <div className="mt-3 border-t border-line pt-3">
                       <RowActions
                         table="project_sections"
-                        row={{ ...s, title: s.heading ?? s.kind } as unknown as Record<string, unknown>}
-                        fields={F}
+                        row={{ ...s, title: s.heading ?? SECTION_LABEL[s.kind] } as unknown as Record<string, unknown>}
+                        fields={FIELDS.project_sections}
+                        projects={options}
                         action={saveRow}
-                        states={["draft", "published", "hidden"]}
                         scope={{ col: "project_id", val: p.id }}
+                        reorderable={false}
                       />
                     </div>
                   </li>

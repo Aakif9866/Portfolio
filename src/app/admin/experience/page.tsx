@@ -1,57 +1,53 @@
 import { requireAdmin } from "@/lib/auth";
 import { saveRow } from "../actions";
-import { NewRowPanel, RowActions, StateChip, type Field } from "../ui";
+import { AdminHeader, ListFilter, NewRowPanel, RowActions, StateChip } from "../ui";
+import { FIELDS } from "@/lib/admin-fields";
 import type { TimelineEntry } from "@/lib/types";
 
-const FIELDS: Field[] = [
-  { name: "title", label: "Role / qualification", type: "text" },
-  { name: "organisation", label: "Organisation", type: "text" },
-  { name: "kind", label: "Kind", type: "select", options: ["work", "education"] },
-  { name: "employment_type", label: "Employment type", type: "text", },
-  { name: "location", label: "Location", type: "text" },
-  { name: "start_date", label: "Start date", type: "date" },
-  { name: "end_date", label: "End date", type: "date" },
-  { name: "url", label: "Organisation URL", type: "url" },
-  { name: "position", label: "Position", type: "number" },
-  { name: "remote", label: "Remote", type: "checkbox" },
-  { name: "bullets", label: "Bullets", type: "lines", rows: 6, hint: "one per line — only what actually happened" },
-];
+const fmt = (s: string | null) => (s ? new Date(s).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : null);
 
-export default async function AdminExperience() {
+export default async function AdminExperience({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; new?: string }> }) {
+  const { q, status, new: isNew } = await searchParams;
   const { supabase } = await requireAdmin();
   const { data } = await supabase.from("timeline_entries").select("*").order("start_date", { ascending: false, nullsFirst: false });
-  const rows = (data ?? []) as TimelineEntry[];
+  const all = (data ?? []) as TimelineEntry[];
+  const needle = q?.trim().toLowerCase();
+  const rows = all.filter((e) => (!status || e.state === status) && (!needle || `${e.title} ${e.organisation}`.toLowerCase().includes(needle)));
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[26px] font-semibold tracking-tight">Experience</h1>
-        <p className="mt-1.5 text-[13.5px] text-muted">
-          {rows.length} rows. /experience is empty until something is published here — it does not
-          invent placeholder roles.
+      <AdminHeader
+        title="Experience"
+        description="Work history and education, shown on the Experience page newest first. Only what actually happened — personal projects belong under Projects."
+      />
+
+      <NewRowPanel table="timeline_entries" fields={FIELDS.timeline_entries} action={saveRow} label="Add work or education" defaultOpen={isNew === "1"} />
+      <ListFilter q={q} status={status} statuses={["published", "draft", "archived"]} />
+
+      {rows.length === 0 ? (
+        <p className="card rounded-2xl px-6 py-10 text-center text-[14px] text-muted">
+          {all.length === 0 ? "Nothing yet. The public Experience page shows a friendly empty state until an entry is published." : "No entries match this filter."}
         </p>
-      </div>
-
-      <NewRowPanel table="timeline_entries" fields={FIELDS} action={saveRow} label="New entry" />
-
-      <ul className="space-y-3">
-        {rows.map((e) => (
-          <li key={e.id} className="card rounded-2xl p-5">
-            <div className="flex items-center gap-2">
-              <h2 className="text-[16px] font-semibold">{e.title}</h2>
-              <StateChip state={e.state} />
-              <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint">{e.kind}</span>
-            </div>
-            <p className="mt-1 text-[13.5px] text-muted">
-              {e.organisation}
-              {e.start_date && <span className="text-faint"> · {e.start_date} → {e.end_date ?? "present"}</span>}
-            </p>
-            <div className="mt-4 border-t border-line pt-3.5">
-              <RowActions table="timeline_entries" row={e as unknown as Record<string, unknown>} fields={FIELDS} action={saveRow} />
-            </div>
-          </li>
-        ))}
-      </ul>
+      ) : (
+        <ul className="space-y-3">
+          {rows.map((e) => (
+            <li key={e.id} className="card rounded-2xl p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-[16px] font-semibold">{e.title}</h2>
+                <StateChip state={e.state} />
+                <span className="rounded-full bg-raised px-2 py-0.5 text-[12px] text-muted">{e.kind === "education" ? "Education" : "Work"}</span>
+              </div>
+              <p className="mt-1.5 text-[14px] text-muted">
+                {e.organisation}
+                {e.start_date && <> · {fmt(e.start_date)} – {fmt(e.end_date) ?? "present"}</>}
+              </p>
+              <div className="mt-4 border-t border-line pt-3.5">
+                <RowActions table="timeline_entries" row={e as unknown as Record<string, unknown>} fields={FIELDS.timeline_entries} action={saveRow} reorderable={false} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

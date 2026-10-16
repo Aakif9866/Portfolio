@@ -35,7 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-8 px-5 py-8">
+      <div className="mx-auto max-w-7xl px-5 py-8 lg:flex lg:gap-8">
         <AdminNav />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
