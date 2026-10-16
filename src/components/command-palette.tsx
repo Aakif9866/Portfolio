@@ -46,11 +46,12 @@ export function CommandPalette({ items }: { items: Item[] }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="hidden items-center gap-2 rounded-full border border-line bg-card px-3 py-1.5 text-[12.5px] text-faint transition-colors hover:text-muted lg:flex"
+        aria-label="Search the site"
+        className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:text-ink lg:flex lg:h-auto lg:w-auto lg:items-center lg:gap-2 lg:px-3 lg:py-1.5 lg:text-[12.5px] lg:text-faint lg:hover:text-muted"
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-        Search
-        <kbd className="ml-1 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px]">⌘K</kbd>
+        <span className="hidden lg:inline">Search</span>
+        <kbd className="ml-1 hidden rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] lg:inline">⌘K</kbd>
       </button>
 
       {open && (
@@ -63,7 +64,8 @@ export function CommandPalette({ items }: { items: Item[] }) {
                 autoFocus
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Jump to a project, article or page…"
+                aria-label="Search projects, experiments, articles, technologies and pages"
+                placeholder="Search projects, experiments, technologies…"
                 className="w-full bg-transparent py-3.5 text-[15px] text-ink outline-none placeholder:text-faint"
               />
               <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-faint">esc</kbd>
@@ -77,7 +79,7 @@ export function CommandPalette({ items }: { items: Item[] }) {
                     onClick={() => { setOpen(false); router.push(r.href); }}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${i === cursor ? "bg-raised" : ""}`}
                   >
-                    <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint w-16 shrink-0">{r.group}</span>
+                    <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint w-20 shrink-0">{r.group}</span>
                     <span className="flex-1 truncate text-[14px] text-ink">{r.label}</span>
                     {r.hint && <span className="shrink-0 text-[12px] text-faint">{r.hint}</span>}
                   </button>

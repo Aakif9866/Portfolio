@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
-  if (pathname === "/login" && user) {
+  // A signed-in user on /login goes to /admin — unless /admin just sent them
+  // back here as not allowlisted (?error=…); redirecting again would loop forever.
+  if (pathname === "/login" && user && !request.nextUrl.searchParams.has("error")) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.search = "";

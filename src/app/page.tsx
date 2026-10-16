@@ -4,21 +4,24 @@ import { ProjectCard } from "@/components/project-card";
 import { publishedProjects, techByProject, allTechnologies } from "@/lib/queries";
 import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
-import type { Experiment, TimelineEntry } from "@/lib/types";
+import type { Experiment } from "@/lib/types";
+import { EXPERIMENT_STATUS } from "@/lib/labels";
+import { StatusPill } from "@/components/project-card";
+import { getContact } from "@/lib/contact";
 
 export const revalidate = 300;
 
 export default async function Home() {
   const sb = supabasePublic();
-  const [projects, tech, labRes, workRes] = await Promise.all([
+  const [projects, tech, labRes, contact] = await Promise.all([
     publishedProjects(),
     allTechnologies(),
-    sb.from("experiments").select("*").eq("state", "published").order("position").limit(3),
-    sb.from("timeline_entries").select("*").eq("state", "published").eq("kind", "work").order("start_date", { ascending: false }).limit(2),
+    sb.from("experiments").select("*", { count: "exact" }).eq("state", "published").order("position").limit(3),
+    getContact(),
   ]);
   const techMap = await techByProject(projects.map((p) => p.id));
   const lab = (labRes.data ?? []) as Experiment[];
-  const work = (workRes.data ?? []) as TimelineEntry[];
+  const labCount = labRes.count ?? lab.length;
 
   const featured = projects.filter((p) => p.featured).slice(0, 4);
   const counts = TECH_GROUPS.map((g) => ({ ...g, n: tech.filter((t) => t.category === g.key).length })).filter((g) => g.n > 0);
@@ -55,19 +58,19 @@ export default async function Home() {
 
           <div className="animate-fade-up mt-9 flex flex-wrap items-center gap-3">
             <Link href="/projects" className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
-              Read the case studies
+              View projects
               <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
-            <a href="mailto:aakif9866@gmail.com" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
-              aakif9866@gmail.com
+            <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+              {contact.email}
             </a>
           </div>
 
           <dl className="animate-fade-up mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
             {[
-              { k: "Case studies", v: String(projects.length) },
+              { k: "Projects", v: String(projects.length) },
               { k: "Technologies", v: String(tech.length) },
-              { k: "Experiments", v: String(lab.length ? lab.length : 0) + "+" },
+              { k: "Experiments", v: String(labCount) },
               { k: "Focus", v: "Backend · AI" },
             ].map((s) => (
               <div key={s.k} className="bg-card px-5 py-5">
@@ -85,8 +88,8 @@ export default async function Home() {
           <Reveal>
             <div className="flex items-end justify-between gap-6">
               <div>
-                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">01 — Selected work</p>
-                <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Systems I shipped</h2>
+                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">01 — Featured projects</p>
+                <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Selected case studies</h2>
               </div>
               <Link href="/projects" className="hidden shrink-0 items-center gap-1.5 text-[13.5px] text-muted transition-colors hover:text-ink md:inline-flex">
                 All {projects.length} projects
@@ -104,6 +107,10 @@ export default async function Home() {
               </Reveal>
             ))}
           </div>
+          <Link href="/projects" className="mt-8 inline-flex items-center gap-1.5 text-[13.5px] text-muted transition-colors hover:text-ink md:hidden">
+            All {projects.length} projects
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </Link>
         </div>
       </section>
 
@@ -111,10 +118,11 @@ export default async function Home() {
       <section className="border-t border-line py-24">
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
-            <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Stack</p>
-            <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">What I reach for</h2>
+            <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Tech stack</p>
+            <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Technologies I work with</h2>
             <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
-              {tech.length} technologies, each tied to the project where I actually used it.
+              {tech.length} technologies grouped by where they sit in a system. Each one links to the
+              projects where I actually used it.
             </p>
           </Reveal>
 
@@ -137,21 +145,21 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── lab + experience ── */}
-      {(lab.length > 0 || work.length > 0) && (
-        <section className="border-t border-line bg-surface py-24">
+      {/* ── experiments + contact ── */}
+      <section className="border-t border-line bg-surface py-24">
           <div className="mx-auto grid max-w-6xl gap-14 px-6 lg:grid-cols-2">
             {lab.length > 0 && (
               <Reveal>
-                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">03 — Lab</p>
-                <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">Open experiments</h2>
+                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">03 — Experiments</p>
+                <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">Recent experiments</h2>
+                <p className="mt-3 text-[15px] leading-relaxed text-muted">Smaller tests with a hypothesis written down first — including the ones that failed.</p>
                 <ul className="mt-7 space-y-3">
                   {lab.map((e) => (
                     <li key={e.id}>
                       <Link href={`/lab/${e.slug}`} className="card card-hover group block rounded-xl p-5">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-[15px] font-medium">{e.title}</span>
-                          <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint">{e.status}</span>
+                          <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
                         </div>
                         <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{e.summary}</p>
                       </Link>
@@ -176,19 +184,23 @@ export default async function Home() {
                 section for exactly that conversation.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <a href="mailto:aakif9866@gmail.com" className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
+                <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3 7 9 6 9-6" /></svg>
                   Email me
                 </a>
-                <a href="https://github.com/Aakif9866" target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+                <a href={contact.github} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.88-1.4-3.88-1.4-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.76.4-1.27.73-1.56-2.56-.3-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.48.11-3.08 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.6.23 2.78.12 3.07.74.82 1.18 1.85 1.18 3.11 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .3.2.66.8.55A11.5 11.5 0 0 0 23.5 12A11.5 11.5 0 0 0 12 .5Z" /></svg>
-                  Aakif9866
+                  GitHub
                 </a>
+                {contact.linkedin && (
+                  <a href={contact.linkedin} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+                    LinkedIn
+                  </a>
+                )}
               </div>
             </Reveal>
           </div>
         </section>
-      )}
     </>
   );
 }

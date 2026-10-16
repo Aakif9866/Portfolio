@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { supabasePublic } from "@/lib/supabase/server";
 import { Markdown } from "@/components/markdown";
 import type { Experiment } from "@/lib/types";
+import { StatusPill } from "@/components/project-card";
+import { EXPERIMENT_STATUS, statusLabel } from "@/lib/labels";
 
 export const revalidate = 300;
 
@@ -38,12 +40,15 @@ export default async function ExperimentPage({ params }: { params: Promise<{ slu
         <div className="relative mx-auto max-w-3xl px-6">
           <Link href="/lab" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-            Lab
+            All experiments
           </Link>
           <h1 className="mt-6 text-[clamp(30px,5vw,46px)] font-semibold leading-[1.05] tracking-tightest">{e.title}</h1>
           <p className="mt-5 text-[17px] leading-relaxed text-muted">{e.summary}</p>
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[12px] text-faint">
-            <span>Status: <span className="text-muted uppercase">{e.status}</span></span>
+            <span className="inline-flex items-center gap-2">
+              <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
+              {EXPERIMENT_STATUS[e.status]?.help && <span>{EXPERIMENT_STATUS[e.status].help}</span>}
+            </span>
             {fmt(e.started_on) && <span>Started {fmt(e.started_on)}</span>}
             {fmt(e.ended_on) && <span>Ended {fmt(e.ended_on)}</span>}
             {e.projects && (
@@ -73,7 +78,7 @@ export default async function ExperimentPage({ params }: { params: Promise<{ slu
           </section>
         ) : (
           <p className="card rounded-xl px-6 py-5 text-[13.5px] text-muted">
-            No outcome recorded yet — this experiment is still {e.status}.
+            No outcome recorded yet — this experiment is {statusLabel(EXPERIMENT_STATUS, e.status).toLowerCase()}.
           </p>
         )}
         {e.tags && e.tags.length > 0 && (

@@ -1,22 +1,20 @@
 import Link from "next/link";
 import type { Project } from "@/lib/types";
+import { PROJECT_STATUS, statusLabel } from "@/lib/labels";
 
 const ACCENTS = ["#a855f7", "#38bdf8", "#fbbf24", "#34d399", "#f43f5e", "#22d3ee", "#818cf8", "#a3e635", "#fb923c"];
 export const accentFor = (i: number) => ACCENTS[i % ACCENTS.length];
 
-const STATUS_TONE: Record<string, string> = {
-  active: "#34d399", shipped: "#38bdf8", exploring: "#a855f7", paused: "#fbbf24", archived: "#8a8a93",
-};
-
-export function StatusPill({ status }: { status: string }) {
-  const tone = STATUS_TONE[status] ?? "#8a8a93";
+/** Coloured status badge. Defaults to project lifecycle labels; pass `map` for other vocabularies. */
+export function StatusPill({ status, map = PROJECT_STATUS }: { status: string; map?: Record<string, { label: string; tone: string }> }) {
+  const tone = map[status]?.tone ?? "#8a8a93";
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-wider"
       style={{ color: tone, background: `${tone}18` }}
     >
       <span className="h-1 w-1 rounded-full" style={{ background: tone }} />
-      {status}
+      {statusLabel(map, status)}
     </span>
   );
 }
@@ -59,9 +57,16 @@ export function ProjectCard({
         )}
       </div>
 
-      <span className="relative mt-5 inline-flex items-center gap-1.5 text-[13px] font-medium text-muted transition-colors group-hover:text-ink">
+      <span className="relative mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-medium text-muted">
+        <span className="inline-flex items-center gap-1.5 transition-colors group-hover:text-ink">
         Read the case study
         <svg className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </span>
+        {(project.repo_url || project.demo_url) && (
+          <span className="font-mono text-[11px] font-normal text-faint">
+            {[project.repo_url && "Code", project.demo_url && "Live demo"].filter(Boolean).join(" · ")}
+          </span>
+        )}
       </span>
     </Link>
   );

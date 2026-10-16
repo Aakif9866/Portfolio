@@ -58,6 +58,23 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
   );
   const archIndex = ordered.findIndex((s) => s.kind === "architecture");
 
+  // "On this page" — mirrors exactly what renders below, in the same order.
+  const toc = [
+    ...(tech.length > 0 ? [{ id: "built-with", label: "Built with" }] : []),
+    ...ordered.map((s) => ({ id: s.kind, label: s.heading ?? SECTION_LABEL[s.kind] ?? s.kind })),
+    ...(archIndex === -1 && diagrams.length > 0 ? [{ id: "architecture", label: "Architecture" }] : []),
+    ...(milestones.length > 0 ? [{ id: "milestones", label: "Milestones" }] : []),
+  ];
+  const tocLinks = (
+    <ol className="space-y-1 text-[13.5px]">
+      {toc.map((t) => (
+        <li key={t.id}>
+          <a href={`#${t.id}`} className="block rounded-md px-2.5 py-1.5 text-muted transition-colors hover:bg-raised hover:text-ink">{t.label}</a>
+        </li>
+      ))}
+    </ol>
+  );
+
   const facts = [
     ["Role", project.role],
     ["Team", project.team_size ? `${project.team_size}` : null],
@@ -73,7 +90,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
         <div className="relative mx-auto max-w-4xl px-6">
           <Link href="/projects" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-            All work
+            All projects
           </Link>
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <StatusPill status={project.status} />
@@ -98,7 +115,22 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-14">
+      <div className="mx-auto max-w-6xl px-6 py-14 lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+        {toc.length > 2 && (
+          <nav aria-label="On this page" className="hidden lg:block">
+            <div className="sticky top-24">
+              <p className="px-2.5 font-mono text-[11px] uppercase tracking-wider text-faint">On this page</p>
+              <div className="mt-2">{tocLinks}</div>
+            </div>
+          </nav>
+        )}
+      <div className={`mx-auto max-w-4xl ${toc.length > 2 ? "lg:col-start-2 lg:mx-0" : "lg:col-span-2"}`}>
+        {toc.length > 2 && (
+          <details className="card mb-10 rounded-2xl p-4 lg:hidden">
+            <summary className="cursor-pointer text-[13.5px] font-medium">On this page</summary>
+            <nav aria-label="On this page" className="mt-3">{tocLinks}</nav>
+          </details>
+        )}
         {facts.length > 0 && (
           <dl className="mb-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
             {facts.map(([k, v]) => (
@@ -111,7 +143,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
         )}
 
         {tech.length > 0 && (
-          <section className="mb-14">
+          <section id="built-with" className="mb-14 scroll-mt-24">
             <h2 className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">Built with</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {tech.map((t) => (
@@ -164,7 +196,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
         ))}
 
         {milestones.length > 0 && (
-          <section className="mb-14">
+          <section id="milestones" className="mb-14 scroll-mt-24">
             <h2 className="mb-5 flex items-baseline gap-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
               <span className="h-px w-8 bg-line-strong" />
               Milestones
@@ -184,6 +216,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
             </ol>
           </section>
         )}
+      </div>
       </div>
     </article>
   );

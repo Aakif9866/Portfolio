@@ -7,7 +7,7 @@ import { supabasePublic } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
 import { staleness } from "@/lib/dates";
 
-export const metadata: Metadata = { title: "Writing" };
+export const metadata: Metadata = { title: "Articles" };
 export const revalidate = 300;
 
 export default async function ArticlesPage() {
@@ -19,13 +19,13 @@ export default async function ArticlesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Writing"
-        title="Notes"
-        lede="Technical notes on things I've had to work out properly. Each one records when it was last reviewed and what version it was tested against."
+        eyebrow="Articles"
+        title="Articles"
+        lede="Technical write-ups on things I've had to work out properly. Each one shows when it was last reviewed and what it was tested against, so you can judge whether it's still current."
       />
       <section className="mx-auto max-w-4xl px-6 py-16">
         {articles.length === 0 ? (
-          <Empty what="articles" />
+          <Empty title="No articles published yet." body="Write-ups are on the way. Until then, each project's case study covers the engineering decisions in detail." action={{ href: "/projects", label: "Read the case studies" }} />
         ) : (
           <ul className="divide-y divide-line">
             {articles.map((a, i) => (

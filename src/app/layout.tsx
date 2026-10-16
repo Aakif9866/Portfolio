@@ -4,6 +4,8 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { supabasePublic } from "@/lib/supabase/server";
 import { getVisitCount } from "@/lib/visits";
+import { getContact } from "@/lib/contact";
+import { NAV } from "@/lib/labels";
 
 export const metadata: Metadata = {
   title: { default: "Aakif — Software Engineer", template: "%s · Aakif" },
@@ -27,21 +29,16 @@ async function searchIndex() {
 
   return [
     { label: "Home", href: "/", group: "Page" },
-    { label: "All work", href: "/projects", group: "Page" },
-    { label: "Stack", href: "/system", group: "Page" },
-    { label: "Lab", href: "/lab", group: "Page" },
-    { label: "Writing", href: "/articles", group: "Page" },
-    { label: "Experience", href: "/experience", group: "Page" },
-    { label: "About", href: "/about", group: "Page" },
+    ...NAV.map((n) => ({ label: n.label, href: n.href, group: "Page" })),
     ...(projects.data ?? []).map((p) => ({ label: p.title, href: `/projects/${p.slug}`, group: "Project" })),
     ...(articles.data ?? []).map((a) => ({ label: a.title, href: `/articles/${a.slug}`, group: "Article" })),
-    ...(experiments.data ?? []).map((e) => ({ label: e.title, href: `/lab/${e.slug}`, group: "Lab" })),
+    ...(experiments.data ?? []).map((e) => ({ label: e.title, href: `/lab/${e.slug}`, group: "Experiment" })),
     ...(tech.data ?? []).map((t) => ({ label: t.name, href: `/system#${t.slug}`, group: "Tech", hint: t.category })),
   ];
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [items, visits] = await Promise.all([searchIndex(), getVisitCount()]);
+  const [items, visits, contact] = await Promise.all([searchIndex(), getVisitCount(), getContact()]);
   return (
     <html lang="en" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
@@ -49,9 +46,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-page">
           Skip to content
         </a>
-        <Nav searchItems={items} />
+        <Nav searchItems={items} contact={contact} />
         <main id="main">{children}</main>
-        <Footer visits={visits} />
+        <Footer visits={visits} contact={contact} />
       </body>
     </html>
   );

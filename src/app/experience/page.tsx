@@ -61,12 +61,22 @@ export default async function ExperiencePage() {
 
   return (
     <>
-      <PageHeader eyebrow="Experience" title="Where I've worked" lede="Reverse chronological. Current role first." />
+      <PageHeader
+        eyebrow="Experience"
+        title="Experience"
+        lede="Work history and education, most recent first. Personal projects and experiments are listed separately under Projects and Experiments."
+      />
       <div className="mx-auto max-w-4xl space-y-16 px-6 py-16">
-        {entries.length === 0 && <Empty what="experience entries" />}
+        {entries.length === 0 && (
+          <Empty
+            title="Work history and education will be listed here."
+            body="Nothing is published yet. The projects show what I've built so far, and the About page has my contact details."
+            action={{ href: "/projects", label: "Browse projects" }}
+          />
+        )}
         {work.length > 0 && (
           <section>
-            <h2 className="mb-7 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Work</h2>
+            <h2 className="mb-7 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Work experience</h2>
             <Timeline entries={work} />
           </section>
         )}

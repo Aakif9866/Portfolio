@@ -37,7 +37,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <div className="relative mx-auto max-w-3xl px-6">
           <Link href="/articles" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-            Writing
+            All articles
           </Link>
           <div className="mt-6 flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
             {a.topics && <span className="text-accent">{a.topics.name}</span>}

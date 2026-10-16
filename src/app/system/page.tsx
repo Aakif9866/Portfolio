@@ -7,7 +7,7 @@ import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
 import type { Technology } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Stack" };
+export const metadata: Metadata = { title: "Tech Stack" };
 export const revalidate = 300;
 
 export default async function SystemPage() {
@@ -29,9 +29,9 @@ export default async function SystemPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Stack"
-        title="The system"
-        lede={`${tech.length} technologies, grouped by where they sit in a system. Each one links to the projects where I actually used it — not a skills bar chart.`}
+        eyebrow="Tech Stack"
+        title="Tech Stack"
+        lede={`${tech.length} technologies I've used, grouped by where they sit in a system. Each one lists the projects it was used in — select a project to see how.`}
       />
 
       <div className="mx-auto max-w-6xl px-6 py-14">
