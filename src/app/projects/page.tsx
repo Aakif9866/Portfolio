@@ -35,7 +35,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
               <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Filter by technology</h2>
               <p className="text-[13px] text-muted" aria-live="polite">
                 Showing {filtered.length} of {projects.length} projects{tech ? <> using <span className="font-medium text-ink">{tech}</span></> : null}
-                {tech && <> · <Link href="/projects" className="text-accent hover:underline">Clear filter</Link></>}
+                {tech && <> · <Link href="/projects" className="text-accent underline underline-offset-2">Clear filter</Link></>}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">

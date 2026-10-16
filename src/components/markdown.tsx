@@ -9,6 +9,8 @@ export function Markdown({ children, className = "" }: { children: string; class
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeHighlight, { detect: true, ignoreMissing: true }]]}
         components={{
+          // wide code blocks scroll sideways; tabIndex lets keyboard users scroll them
+          pre: ({ children, node: _node, ...props }) => <pre tabIndex={0} {...props}>{children}</pre>,
           a: ({ href, children }) => (
             <a href={href} target={href?.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
               {children}

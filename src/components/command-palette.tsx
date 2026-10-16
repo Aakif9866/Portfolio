@@ -51,7 +51,7 @@ export function CommandPalette({ items }: { items: Item[] }) {
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         <span className="hidden lg:inline">Search</span>
-        <kbd className="ml-1 hidden rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] lg:inline">⌘K</kbd>
+        <kbd className="ml-1 hidden rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-muted lg:inline">⌘K</kbd>
       </button>
 
       {open && (
@@ -68,7 +68,7 @@ export function CommandPalette({ items }: { items: Item[] }) {
                 placeholder="Search projects, experiments, technologies…"
                 className="w-full bg-transparent py-3.5 text-[15px] text-ink outline-none placeholder:text-faint"
               />
-              <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-faint">esc</kbd>
+              <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-muted">esc</kbd>
             </div>
             <ul className="max-h-[52vh] overflow-y-auto p-2">
               {results.length === 0 && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Nothing matches “{q}”.</li>}

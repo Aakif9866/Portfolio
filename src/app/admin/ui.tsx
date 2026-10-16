@@ -62,7 +62,7 @@ export function StateChip({ state }: { state: string }) {
   const s = PUBLISH_STATE[state];
   const c = s?.tone ?? "#8a8a93";
   return (
-    <span title={s?.help} className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ color: c, background: `${c}1a` }}>
+    <span title={s?.help} className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ color: `color-mix(in oklab, ${c} 50%, var(--ink))`, background: `${c}1a` }}>
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: c }} />
       {statusLabel(PUBLISH_STATE, state)}
     </span>
