@@ -21,6 +21,7 @@
     "remark-gfm": "4.0.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "22.10.7",
     "@types/react": "19.0.7",

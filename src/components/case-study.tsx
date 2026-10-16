@@ -5,6 +5,7 @@ import { ArchitectureDiagram } from "@/components/diagram";
 import { StatusPill } from "@/components/project-card";
 import { SECTION_ORDER, SECTION_LABEL } from "@/lib/types";
 import type { Project, ProjectSection, Diagram, Technology } from "@/lib/types";
+import { fetchOrThrow } from "@/lib/db";
 
 /**
  * Loads one case study. Sections are always published-only — that is what a
@@ -13,17 +14,19 @@ import type { Project, ProjectSection, Diagram, Technology } from "@/lib/types";
  * session-bound client) to show a draft exactly as it would look once live.
  */
 export async function loadCaseStudy(sb: SupabaseClient, by: { slug?: string; id?: string; publishedOnly: boolean }) {
-  let q = sb.from("projects").select("*");
-  q = by.id ? q.eq("id", by.id) : q.eq("slug", by.slug ?? "");
-  if (by.publishedOnly) q = q.eq("state", "published");
-  const { data: project } = await q.maybeSingle();
+  const { data: project } = await fetchOrThrow("project", (s) => {
+    let q = sb.from("projects").select("*").abortSignal(s);
+    q = by.id ? q.eq("id", by.id) : q.eq("slug", by.slug ?? "");
+    if (by.publishedOnly) q = q.eq("state", "published");
+    return q.maybeSingle();
+  });
   if (!project) return null;
 
   const [sections, diagrams, techRes, milestones] = await Promise.all([
-    sb.from("project_sections").select("*").eq("project_id", project.id).eq("state", "published").order("position"),
-    sb.from("architecture_diagrams").select("*").eq("project_id", project.id).order("position"),
-    sb.from("project_technologies").select("technologies(*)").eq("project_id", project.id),
-    sb.from("project_milestones").select("*").eq("project_id", project.id).order("position"),
+    fetchOrThrow("case-study sections", (s) => sb.from("project_sections").select("*").abortSignal(s).eq("project_id", project.id).eq("state", "published").order("position")),
+    fetchOrThrow("architecture diagrams", (s) => sb.from("architecture_diagrams").select("*").abortSignal(s).eq("project_id", project.id).order("position")),
+    fetchOrThrow("project technologies", (s) => sb.from("project_technologies").select("technologies(*)").abortSignal(s).eq("project_id", project.id)),
+    fetchOrThrow("milestones", (s) => sb.from("project_milestones").select("*").abortSignal(s).eq("project_id", project.id).order("position")),
   ]);
 
   return {

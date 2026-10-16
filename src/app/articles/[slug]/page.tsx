@@ -5,17 +5,18 @@ import { supabasePublic } from "@/lib/supabase/server";
 import { Markdown } from "@/components/markdown";
 import { staleness } from "@/lib/dates";
 import type { Article } from "@/lib/types";
+import { fetchOrThrow } from "@/lib/db";
 
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const { data } = await supabasePublic().from("articles").select("slug").eq("state", "published");
+  const { data } = await fetchOrThrow("article list", (s) => supabasePublic().from("articles").select("slug").abortSignal(s).eq("state", "published"));
   return (data ?? []).map((a) => ({ slug: a.slug }));
 }
 
 async function load(slug: string) {
-  const { data } = await supabasePublic()
-    .from("articles").select("*, topics(name,slug)").eq("slug", slug).eq("state", "published").maybeSingle();
+  const { data } = await fetchOrThrow("article", (s) => supabasePublic()
+    .from("articles").select("*, topics(name,slug)").abortSignal(s).eq("slug", slug).eq("state", "published").maybeSingle());
   return data as (Article & { topics: { name: string; slug: string } | null }) | null;
 }
 

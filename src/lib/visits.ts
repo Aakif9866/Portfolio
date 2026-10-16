@@ -1,4 +1,5 @@
 import { supabasePublic, supabaseService } from "./supabase/server";
+import { fetchOrThrow } from "./db";
 
 /**
  * The one metric this site tracks: total page views, stored as a single
@@ -20,7 +21,16 @@ export async function recordVisit() {
     .upsert({ key: KEY, value: String(next), label: "Visit count", group: "internal" }, { onConflict: "key" });
 }
 
-export async function getVisitCount(): Promise<number> {
-  const { data } = await supabasePublic().from("site_config").select("value").eq("key", KEY).maybeSingle();
-  return Number(data?.value) || 0;
+/**
+ * Non-essential: if the count can't be read, return null so the UI omits it —
+ * never a made-up 0, and never failing the whole page for a footer number.
+ */
+export async function getVisitCount(): Promise<number | null> {
+  try {
+    const { data } = await fetchOrThrow("visit count", (s) =>
+      supabasePublic().from("site_config").select("value").abortSignal(s).eq("key", KEY).maybeSingle(), { attempts: 2 });
+    return Number(data?.value) || 0;
+  } catch {
+    return null;
+  }
 }

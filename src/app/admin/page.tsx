@@ -166,8 +166,8 @@ export default async function Dashboard() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 id="visits-h" className="text-[15px] font-semibold">Site visits</h2>
-            <p className="mt-2 text-[30px] font-semibold leading-none tracking-tight">{visits.toLocaleString()}</p>
-            <p className="mt-1 text-[13px] text-muted">page views in total</p>
+            <p className="mt-2 text-[30px] font-semibold leading-none tracking-tight">{visits === null ? "Unavailable" : visits.toLocaleString()}</p>
+            <p className="mt-1 text-[13px] text-muted">{visits === null ? "The counter couldn't be read just now." : "page views in total"}</p>
           </div>
           <p className="max-w-md text-[13px] leading-relaxed text-muted">
             The counter stores a single running total — no dates, pages or visitors — so daily trends and

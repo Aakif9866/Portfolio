@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { NAV } from "@/lib/labels";
 import type { Contact } from "@/lib/contact";
 
-export function Footer({ visits, contact }: { visits: number; contact: Contact }) {
+export function Footer({ visits, contact }: { visits: number | null; contact: Contact }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin") || pathname === "/login") return null;
   return (
@@ -41,7 +41,7 @@ export function Footer({ visits, contact }: { visits: number; contact: Contact }
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[12.5px] text-faint">
           <p>© {new Date().getFullYear()} Aakif. Built with Next.js, Supabase and Tailwind CSS.</p>
-          <p className="font-mono">{visits.toLocaleString()} page views</p>
+          {visits !== null && <p className="font-mono">{visits.toLocaleString()} page views</p>}
         </div>
       </div>
     </footer>

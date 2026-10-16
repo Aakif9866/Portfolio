@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { supabasePublic } from "@/lib/supabase/server";
 import { CaseStudyView, loadCaseStudy } from "@/components/case-study";
+import { fetchOrThrow } from "@/lib/db";
 
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const { data } = await supabasePublic().from("projects").select("slug").eq("state", "published");
+  const { data } = await fetchOrThrow("project list", (s) => supabasePublic().from("projects").select("slug").abortSignal(s).eq("state", "published"));
   return (data ?? []).map((p) => ({ slug: p.slug }));
 }
 

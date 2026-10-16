@@ -6,14 +6,15 @@ import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
 import { staleness } from "@/lib/dates";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Articles" };
 export const revalidate = 300;
 
 export default async function ArticlesPage() {
-  const { data } = await supabasePublic()
-    .from("articles").select("*, topics(name)").eq("state", "published")
-    .order("published_at", { ascending: false, nullsFirst: false });
+  const { data } = await fetchOrThrow("articles", (s) => supabasePublic()
+    .from("articles").select("*, topics(name)").abortSignal(s).eq("state", "published")
+    .order("published_at", { ascending: false, nullsFirst: false }));
   const articles = (data ?? []) as (Article & { topics: { name: string } | null })[];
 
   return (

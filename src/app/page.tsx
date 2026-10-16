@@ -8,6 +8,7 @@ import type { Experiment } from "@/lib/types";
 import { EXPERIMENT_STATUS } from "@/lib/labels";
 import { StatusPill } from "@/components/project-card";
 import { getContact } from "@/lib/contact";
+import { fetchOrThrow } from "@/lib/db";
 
 export const revalidate = 300;
 
@@ -16,7 +17,7 @@ export default async function Home() {
   const [projects, tech, labRes, contact] = await Promise.all([
     publishedProjects(),
     allTechnologies(),
-    sb.from("experiments").select("*", { count: "exact" }).eq("state", "published").order("position").limit(3),
+    fetchOrThrow("experiments", (s) => sb.from("experiments").select("*", { count: "exact" }).abortSignal(s).eq("state", "published").order("position").limit(3)),
     getContact(),
   ]);
   const techMap = await techByProject(projects.map((p) => p.id));

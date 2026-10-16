@@ -6,17 +6,18 @@ import { Markdown } from "@/components/markdown";
 import type { Experiment } from "@/lib/types";
 import { StatusPill } from "@/components/project-card";
 import { EXPERIMENT_STATUS, statusLabel } from "@/lib/labels";
+import { fetchOrThrow } from "@/lib/db";
 
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const { data } = await supabasePublic().from("experiments").select("slug").eq("state", "published");
+  const { data } = await fetchOrThrow("experiment list", (s) => supabasePublic().from("experiments").select("slug").abortSignal(s).eq("state", "published"));
   return (data ?? []).map((e) => ({ slug: e.slug }));
 }
 
 async function load(slug: string) {
   const sb = supabasePublic();
-  const { data } = await sb.from("experiments").select("*, projects(slug,title)").eq("slug", slug).eq("state", "published").maybeSingle();
+  const { data } = await fetchOrThrow("experiment", (s) => sb.from("experiments").select("*, projects(slug,title)").abortSignal(s).eq("slug", slug).eq("state", "published").maybeSingle());
   return data as (Experiment & { projects: { slug: string; title: string } | null }) | null;
 }
 

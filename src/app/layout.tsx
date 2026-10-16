@@ -6,6 +6,7 @@ import { supabasePublic } from "@/lib/supabase/server";
 import { getVisitCount } from "@/lib/visits";
 import { getContact } from "@/lib/contact";
 import { NAV } from "@/lib/labels";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: { default: "Aakif — Software Engineer", template: "%s · Aakif" },
@@ -21,10 +22,10 @@ const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t
 async function searchIndex() {
   const sb = supabasePublic();
   const [projects, articles, experiments, tech] = await Promise.all([
-    sb.from("projects").select("slug,title").eq("state", "published"),
-    sb.from("articles").select("slug,title").eq("state", "published"),
-    sb.from("experiments").select("slug,title").eq("state", "published"),
-    sb.from("technologies").select("slug,name,category"),
+    fetchOrThrow("search index (projects)", (s) => sb.from("projects").select("slug,title").abortSignal(s).eq("state", "published")),
+    fetchOrThrow("search index (articles)", (s) => sb.from("articles").select("slug,title").abortSignal(s).eq("state", "published")),
+    fetchOrThrow("search index (experiments)", (s) => sb.from("experiments").select("slug,title").abortSignal(s).eq("state", "published")),
+    fetchOrThrow("search index (technologies)", (s) => sb.from("technologies").select("slug,name,category").abortSignal(s)),
   ]);
 
   return [

@@ -3,13 +3,14 @@ import { PageHeader } from "@/components/page-header";
 import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { getContact } from "@/lib/contact";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "About" };
 export const revalidate = 300;
 
 export default async function AboutPage() {
   const [{ data }, contact] = await Promise.all([
-    supabasePublic().from("site_config").select("key,value").eq("key", "about_md").maybeSingle(),
+    fetchOrThrow("About page text", (s) => supabasePublic().from("site_config").select("key,value").abortSignal(s).eq("key", "about_md").maybeSingle()),
     getContact(),
   ]);
   const body = typeof data?.value === "string" && data.value.trim() ? data.value : null;

@@ -4,6 +4,7 @@ import { Reveal } from "@/components/reveal";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { TimelineEntry } from "@/lib/types";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Experience" };
 export const revalidate = 300;
@@ -52,9 +53,9 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
 }
 
 export default async function ExperiencePage() {
-  const { data } = await supabasePublic()
-    .from("timeline_entries").select("*").eq("state", "published")
-    .order("start_date", { ascending: false, nullsFirst: false });
+  const { data } = await fetchOrThrow("experience", (s) => supabasePublic()
+    .from("timeline_entries").select("*").abortSignal(s).eq("state", "published")
+    .order("start_date", { ascending: false, nullsFirst: false }));
   const entries = (data ?? []) as TimelineEntry[];
   const work = entries.filter((e) => e.kind === "work");
   const education = entries.filter((e) => e.kind === "education");

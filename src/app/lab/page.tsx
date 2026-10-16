@@ -7,14 +7,15 @@ import { supabasePublic } from "@/lib/supabase/server";
 import type { Experiment } from "@/lib/types";
 import { StatusPill } from "@/components/project-card";
 import { EXPERIMENT_STATUS } from "@/lib/labels";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Experiments" };
 export const revalidate = 300;
 
 
 export default async function LabPage() {
-  const { data } = await supabasePublic()
-    .from("experiments").select("*").eq("state", "published").order("position");
+  const { data } = await fetchOrThrow("experiments", (s) =>
+    supabasePublic().from("experiments").select("*").abortSignal(s).eq("state", "published").order("position"));
   const experiments = (data ?? []) as Experiment[];
 
   return (

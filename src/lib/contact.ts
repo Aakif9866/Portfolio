@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { supabasePublic } from "./supabase/server";
+import { fetchOrThrow } from "./db";
 
 export type Contact = { email: string; github: string; linkedin: string | null };
 
@@ -10,7 +11,8 @@ const FALLBACK: Contact = { email: "aakif9866@gmail.com", github: "https://githu
 
 /** Contact links from site_config, falling back to built-in values. Deduped per render. */
 export const getContact = cache(async (): Promise<Contact> => {
-  const { data } = await supabasePublic().from("site_config").select("key,value").in("key", [...CONTACT_KEYS]);
+  const { data } = await fetchOrThrow("contact settings", (s) =>
+    supabasePublic().from("site_config").select("key,value").abortSignal(s).in("key", [...CONTACT_KEYS]));
   const v: Record<string, string | null> = {};
   for (const r of (data ?? []) as { key: string; value: unknown }[]) {
     v[r.key] = typeof r.value === "string" && r.value.trim() ? r.value.trim() : null;

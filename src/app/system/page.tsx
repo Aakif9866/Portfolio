@@ -6,6 +6,7 @@ import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
 import type { Technology } from "@/lib/types";
+import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Tech Stack" };
 export const revalidate = 300;
@@ -13,8 +14,8 @@ export const revalidate = 300;
 export default async function SystemPage() {
   const sb = supabasePublic();
   const [techRes, linkRes] = await Promise.all([
-    sb.from("technologies").select("*").order("position"),
-    sb.from("project_technologies").select("technology_id, projects(slug,title,state)"),
+    fetchOrThrow("technologies", (s) => sb.from("technologies").select("*").abortSignal(s).order("position")),
+    fetchOrThrow("technology usage", (s) => sb.from("project_technologies").select("technology_id, projects(slug,title,state)").abortSignal(s)),
   ]);
 
   const tech = (techRes.data ?? []) as Technology[];
