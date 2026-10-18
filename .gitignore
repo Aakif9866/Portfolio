@@ -10,3 +10,6 @@ next-env.d.ts
 
 # vercel project link (local only)
 .vercel
+
+# generated knowledge graph (graphify)
+graphify-out
