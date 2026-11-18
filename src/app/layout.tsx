@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
-import { supabasePublic } from "@/lib/supabase/server";
 import { getVisitCount } from "@/lib/visits";
 import { getContact } from "@/lib/contact";
-import { NAV } from "@/lib/labels";
-import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: { default: "Aakif — Software Engineer", template: "%s · Aakif" },
@@ -19,27 +16,8 @@ export const metadata: Metadata = {
 // Runs before paint: no theme flash, no layout shift.
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();`;
 
-async function searchIndex() {
-  const sb = supabasePublic();
-  const [projects, articles, experiments, tech] = await Promise.all([
-    fetchOrThrow("search index (projects)", (s) => sb.from("projects").select("slug,title").abortSignal(s).eq("state", "published")),
-    fetchOrThrow("search index (articles)", (s) => sb.from("articles").select("slug,title").abortSignal(s).eq("state", "published")),
-    fetchOrThrow("search index (experiments)", (s) => sb.from("experiments").select("slug,title").abortSignal(s).eq("state", "published")),
-    fetchOrThrow("search index (technologies)", (s) => sb.from("technologies").select("slug,name,category").abortSignal(s)),
-  ]);
-
-  return [
-    { label: "Home", href: "/", group: "Page" },
-    ...NAV.map((n) => ({ label: n.label, href: n.href, group: "Page" })),
-    ...(projects.data ?? []).map((p) => ({ label: p.title, href: `/projects/${p.slug}`, group: "Project" })),
-    ...(articles.data ?? []).map((a) => ({ label: a.title, href: `/articles/${a.slug}`, group: "Article" })),
-    ...(experiments.data ?? []).map((e) => ({ label: e.title, href: `/lab/${e.slug}`, group: "Experiment" })),
-    ...(tech.data ?? []).map((t) => ({ label: t.name, href: `/system#${t.slug}`, group: "Tech", hint: t.category })),
-  ];
-}
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [items, visits, contact] = await Promise.all([searchIndex(), getVisitCount(), getContact()]);
+  const [visits, contact] = await Promise.all([getVisitCount(), getContact()]);
   return (
     <html lang="en" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
@@ -47,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-page">
           Skip to content
         </a>
-        <Nav searchItems={items} contact={contact} />
+        <Nav contact={contact} />
         <main id="main">{children}</main>
         <Footer visits={visits} contact={contact} />
       </body>

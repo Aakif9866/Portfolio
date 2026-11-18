@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { Reveal } from "@/components/reveal";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
@@ -30,8 +29,7 @@ export default async function ArticlesPage() {
         ) : (
           <ul className="divide-y divide-line">
             {articles.map((a, i) => (
-              <Reveal key={a.id} delay={(i % 4) * 50}>
-                <li>
+              <li key={a.id} className="rv">
                   <Link href={`/articles/${a.slug}`} className="group flex flex-col gap-2 py-6 transition-opacity hover:opacity-100">
                     <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
                       {a.topics && <span className="text-accent">{a.topics.name}</span>}
@@ -46,7 +44,6 @@ export default async function ArticlesPage() {
                     {a.dek && <p className="max-w-2xl text-[14.5px] leading-relaxed text-muted">{a.dek}</p>}
                   </Link>
                 </li>
-              </Reveal>
             ))}
           </ul>
         )}

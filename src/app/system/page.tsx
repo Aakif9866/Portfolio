@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { Reveal } from "@/components/reveal";
 import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
@@ -57,7 +56,7 @@ export default async function SystemPage() {
                 {g.items.map((t, i) => {
                   const projects = usedIn[t.id] ?? [];
                   return (
-                    <Reveal key={t.id} delay={(i % 3) * 50}>
+                    <div key={t.id} className="rv">
                       <div id={t.slug} className="card card-hover h-full scroll-mt-32 rounded-2xl p-5">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-[15.5px] font-semibold" style={{ color: t.color ?? undefined }}>
@@ -80,7 +79,7 @@ export default async function SystemPage() {
                           </div>
                         )}
                       </div>
-                    </Reveal>
+                    </div>
                   );
                 })}
               </div>

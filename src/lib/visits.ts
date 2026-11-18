@@ -5,14 +5,18 @@ import { fetchOrThrow } from "./db";
  * The one metric this site tracks: total page views, stored as a single
  * site_config row. No new table, no per-visitor identity.
  *
- * ponytail: read-then-write, not atomic — concurrent requests can drop an
- * increment. Fine at portfolio traffic; upgrade to a Postgres RPC
- * (`increment_visit_count()`) if that ever matters.
+ * Recorded from middleware via waitUntil, so it never delays a page.
+ * One atomic call: increment_visit_count() (migration 20261118000000).
  */
 const KEY = "visit_count";
 
 export async function recordVisit() {
   const supabase = supabaseService();
+  const { error } = await supabase.rpc("increment_visit_count");
+  // PGRST202 = function not found: the migration isn't applied yet, so fall back.
+  if (error?.code !== "PGRST202") return;
+
+  // ponytail: fallback is read-then-write (can drop a count under concurrency); delete once the migration is live.
   const { data } = await supabase.from("site_config").select("value").eq("key", KEY).maybeSingle();
   const next = (Number(data?.value) || 0) + 1;
   // label is NOT NULL in site_config — only matters on the first-ever insert of this key.

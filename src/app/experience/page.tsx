@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
-import { Reveal } from "@/components/reveal";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { TimelineEntry } from "@/lib/types";
@@ -15,8 +14,7 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
   return (
     <ol className="relative space-y-8 border-l border-line pl-8">
       {entries.map((e, i) => (
-        <Reveal key={e.id} delay={i * 60}>
-          <li className="relative">
+        <li key={e.id} className="rv relative">
             <span className="absolute -left-[41px] top-2 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-page" />
             <div className="card rounded-2xl p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -46,7 +44,6 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
               )}
             </div>
           </li>
-        </Reveal>
       ))}
     </ol>
   );

@@ -4,11 +4,25 @@ import { useRouter } from "next/navigation";
 
 type Item = { label: string; href: string; group: string; hint?: string };
 
-export function CommandPalette({ items }: { items: Item[] }) {
+export function CommandPalette() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [cursor, setCursor] = useState(0);
+  // The index loads on first open (cached at /search.json), so pages don't carry it.
+  const [items, setItems] = useState<Item[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+
+  useEffect(() => {
+    if (!open || status === "loading" || status === "ready") return;
+    setStatus("loading");
+    fetch("/search.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((list: Item[]) => { setItems(list); setStatus("ready"); })
+      .catch(() => setStatus("error"));
+    // status is deliberately not a dependency: a failure retries on the next open, not in a loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -71,7 +85,9 @@ export function CommandPalette({ items }: { items: Item[] }) {
               <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-muted">esc</kbd>
             </div>
             <ul className="max-h-[52vh] overflow-y-auto p-2">
-              {results.length === 0 && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Nothing matches “{q}”.</li>}
+              {status === "loading" && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Loading…</li>}
+              {status === "error" && <li role="alert" className="px-3 py-6 text-center text-[13.5px] text-faint">Search couldn&apos;t load. Close and reopen to try again.</li>}
+              {status === "ready" && results.length === 0 && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Nothing matches “{q}”.</li>}
               {results.map((r, i) => (
                 <li key={r.href + r.label}>
                   <button

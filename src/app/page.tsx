@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Reveal } from "@/components/reveal";
 import { ProjectCard } from "@/components/project-card";
 import { publishedProjects, techByProject, allTechnologies } from "@/lib/queries";
 import { supabasePublic } from "@/lib/supabase/server";
@@ -81,7 +80,7 @@ export default async function Home() {
       {/* ── selected work ── */}
       <section className="border-t border-line bg-surface py-16">
         <div className="mx-auto max-w-6xl px-6">
-          <Reveal>
+          <div className="rv">
             <div className="flex items-end justify-between gap-6">
               <div>
                 <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">01 — Featured projects</p>
@@ -92,15 +91,15 @@ export default async function Home() {
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </Link>
             </div>
-          </Reveal>
+          </div>
 
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((p, i) => (
-              <Reveal key={p.id} delay={i * 70} className={i === 0 ? "md:col-span-2" : ""}>
+              <div key={p.id} className={i === 0 ? "rv md:col-span-2" : "rv"}>
                 <div className="h-full">
                   <ProjectCard project={p} index={i} tech={techMap[p.id] ?? []} featured={i === 0} />
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
           <Link href="/projects" className="mt-8 inline-flex items-center gap-1.5 text-[13.5px] text-muted transition-colors hover:text-ink md:hidden">
@@ -113,18 +112,18 @@ export default async function Home() {
       {/* ── stack ── */}
       <section className="border-t border-line py-16">
         <div className="mx-auto max-w-6xl px-6">
-          <Reveal>
+          <div className="rv">
             <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Tech stack</p>
             <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Technologies I work with</h2>
             <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
               {tech.length} technologies grouped by where they sit in a system. Each one links to the
               projects where I actually used it.
             </p>
-          </Reveal>
+          </div>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {counts.map((g, i) => (
-              <Reveal key={g.key} delay={i * 50}>
+              <div key={g.key} className="rv">
                 <Link href={`/system#${g.key}`} className="card card-hover block h-full rounded-2xl p-6">
                   <div className="h-1 w-9 rounded-full" style={{ background: `linear-gradient(90deg, ${g.accent}, transparent)` }} />
                   <h3 className="mt-4 flex items-baseline justify-between text-[14.5px] font-semibold uppercase tracking-wider">
@@ -135,7 +134,7 @@ export default async function Home() {
                     {tech.filter((t) => t.category === g.key).slice(0, 5).map((t) => t.name).join(" · ")}
                   </p>
                 </Link>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
@@ -145,7 +144,7 @@ export default async function Home() {
       <section className="border-t border-line bg-surface py-16">
           <div className="mx-auto grid max-w-6xl gap-14 px-6 lg:grid-cols-2">
             {lab.length > 0 && (
-              <Reveal>
+              <div className="rv">
                 <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">03 — Experiments</p>
                 <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">Recent experiments</h2>
                 <p className="mt-3 text-[15px] leading-relaxed text-muted">Smaller tests with a hypothesis written down first — including the ones that failed.</p>
@@ -166,10 +165,10 @@ export default async function Home() {
                   All experiments
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </Link>
-              </Reveal>
+              </div>
             )}
 
-            <Reveal delay={100}>
+            <div className="rv">
               <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">04 — Contact</p>
               <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">
                 Hiring, or <span className="grad-text">curious how it works?</span>
@@ -194,7 +193,7 @@ export default async function Home() {
                   </a>
                 )}
               </div>
-            </Reveal>
+            </div>
           </div>
         </section>
     </>

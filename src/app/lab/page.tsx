@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { Reveal } from "@/components/reveal";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { Experiment } from "@/lib/types";
@@ -32,7 +31,7 @@ export default async function LabPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {experiments.map((e, i) => {
               return (
-                <Reveal key={e.id} delay={(i % 2) * 70}>
+                <div key={e.id} className="rv">
                   <Link href={`/lab/${e.slug}`} className="card card-hover group block h-full rounded-2xl p-6">
                     <div className="flex items-center justify-between gap-3">
                       <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
@@ -47,7 +46,7 @@ export default async function LabPage() {
                       <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                     </span>
                   </Link>
-                </Reveal>
+                </div>
               );
             })}
           </div>

@@ -42,7 +42,7 @@ Next.js 15 App Router portfolio whose content lives in Supabase Postgres, edited
 ## Conventions
 
 - TypeScript, Server Components by default; `"use client"` only for real interactivity (nav,
-  command palette, theme toggle, reveal).
+  command palette, theme toggle, project filter).
 - Tailwind v4 with the CSS variables in `src/app/globals.css` (`page`, `surface`, `card`,
   `raised`, `line`, `ink`, `muted`, `faint`, `accent`). **No raw hex and no `gray-500`-style
   palette classes in components** — both themes come from those tokens.

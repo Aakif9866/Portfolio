@@ -61,10 +61,27 @@ Create `.env.local` with:
 
 Navigation labels live in one place (`src/lib/labels.ts`) and are used by the nav, footer,
 headings and search. The command palette (⌘K / Ctrl K, or the search button) jumps to any page,
-project, experiment, article or technology. Phones get a menu button. Light and dark themes are
+project, experiment, article or technology. Its index is a cached `/search.json` loaded the first
+time the palette opens, so pages don't carry it. Phones get a menu button. Light and dark themes are
 applied before the first paint.
 
-Public pages are prerendered and refreshed every 5 minutes (ISR).
+Public pages are prerendered and refreshed every 5 minutes (ISR). `/projects` is static too: its
+`?tech=` filter runs in the browser (`src/components/tech-filter.tsx`). Middleware does no network
+work on public pages: the visit is recorded after the response (`waitUntil`), and the session is
+only refreshed on `/admin` and `/login`.
+
+**Measured** (local production build, median of 10 warm requests, 2026-11-18):
+
+| Route | Before v2 | After | HTML before → after |
+| --- | --- | --- | --- |
+| `/` | 88 ms | 3 ms | 73 → 65 KB |
+| `/projects` | 218 ms | 3 ms | 88 → 70 KB |
+| `/projects/pulseiq` | 66 ms | 3 ms | 57 → 50 KB |
+| `/lab` | 67 ms | 2 ms | 44 → 36 KB |
+| `/articles` | 72 ms | 2 ms | 25 → 17 KB |
+
+Time to first byte, server on the same machine, so network latency to visitors is not
+included. The "before" time was mostly middleware waiting on the visit counter.
 
 **Case-study sections** come in 17 types (overview, problem, why, how, architecture, data model,
 API, frontend, backend, infrastructure, performance, testing, decisions, challenges, results,
@@ -178,7 +195,8 @@ A test fails if a public page adds a query that bypasses `fetchOrThrow`.
 
 **Visit counter.** The site tracks one number: total page views, stored in
 `site_config.visit_count`. It stores no IPs, user agents or per-visitor data, and uses no
-third-party analytics. `middleware.ts` adds one per real page view. Admin pages, the login page
+third-party analytics. `middleware.ts` adds one per real page view, after the response is sent, via one atomic
+`increment_visit_count()` call. Admin pages, the login page
 and link prefetches aren't counted. If the count can't be read, it is hidden rather than shown
 as 0.
 
@@ -186,7 +204,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 79 tests, offline:
+`npm test` runs 83 tests, offline:
 
 | File | Covers |
 | --- | --- |
@@ -194,6 +212,7 @@ as 0.
 | `tests/db-fetch.test.ts` | Zero rows vs. failure, retry limits, which errors are retried, no data leaking into logs, every public query uses `fetchOrThrow` |
 | `tests/settings-usage.test.ts` | The site only reads settings the admin can edit, and every editable setting is used |
 | `tests/migration-atomic.test.ts` | The pending migration's SQL, run against a real Postgres engine (PGlite) with simplified tables |
+| `tests/migration-visits.test.ts` | The visit-counter migration: one per call, first-use insert, service-role only |
 
 There are no browser end-to-end tests and no CI workflow yet. The admin flows are verified by
 hand.
@@ -246,8 +265,8 @@ Details for all of these are in [docs/maintenance.md](docs/maintenance.md).
   - The fix is a ready, tested migration: `supabase/migrations/20261017000000_atomic_reorder_and_revisions.sql`.
   - Applying it needs `npx supabase login` and explicit approval. The app code switches over in
     the same deploy.
-- **The visit counter can miss counts** when two visits happen at the same moment, because it
-  reads then writes. Each page also waits for the counter before it is sent.
+- **The visit counter can miss counts** until `supabase/migrations/20261118000000_increment_visit_count.sql`
+  is applied (needs approval). Until then it falls back to read-then-write.
 - **20 unused `site_config` settings** from an earlier design remain in the database, shown
   read-only in Admin → Settings. The audit and cleanup plan are in `docs/maintenance.md`.
 - **Image uploads:** diagram and hero images are pasted links; there is no upload widget.

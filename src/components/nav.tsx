@@ -7,9 +7,7 @@ import { CommandPalette } from "./command-palette";
 import { NAV } from "@/lib/labels";
 import type { Contact } from "@/lib/contact";
 
-type Item = { label: string; href: string; group: string; hint?: string };
-
-export function Nav({ searchItems, contact }: { searchItems: Item[]; contact: Contact }) {
+export function Nav({ contact }: { contact: Contact }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -61,7 +59,7 @@ export function Nav({ searchItems, contact }: { searchItems: Item[]; contact: Co
         </div>
 
         <div className="flex items-center gap-2">
-          <CommandPalette items={searchItems} />
+          <CommandPalette />
           <ThemeToggle />
           <a
             href={contact.github}
