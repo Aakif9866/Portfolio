@@ -7,11 +7,7 @@ export const metadata: Metadata = { title: "Admin sign in", robots: { index: fal
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
   const { error, next } = await searchParams;
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden spotlight px-6">
-      <div className="pointer-events-none absolute inset-0 grid-bg opacity-50" />
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[380px] w-[700px] -translate-x-1/2">
-        <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_200deg,#a855f7,#38bdf8,#f43f5e,#a855f7)]" />
-      </div>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
 
       <div className="relative w-full max-w-sm">
         <Link href="/" className="mb-8 inline-flex items-center gap-2 text-[14px] text-muted transition-colors hover:text-ink">
@@ -19,8 +15,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           Back to site
         </Link>
 
-        <div className="card ring-grad rounded-2xl p-7">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-rose-500 to-violet-600 text-[13px] font-bold text-white">A</div>
+        <div className="card rounded-2xl p-7">
+          <span className="brand-mark">SA</span>
           <h1 className="mt-5 text-[22px] font-semibold tracking-tight">Admin sign in</h1>
           <p className="mt-2 text-[13.5px] leading-relaxed text-muted">
             Single-account area. Authorisation is enforced by an allowlist table in Postgres, so a

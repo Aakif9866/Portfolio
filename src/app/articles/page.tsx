@@ -8,7 +8,7 @@ import type { Article } from "@/lib/types";
 import { staleness } from "@/lib/dates";
 import { fetchOrThrow } from "@/lib/db";
 
-export const metadata: Metadata = { title: "Articles" };
+export const metadata: Metadata = { title: "Writing" };
 export const revalidate = 300;
 
 export default async function ArticlesPage() {
@@ -20,8 +20,8 @@ export default async function ArticlesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Articles"
-        title="Articles"
+        eyebrow="Writing"
+        title="Writing"
         lede="Technical write-ups on things I've had to work out properly. Each one shows when it was last reviewed and what it was tested against, so you can judge whether it's still current."
       />
       <section className="mx-auto max-w-4xl px-6 py-16">

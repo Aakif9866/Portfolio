@@ -33,7 +33,7 @@ export default async function LabPage() {
             {experiments.map((e, i) => {
               return (
                 <Reveal key={e.id} delay={(i % 2) * 70}>
-                  <Link href={`/lab/${e.slug}`} className="card card-hover ring-grad group block h-full rounded-2xl p-6">
+                  <Link href={`/lab/${e.slug}`} className="card card-hover group block h-full rounded-2xl p-6">
                     <div className="flex items-center justify-between gap-3">
                       <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
                       {e.tags && e.tags.length > 0 && (

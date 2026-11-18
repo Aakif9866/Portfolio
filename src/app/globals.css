@@ -34,12 +34,9 @@
   --faint: #6e6e78; /* ≥4.5:1 on white (WCAG AA) */
   --accent: #7c3aed;
 
-  --glow: 0.2;
-  --grain: 0.025;
-  --spot: rgba(124, 58, 237, 0.07);
-  --sheen: rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.1);
-  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04), 0 24px 48px -20px rgba(0, 0, 0, 0.18);
+  /* the brand gradient (same as the favicon). Used sparingly: brand mark, top strip, active nav, one CTA.
+     -600 stops so white text on it passes AA. */
+  --grad: linear-gradient(100deg, #7c3aed, #9333ea 50%, #db2777);
   color-scheme: light;
 }
 
@@ -56,12 +53,7 @@
   --faint: #7d7d8a; /* ≥4.5:1 on black (WCAG AA) */
   --accent: #a78bfa;
 
-  --glow: 0.42;
-  --grain: 0.05;
-  --spot: rgba(167, 139, 250, 0.1);
-  --sheen: rgba(255, 255, 255, 0.07);
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.9);
-  --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 32px 64px -24px rgba(0, 0, 0, 1);
+  --grad: linear-gradient(100deg, #7c3aed, #a855f7 50%, #ec4899);
   color-scheme: dark;
 }
 
@@ -83,15 +75,15 @@
   ::selection { background: var(--accent); color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
-  /* film grain — the single cheapest trick that kills flat-black banding */
+  /* signature 2px brand strip along the top of every page */
   body::before {
     content: "";
     position: fixed;
-    inset: 0;
-    z-index: 9999;
+    inset: 0 0 auto;
+    height: 2px;
+    z-index: 60;
     pointer-events: none;
-    opacity: var(--grain);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    background: var(--grad);
   }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: var(--page); }
@@ -100,59 +92,46 @@
 }
 
 @layer utilities {
-  /* glass panel with a lit top edge — reads as depth, not as a border */
+  /* sticky bars: near-opaque page colour, light blur. Borders give the edge, not shadows. */
   .glass {
-    background: color-mix(in oklab, var(--card) 72%, transparent);
-    backdrop-filter: blur(20px) saturate(180%);
-    box-shadow: var(--shadow-card), 0 1px 0 0 var(--sheen) inset;
+    background: color-mix(in oklab, var(--page) 88%, transparent);
+    backdrop-filter: blur(12px);
   }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
-    box-shadow: var(--shadow-card);
-    transition: transform 0.4s var(--ease-out-soft), border-color 0.3s, box-shadow 0.4s var(--ease-out-soft);
+    transition: border-color 0.2s, background-color 0.2s;
   }
   .card-hover:hover {
-    transform: translateY(-3px);
     border-color: var(--line-strong);
-    box-shadow: var(--shadow-lift);
+    background: var(--raised);
   }
   .grad-text {
-    background-image: linear-gradient(100deg, #fb923c, #f43f5e 36%, #a855f7 66%, #38bdf8);
+    background-image: var(--grad);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  /* 1px gradient ring, drawn with mask so it works on any background */
-  .ring-grad { position: relative; }
-  .ring-grad::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(140deg, var(--sheen), transparent 40%, transparent 60%, var(--sheen));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+  /* the SA mark: favicon shape (opposite corners rounded more) on the brand gradient */
+  .brand-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.5rem 0.75rem 0.5rem 0.75rem;
+    background: var(--grad);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
-  .spotlight {
-    background: radial-gradient(ellipse 70% 55% at 50% -10%, var(--spot), transparent 70%);
+  /* the one primary call to action per page */
+  .btn-grad {
+    background: var(--grad);
+    color: #fff;
+    transition: opacity 0.2s;
   }
-  .grid-bg {
-    background-image: linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 68px 68px;
-    -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 15%, transparent 72%);
-    mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 15%, transparent 72%);
-  }
-  .aurora {
-    filter: blur(100px);
-    opacity: var(--glow);
-    animation: drift 26s ease-in-out infinite alternate;
-  }
+  .btn-grad:hover { opacity: 0.9; }
   .ul { position: relative; }
   .ul::after {
     content: "";
@@ -167,12 +146,13 @@
     transition: transform 0.4s var(--ease-out-soft);
   }
   .ul:hover::after { transform: scaleX(1); }
+  /* current page: the underline stays, drawn in the brand gradient */
+  .nav-active::after { transform: scaleX(1); height: 2px; bottom: -4px; background: var(--grad); }
+  /* admin sidebar: a gradient rail on the active link */
+  .nav-rail { position: relative; }
+  .nav-rail::before { content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--grad); }
 }
 
-@keyframes drift {
-  from { transform: translate3d(-4%, 0, 0) scale(1); }
-  to { transform: translate3d(4%, -3%, 0) scale(1.14); }
-}
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
@@ -186,7 +166,7 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .aurora, .animate-fade-up { animation: none !important; }
+  .animate-fade-up { animation: none !important; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 

@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-[14.5px] font-semibold tracking-tight">
-              <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-rose-500 to-violet-600 text-[11px] font-bold text-white">A</span>
+              <span className="brand-mark">SA</span>
               Admin
             </Link>
             <span className="hidden font-mono text-[11.5px] text-faint sm:inline">{user.email}</span>

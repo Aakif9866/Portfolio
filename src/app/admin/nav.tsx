@@ -46,7 +46,7 @@ export function AdminNav() {
                         href={l.href}
                         aria-current={active ? "page" : undefined}
                         className={`block rounded-lg px-3 py-2 text-[13.5px] transition-colors ${
-                          active ? "bg-raised font-medium text-ink" : "text-muted hover:bg-raised/60 hover:text-ink"
+                          active ? "nav-rail bg-raised font-medium text-ink" : "text-muted hover:bg-raised/60 hover:text-ink"
                         }`}
                       >
                         {l.label}

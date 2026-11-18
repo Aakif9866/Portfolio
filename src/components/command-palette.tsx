@@ -57,7 +57,7 @@ export function CommandPalette({ items }: { items: Item[] }) {
       {open && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[14vh]" role="dialog" aria-modal="true" aria-label="Search the site">
           <div className="absolute inset-0 bg-black/55 backdrop-blur-sm animate-fade-up" onClick={() => setOpen(false)} />
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-line-strong glass ring-grad animate-fade-up">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-line-strong glass animate-fade-up">
             <div className="flex items-center gap-3 border-b border-line px-4">
               <svg className="h-4 w-4 shrink-0 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
               <input

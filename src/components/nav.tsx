@@ -40,7 +40,7 @@ export function Nav({ searchItems, contact }: { searchItems: Item[]; contact: Co
     >
       <nav aria-label="Main" className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-rose-500 to-violet-600 text-[11px] font-bold text-white">A</span>
+          <span className="brand-mark">SA</span>
           Aakif
         </Link>
 
@@ -52,7 +52,7 @@ export function Nav({ searchItems, contact }: { searchItems: Item[]; contact: Co
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`ul transition-colors ${active ? "text-ink" : "text-muted hover:text-ink"}`}
+                className={`ul transition-colors ${active ? "nav-active text-ink" : "text-muted hover:text-ink"}`}
               >
                 {l.label}
               </Link>
