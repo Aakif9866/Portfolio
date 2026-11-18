@@ -13,3 +13,6 @@ next-env.d.ts
 
 # generated knowledge graph (graphify)
 graphify-out
+
+# database snapshots (scripts/backup-db.mjs) — contain drafts and the admin allowlist
+backups

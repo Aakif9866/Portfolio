@@ -1,0 +1,218 @@
+ENGINEERING PORTFOLIO & CMS — RESUME-READY IMPROVEMENT ROADMAP
+Target: Software Engineering roles asking for roughly 1–2 years of experience
+Current stack: Next.js 15, React 19, TypeScript, Supabase/Postgres, Tailwind v4, Vitest, Vercel
+
+============================================================
+1. CURRENT PROJECT — QUICK ASSESSMENT
+============================================================
+
+Current rating: 8.0/10 as an engineering portfolio/CMS project.
+Potential after focused improvements: 9.0–9.3/10 as a portfolio project.
+
+Why it is already strong:
+- Database-enforced authorization with Postgres Row-Level Security (RLS).
+- A 13-table relational CMS rather than a static portfolio.
+- Explicit handling of database errors versus empty query results.
+- Server-side field allowlists to reduce mass-assignment risk.
+- 79 offline tests, including real SQL behavior through PGlite.
+- ISR, path-level revalidation, security headers, and a documented architecture.
+
+What holds it back:
+- A portfolio CMS can still look like a polished CRUD app unless the engineering decisions are easy to inspect and verify.
+- The supplied evidence does not establish real user adoption, load capacity, latency improvements, or business impact. Do not claim those.
+- CI/CD is a visible gap in the supplied project notes.
+- There is no stated end-to-end browser test suite, measured performance baseline, operational dashboard, or reproducible deployment/release workflow.
+- Recruiters need a fast way to understand the architecture and try the product without guessing how to navigate it.
+
+Rule: Build a smaller number of complete, testable features. Do not add features merely to make the feature list longer.
+
+============================================================
+2. PRIORITY ROADMAP
+============================================================
+
+PHASE 1 — ENGINEERING QUALITY GATES (highest priority)
+Goal: Make every change safer and every deployment reproducible.
+
+[ ] Add CI on every pull request and push:
+    - Install using the lockfile.
+    - Run lint, TypeScript type-check, unit/integration tests, and production build.
+    - Fail the workflow if any required check fails.
+    - Document required environment variables without committing secrets.
+    Acceptance: a deliberately failing test or type error makes CI fail.
+
+[ ] Add browser-level end-to-end tests with Playwright:
+    - Public visitor can view published projects and articles.
+    - Draft/private content is not visible to an anonymous visitor.
+    - Admin can create/edit a draft, preview it, publish it, and unpublish/archive it.
+    - Reordering and validation errors behave correctly.
+    - Add a stable test strategy for auth and database setup.
+    Acceptance: core journeys run automatically in CI and are repeatable.
+
+[ ] Add database migration discipline:
+    - Store schema changes as ordered migrations.
+    - Document local setup and safe migration application.
+    - Add a clean-database setup test where practical.
+    Acceptance: another developer can set up the database from the repository instructions.
+
+[ ] Review authorization as a threat model, not just a checklist:
+    - Document roles, public/admin boundaries, RLS policies, and trusted server paths.
+    - Test anonymous reads and writes, cross-user access, draft access, and attempts to modify protected fields.
+    - Keep service-role credentials server-only and out of client bundles.
+    Acceptance: a concise SECURITY.md describes the threat model and tests prove the key boundaries.
+
+PHASE 2 — MAKE THE ENGINEERING VISIBLE
+Goal: Let an interviewer understand the system in five minutes.
+
+[ ] Add an architecture page to the portfolio:
+    - Render the real system flow: browser -> Next.js page/action -> validation/auth -> Supabase/Postgres/RLS -> revalidation.
+    - Show public read paths, admin write paths, and failure handling.
+    - Label actual implemented behavior separately from planned work.
+    Acceptance: diagrams match the current code, not an aspirational architecture.
+
+[ ] Add a concise README with:
+    - What problem the project solves.
+    - Screenshots or a short demo GIF.
+    - Live demo and source links.
+    - Architecture diagram and key design decisions.
+    - Local setup, environment variables, migrations, test commands, and deployment notes.
+    - Known limitations and security notes.
+    Acceptance: a developer unfamiliar with the project can run it from the README.
+
+[ ] Add engineering decision records (ADRs):
+    - Why RLS is the authorization boundary.
+    - Why public queries use a reliability wrapper.
+    - Why Server Actions fit this single-writer CMS.
+    - Why ISR/revalidation settings were selected.
+    - Include alternatives considered and trade-offs.
+    Acceptance: 3–5 short, specific records linked from the README.
+
+[ ] Improve the public demo experience:
+    - Add a clear “Start here” project page.
+    - Include one strong case study with problem, architecture, trade-offs, tests, and lessons.
+    - Make empty, loading, error, and not-found states deliberate.
+    - Make the site responsive and accessible with keyboard navigation and visible focus.
+    Acceptance: the main project story is understandable without an interviewer's guidance.
+
+PHASE 3 — RELIABILITY AND OBSERVABILITY
+Goal: Demonstrate production-minded thinking without inventing production traffic.
+
+[ ] Add structured server-side logs for important failures:
+    - Include request/correlation ID, operation name, and safe error context.
+    - Never log secrets, session tokens, or unnecessary personal data.
+    - Make retries and final failures distinguishable.
+    Acceptance: a simulated database failure can be traced from logs without exposing sensitive data.
+
+[ ] Add an admin-visible health/status view:
+    - Show whether key dependencies are reachable and when the last check ran.
+    - Clearly distinguish “unknown/unavailable” from “zero”.
+    - Protect the view and do not expose secrets or detailed internal errors publicly.
+    Acceptance: dependency failure is reported accurately and does not masquerade as empty content.
+
+[ ] Add a small failure-test suite:
+    - Database unavailable or timed out.
+    - Invalid input.
+    - Unauthorized action.
+    - Revalidation failure or partial operation where applicable.
+    - Retry exhaustion.
+    Acceptance: expected behavior is documented and tested for each failure.
+
+PHASE 4 — MEASURED PERFORMANCE AND DATA QUALITY
+Goal: Replace vague claims with reproducible evidence.
+
+[ ] Establish a performance baseline:
+    - Use Lighthouse or an equivalent repeatable tool on a small set of routes.
+    - Record test environment, date, route, and results.
+    - Measure before changing code, then compare after targeted changes.
+    - Do not promise a score or improvement before measuring it.
+    Acceptance: README contains a reproducible baseline and any claimed improvement has before/after evidence.
+
+[ ] Review database query shape and indexes:
+    - Identify high-frequency public queries and ordering/filtering patterns.
+    - Inspect query plans where practical.
+    - Add indexes only when justified by query patterns and evidence.
+    Acceptance: each added index has a documented reason; avoid speculative indexing.
+
+[ ] Add validation and content integrity checks:
+    - Validate user-controlled fields on the server.
+    - Define limits for long text, slugs, URLs, and uploaded/embedded content where relevant.
+    - Enforce uniqueness and referential integrity in the database where appropriate.
+    Acceptance: malformed inputs fail predictably at the boundary and cannot corrupt related records.
+
+PHASE 5 — OPTIONAL DIFFERENTIATOR (only after the phases above)
+Choose ONE, implement it end-to-end, and document the trade-offs.
+
+Option A: Versioned publishing workflow
+- Draft revisions, preview, publish, rollback to a prior revision, and audit history.
+- Test concurrent edits and stale-version conflicts.
+- Keep authoring state separate from public published state.
+
+Option B: Engineering knowledge graph
+- Connect projects, technologies, architecture components, articles, and decisions.
+- Make nodes navigable and explain the underlying data model.
+- Ensure the graph is useful, keyboard-accessible, and performant; do not add a graph just for visual effect.
+
+Option C: Search with useful behavior
+- Search projects/articles with filters, sorting, and empty states.
+- Use database-supported search and indexes appropriate to the data.
+- Test ranking/filter behavior and document trade-offs.
+
+Option D: Incremental external data sync
+- Sync selected GitHub repository metadata using a scheduled or on-demand job.
+- Add idempotency, rate-limit handling, retries, logs, and a visible last-synced status.
+- Never make the public site depend on a live GitHub request for every page view.
+
+Do not implement all four. One complete differentiator is more credible than four shallow demos.
+
+============================================================
+3. RECOMMENDED BUILD ORDER
+============================================================
+
+1. CI for lint, type-check, tests, and build.
+2. Playwright end-to-end tests for the core public and admin journeys.
+3. README, architecture diagram, SECURITY.md, and 3–5 ADRs.
+4. Database migrations and clean setup instructions.
+5. Structured logs and explicit failure tests.
+6. Repeatable performance baseline and evidence-based query/index review.
+7. One differentiator: preferably versioned publishing/rollback OR incremental GitHub sync, depending on which story you want to discuss in interviews.
+8. Final UX/accessibility polish and a short demo walkthrough.
+
+============================================================
+4. RESUME POSITIONING
+============================================================
+
+Suggested project name:
+Engineering Portfolio & CMS
+
+Suggested skills line:
+Next.js 15, React 19, TypeScript, PostgreSQL, Supabase, Row-Level Security, Server Actions, Vitest, PGlite, Tailwind CSS, Vercel, CI/CD (only after implemented), Playwright (only after implemented)
+
+Use strong, defensible engineering claims:
+- Database-enforced access control.
+- Explicit database failure handling and bounded retry behavior.
+- Field-level write allowlists.
+- Automated tests covering SQL behavior and application invariants.
+- Reproducible CI and end-to-end tests, once implemented.
+- Measured performance findings, only when the measurements exist.
+
+Avoid:
+- Invented users, traffic, throughput, latency, uptime, or percentage improvements.
+- Calling it a production app with users unless that is true.
+- Listing tools or features that are only planned.
+- Saying “zero exposed endpoints” as a security guarantee; Server Actions still need authorization, validation, and careful exposure review.
+
+============================================================
+5. DEFINITION OF “RESUME READY”
+============================================================
+
+Call the upgrade complete when:
+[ ] CI runs and blocks broken changes.
+[ ] Core public/admin flows have repeatable end-to-end tests.
+[ ] Database setup is reproducible from migrations and documentation.
+[ ] Security boundaries and key failure modes are tested and documented.
+[ ] README includes architecture, setup, demo, decisions, and limitations.
+[ ] At least one measured performance or query investigation is documented.
+[ ] One differentiator is complete and demonstrated.
+[ ] The live demo, repository, screenshots, and resume claims all agree.
+
+The strongest interview story is not “I added many features.” It is:
+“I identified a concrete failure/security risk, designed a boundary around it, tested the behavior—including failure cases—and documented the trade-offs.”
