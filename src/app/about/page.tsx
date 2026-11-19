@@ -51,12 +51,12 @@ export default async function AboutPage() {
 
         <aside aria-labelledby="contact-heading" className="lg:sticky lg:top-24 lg:self-start">
           <div className="card rounded-2xl p-6">
-            <h2 id="contact-heading" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Contact</h2>
-            <p className="mt-3 text-[14px] leading-relaxed text-muted">Open to software engineering roles. Email is the fastest way to reach me.</p>
-            <ul className="mt-5 space-y-2.5 text-[14px]">
+            <h2 id="contact-heading" className="text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">Contact</h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-muted">Open to software engineering roles. Email is the fastest way to reach me.</p>
+            <ul className="mt-5 space-y-2.5 text-[15px]">
               <li>
-                <a href={`mailto:${contact.email}`} className="flex items-center justify-between gap-3 rounded-lg bg-ink px-4 py-2.5 font-medium text-page transition-opacity hover:opacity-85">
-                  Email <span className="truncate font-normal opacity-80">{contact.email}</span>
+                <a href={`mailto:${contact.email}`} className="flex flex-col gap-0.5 rounded-lg bg-ink px-4 py-2.5 font-medium text-page transition-opacity hover:opacity-85">
+                  Email <span className="break-all font-mono text-[13px] font-normal opacity-80">{contact.email}</span>
                 </a>
               </li>
               <li>
@@ -84,8 +84,8 @@ function GitHubSection({ gh }: { gh: GitHubSummary }) {
   return (
     <section aria-labelledby="github-heading" className="mt-14">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="github-heading" className="text-[20px] font-semibold tracking-tight">On GitHub</h2>
-        <a href={gh.url} target="_blank" rel="noopener" className="text-[13.5px] text-muted transition-colors hover:text-ink">
+        <h2 id="github-heading" className="text-[22px] font-semibold tracking-tight">On GitHub</h2>
+        <a href={gh.url} target="_blank" rel="noopener" className="text-[14.5px] text-muted transition-colors hover:text-ink">
           @{gh.login} · {gh.publicRepos} public repos · {gh.followers} followers <span aria-hidden>↗</span>
         </a>
       </div>
@@ -94,9 +94,9 @@ function GitHubSection({ gh }: { gh: GitHubSummary }) {
           {gh.repos.map((r) => (
             <li key={r.name}>
               <a href={r.url} target="_blank" rel="noopener" className="card flex h-full flex-col rounded-xl p-4 transition-colors hover:bg-raised">
-                <span className="truncate font-mono text-[14px] font-medium">{r.name}</span>
-                {r.description && <span className="mt-1.5 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{r.description}</span>}
-                <span className="mt-auto flex flex-wrap gap-x-3 pt-3 text-[12px] text-faint">
+                <span className="truncate font-mono text-[15px] font-medium">{r.name}</span>
+                {r.description && <span className="mt-1.5 line-clamp-2 text-[14.5px] leading-relaxed text-muted">{r.description}</span>}
+                <span className="mt-auto flex flex-wrap gap-x-3 pt-3 text-[13px] text-faint">
                   {r.language && <span>{r.language}</span>}
                   {r.stars > 0 && <span>★ {r.stars}</span>}
                   <span>Updated {fullDate(r.pushedAt)}</span>

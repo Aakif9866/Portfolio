@@ -36,12 +36,12 @@ export default async function LabPage() {
                     <div className="flex items-center justify-between gap-3">
                       <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
                       {e.tags && e.tags.length > 0 && (
-                        <span className="font-mono text-[11px] text-faint">{e.tags.slice(0, 2).join(" · ")}</span>
+                        <span className="font-mono text-[12px] text-faint">{e.tags.slice(0, 2).join(" · ")}</span>
                       )}
                     </div>
-                    <h2 className="mt-4 text-[19px] font-semibold tracking-tight">{e.title}</h2>
-                    <p className="mt-2.5 text-[14px] leading-relaxed text-muted">{e.summary}</p>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors group-hover:text-ink">
+                    <h2 className="mt-4 text-[20.5px] font-semibold tracking-tight">{e.title}</h2>
+                    <p className="mt-2.5 text-[15px] leading-relaxed text-muted">{e.summary}</p>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-[14px] text-muted transition-colors group-hover:text-ink">
                       Hypothesis and outcome
                       <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                     </span>

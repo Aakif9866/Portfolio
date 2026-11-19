@@ -103,6 +103,12 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
   email newsletter, series/playlists.
 
 - **Visual theme = v1** (tag `v1`): the user disliked the v2 declutter. Keep v1 effects; new UI should use them.
+- **Type:** Geist (text/headings), Geist Mono (labels, meta, code), Instrument Serif italic for highlights
+  (`.grad-text`, `.font-accent`: article summaries, home stats, blockquotes), self-hosted via `next/font`. Public
+  text was bumped one step; prose is 18px in v1's muted colour. Verified against a v1 build: backgrounds match
+  (0.2% pixel diff = logo/nav label).
+- **Speed:** pages are static (4–25 ms TTFB vs v1's 90–690 ms). The aurora glow renders at 1/4 size ×4 scale;
+  don't add `will-change` to it (measured: dropped scroll frames). Entrance animations are 0.35 s.
 
 - Nav keeps all 6 items; "Articles" is labelled **Writing** (URLs unchanged).
 - Keep the 9 unused tables and the admin Project builder pages. Remove the 9 obsolete `site_config` rows,

@@ -10,7 +10,7 @@ export function StatusPill({ status, map = PROJECT_STATUS }: { status: string; m
   const tone = map[status]?.tone ?? "#8a8a93";
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-wider"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11.5px] uppercase tracking-wider"
       style={{ color: `color-mix(in oklab, ${tone} 50%, var(--ink))`, background: `${tone}18` }}
     >
       <span className="h-1 w-1 rounded-full" style={{ background: tone }} />
@@ -35,35 +35,35 @@ export function ProjectCard({
       <div className="relative flex items-center gap-2">
         <StatusPill status={project.status} />
         {project.featured && (
-          <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint">Featured</span>
+          <span className="font-mono text-[11.5px] uppercase tracking-wider text-faint">Featured</span>
         )}
       </div>
 
-      <h3 className={`relative mt-5 font-semibold tracking-tight ${featured ? "text-[28px]" : "text-[21px]"}`}>
+      <h3 className={`relative mt-5 font-semibold tracking-tight ${featured ? "text-[30px]" : "text-[23px]"}`}>
         {project.title}
       </h3>
-      <p className={`relative mt-2.5 leading-relaxed text-muted ${featured ? "max-w-xl text-[16px]" : "text-[14.5px]"}`}>
+      <p className={`relative mt-2.5 leading-relaxed text-muted ${featured ? "max-w-xl text-[17px]" : "text-[15.5px]"}`}>
         {project.thesis ?? project.summary}
       </p>
 
       <div className="relative mt-auto flex flex-wrap items-center gap-1.5 pt-6">
         {tech.slice(0, featured ? 6 : 3).map((t) => (
-          <span key={t} className="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11px] text-muted">
+          <span key={t} className="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[12px] text-muted">
             {t}
           </span>
         ))}
         {tech.length > (featured ? 6 : 3) && (
-          <span className="font-mono text-[11px] text-faint">+{tech.length - (featured ? 6 : 3)}</span>
+          <span className="font-mono text-[12px] text-faint">+{tech.length - (featured ? 6 : 3)}</span>
         )}
       </div>
 
-      <span className="relative mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-medium text-muted">
+      <span className="relative mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] font-medium text-muted">
         <span className="inline-flex items-center gap-1.5 transition-colors group-hover:text-ink">
         Read the case study
         <svg className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </span>
         {(project.repo_url || project.demo_url) && (
-          <span className="font-mono text-[11px] font-normal text-faint">
+          <span className="font-mono text-[12px] font-normal text-faint">
             {[project.repo_url && "Code", project.demo_url && "Live demo"].filter(Boolean).join(" · ")}
           </span>
         )}

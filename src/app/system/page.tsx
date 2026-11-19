@@ -38,7 +38,7 @@ export default async function SystemPage() {
         {/* jump bar */}
         <nav className="sticky top-14 z-30 -mx-6 mb-12 flex gap-1.5 overflow-x-auto border-b border-line bg-page/85 px-6 py-3 backdrop-blur">
           {groups.map((g) => (
-            <a key={g.key} href={`#${g.key}`} className="shrink-0 rounded-full border border-line px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:border-line-strong hover:text-ink">
+            <a key={g.key} href={`#${g.key}`} className="shrink-0 rounded-full border border-line px-3 py-1.5 text-[13.5px] text-muted transition-colors hover:border-line-strong hover:text-ink">
               {g.label} <span className="text-faint">{g.items.length}</span>
             </a>
           ))}
@@ -49,8 +49,8 @@ export default async function SystemPage() {
             <section key={g.key} id={g.key} className="scroll-mt-32">
               <div className="flex items-center gap-3">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: g.accent }} />
-                <h2 className="text-[22px] font-semibold tracking-tight">{g.label}</h2>
-                <span className="font-mono text-[12px] text-faint">{g.items.length}</span>
+                <h2 className="text-[24px] font-semibold tracking-tight">{g.label}</h2>
+                <span className="font-mono text-[13px] text-faint">{g.items.length}</span>
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {g.items.map((t, i) => {
@@ -59,7 +59,7 @@ export default async function SystemPage() {
                     <div key={t.id} className="rv">
                       <div id={t.slug} className="card card-hover ring-grad h-full scroll-mt-32 rounded-2xl p-5">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-[15.5px] font-semibold" style={{ color: t.color ?? undefined }}>
+                          <h3 className="text-[16.5px] font-semibold" style={{ color: t.color ?? undefined }}>
                             {t.name}
                           </h3>
                           {t.url && (
@@ -68,11 +68,11 @@ export default async function SystemPage() {
                             </a>
                           )}
                         </div>
-                        {t.summary_md && <div className="mt-2.5 text-[13.5px]"><Markdown>{t.summary_md}</Markdown></div>}
+                        {t.summary_md && <div className="mt-2.5 text-[14.5px]"><Markdown>{t.summary_md}</Markdown></div>}
                         {projects.length > 0 && (
                           <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-3.5">
                             {projects.map((p) => (
-                              <Link key={p.slug} href={`/projects/${p.slug}`} className="rounded-md bg-raised px-2 py-0.5 text-[11.5px] text-muted transition-colors hover:text-ink">
+                              <Link key={p.slug} href={`/projects/${p.slug}`} className="rounded-md bg-raised px-2 py-0.5 text-[12.5px] text-muted transition-colors hover:text-ink">
                                 {p.title}
                               </Link>
                             ))}

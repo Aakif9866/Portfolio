@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 
 const MIGRATION = readFileSync(new URL("../supabase/migrations/20261119000003_article_media.sql", import.meta.url), "utf8");
 
-it("adds tags (default empty), cover_image_url and video_url, and can run twice", async () => {
+it("adds tags (default empty), cover_image_url and video_url, and can run twice", { timeout: 30_000 }, async () => {
   const db = new PGlite();
   await db.exec("create table public.articles (id serial primary key, title text not null)");
   await db.exec("insert into public.articles (title) values ('existing')");

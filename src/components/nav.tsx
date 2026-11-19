@@ -37,12 +37,12 @@ export function Nav({ contact }: { contact: Contact }) {
       }`}
     >
       <nav aria-label="Main" className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 text-[16px] font-semibold tracking-tight">
           <span className="brand-mark">SA</span>
           Aakif
         </Link>
 
-        <div className="hidden items-center gap-6 text-[13.5px] md:flex">
+        <div className="hidden items-center gap-6 text-[14.5px] md:flex">
           {NAV.map((l) => {
             const active = pathname.startsWith(l.href);
             return (
@@ -65,7 +65,7 @@ export function Nav({ contact }: { contact: Contact }) {
             href={contact.github}
             target="_blank"
             rel="noopener"
-            className="hidden rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-page transition-opacity hover:opacity-85 sm:inline-flex"
+            className="hidden rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85 sm:inline-flex"
           >
             GitHub
           </a>
@@ -94,7 +94,7 @@ export function Nav({ contact }: { contact: Contact }) {
                   <Link
                     href={l.href}
                     aria-current={active ? "page" : undefined}
-                    className={`flex items-center justify-between py-3.5 text-[16px] ${active ? "font-medium text-ink" : "text-muted"}`}
+                    className={`flex items-center justify-between py-3.5 text-[17px] ${active ? "font-medium text-ink" : "text-muted"}`}
                   >
                     {l.label}
                     <svg className="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M9 6l6 6-6 6" /></svg>
@@ -104,10 +104,10 @@ export function Nav({ contact }: { contact: Contact }) {
             })}
           </ul>
           <div className="mt-4 flex flex-wrap gap-2">
-            <a href={`mailto:${contact.email}`} className="rounded-full bg-ink px-4 py-2 text-[13.5px] font-medium text-page">Email me</a>
-            <a href={contact.github} target="_blank" rel="noopener" className="rounded-full border border-line bg-card px-4 py-2 text-[13.5px] font-medium">GitHub</a>
+            <a href={`mailto:${contact.email}`} className="rounded-full bg-ink px-4 py-2 text-[14.5px] font-medium text-page">Email me</a>
+            <a href={contact.github} target="_blank" rel="noopener" className="rounded-full border border-line bg-card px-4 py-2 text-[14.5px] font-medium">GitHub</a>
             {contact.linkedin && (
-              <a href={contact.linkedin} target="_blank" rel="noopener" className="rounded-full border border-line bg-card px-4 py-2 text-[13.5px] font-medium">LinkedIn</a>
+              <a href={contact.linkedin} target="_blank" rel="noopener" className="rounded-full border border-line bg-card px-4 py-2 text-[14.5px] font-medium">LinkedIn</a>
             )}
           </div>
         </div>

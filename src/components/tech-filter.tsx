@@ -29,7 +29,7 @@ function Filter({ tags, counts, total, tech }: Props & { tech: string | null }) 
   const known = tech !== null && tags.includes(tech);
   const shown = tech === null ? total : known ? counts[tech] : 0;
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1.5 text-[12.5px] transition-colors ${
+    `rounded-full border px-3 py-1.5 text-[13.5px] transition-colors ${
       active ? "border-ink bg-ink text-page" : "border-line text-muted hover:border-line-strong hover:text-ink"
     }`;
 
@@ -41,8 +41,8 @@ function Filter({ tags, counts, total, tech }: Props & { tech: string | null }) 
       {tags.length > 0 && (
         <div className="mb-8">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Filter by technology</h2>
-            <p className="text-[13px] text-muted" aria-live="polite">
+            <h2 className="text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">Filter by technology</h2>
+            <p className="text-[14px] text-muted" aria-live="polite">
               Showing {shown} of {total} projects{tech ? <> using <span className="font-medium text-ink">{tech}</span></> : null}
               {tech && <> · <Link href="/projects" className="text-accent underline underline-offset-2">Clear filter</Link></>}
             </p>

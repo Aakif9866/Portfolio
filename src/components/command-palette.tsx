@@ -61,11 +61,11 @@ export function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Search the site"
-        className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:text-ink lg:flex lg:h-auto lg:w-auto lg:items-center lg:gap-2 lg:px-3 lg:py-1.5 lg:text-[12.5px] lg:text-faint lg:hover:text-muted"
+        className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:text-ink lg:flex lg:h-auto lg:w-auto lg:items-center lg:gap-2 lg:px-3 lg:py-1.5 lg:text-[13.5px] lg:text-faint lg:hover:text-muted"
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         <span className="hidden lg:inline">Search</span>
-        <kbd className="ml-1 hidden rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-muted lg:inline">⌘K</kbd>
+        <kbd className="ml-1 hidden rounded border border-line bg-raised px-1.5 py-px font-mono text-[11.5px] text-muted lg:inline">⌘K</kbd>
       </button>
 
       {open && (
@@ -80,14 +80,14 @@ export function CommandPalette() {
                 onChange={(e) => setQ(e.target.value)}
                 aria-label="Search projects, experiments, articles, technologies and pages"
                 placeholder="Search projects, experiments, technologies…"
-                className="w-full bg-transparent py-3.5 text-[15px] text-ink outline-none placeholder:text-faint"
+                className="w-full bg-transparent py-3.5 text-[16px] text-ink outline-none placeholder:text-faint"
               />
-              <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[10.5px] text-muted">esc</kbd>
+              <kbd className="shrink-0 rounded border border-line bg-raised px-1.5 py-px font-mono text-[11.5px] text-muted">esc</kbd>
             </div>
             <ul className="max-h-[52vh] overflow-y-auto p-2">
-              {status === "loading" && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Loading…</li>}
-              {status === "error" && <li role="alert" className="px-3 py-6 text-center text-[13.5px] text-faint">Search couldn&apos;t load. Close and reopen to try again.</li>}
-              {status === "ready" && results.length === 0 && <li className="px-3 py-6 text-center text-[13.5px] text-faint">Nothing matches “{q}”.</li>}
+              {status === "loading" && <li className="px-3 py-6 text-center text-[14.5px] text-faint">Loading…</li>}
+              {status === "error" && <li role="alert" className="px-3 py-6 text-center text-[14.5px] text-faint">Search couldn&apos;t load. Close and reopen to try again.</li>}
+              {status === "ready" && results.length === 0 && <li className="px-3 py-6 text-center text-[14.5px] text-faint">Nothing matches “{q}”.</li>}
               {results.map((r, i) => (
                 <li key={r.href + r.label}>
                   <button
@@ -95,9 +95,9 @@ export function CommandPalette() {
                     onClick={() => { setOpen(false); router.push(r.href); }}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${i === cursor ? "bg-raised" : ""}`}
                   >
-                    <span className="font-mono text-[10.5px] uppercase tracking-wider text-faint w-20 shrink-0">{r.group}</span>
-                    <span className="flex-1 truncate text-[14px] text-ink">{r.label}</span>
-                    {r.hint && <span className="shrink-0 text-[12px] text-faint">{r.hint}</span>}
+                    <span className="font-mono text-[11.5px] uppercase tracking-wider text-faint w-20 shrink-0">{r.group}</span>
+                    <span className="flex-1 truncate text-[15px] text-ink">{r.label}</span>
+                    {r.hint && <span className="shrink-0 text-[13px] text-faint">{r.hint}</span>}
                   </button>
                 </li>
               ))}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { getVisitCount } from "@/lib/visits";
@@ -16,13 +17,18 @@ export const metadata: Metadata = {
   alternates: { types: { "application/rss+xml": [{ url: "/feed.xml", title: "Aakif — Writing" }] } },
 };
 
+// Self-hosted at build time (no request to Google from visitors' browsers), swap so text shows at once.
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-instrument", display: "swap" });
+
 // Runs before paint: no theme flash, no layout shift.
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [visits, contact] = await Promise.all([getVisitCount(), getContact()]);
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-page">

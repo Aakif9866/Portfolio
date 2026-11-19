@@ -15,10 +15,10 @@ export function ShareBar({ url, title }: { url: string; title: string }) {
     { label: "Reddit", href: `https://www.reddit.com/submit?url=${u}&title=${t}` },
     { label: "WhatsApp", href: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}` },
   ];
-  const chip = "rounded-full border border-line px-3 py-1.5 text-[13px] text-muted transition-colors hover:bg-raised hover:text-ink";
+  const chip = "rounded-full border border-line px-3 py-1.5 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink";
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Share</span>
+      <span className="mr-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Share</span>
       {links.map((l) => (
         <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className={chip}>{l.label}</a>
       ))}

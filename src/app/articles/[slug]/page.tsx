@@ -86,28 +86,28 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <header className="relative overflow-hidden spotlight border-b border-line pb-12 pt-32">
         <div className="pointer-events-none absolute inset-0 grid-bg opacity-50" />
         <div className="relative mx-auto max-w-3xl px-6">
-          <Link href="/articles" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
+          <Link href="/articles" className="inline-flex items-center gap-1.5 text-[14px] text-muted transition-colors hover:text-ink">
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
             All writing
           </Link>
-          <div className="mt-6 flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
+          <div className="mt-6 flex flex-wrap items-center gap-2.5 font-mono text-[12.5px] uppercase tracking-wider text-faint">
             {a.video_url && <span className="text-accent">▶ Video</span>}
             {a.topics && <span className="text-accent">{a.topics.name}</span>}
             {a.difficulty && <span>{a.difficulty}</span>}
             {minutes && <span>{minutes} min read</span>}
           </div>
-          <h1 className="mt-4 text-[clamp(30px,5vw,46px)] font-semibold leading-[1.08] tracking-tightest">{a.title}</h1>
-          {a.dek && <p className="mt-5 text-[18px] leading-relaxed text-muted">{a.dek}</p>}
+          <h1 className="mt-4 text-[clamp(32px,5.4vw,52px)] font-semibold leading-[1.08] tracking-tightest">{a.title}</h1>
+          {a.dek && <p className="font-accent mt-5 text-[26px] leading-snug text-muted">{a.dek}</p>}
           {tags.length > 0 && (
             <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Tags">
               {tags.map((t) => (
                 <li key={t}>
-                  <Link href={`/articles/tag/${tagSlug(t)}`} className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[12px] text-muted transition-colors hover:bg-raised hover:text-ink">#{t}</Link>
+                  <Link href={`/articles/tag/${tagSlug(t)}`} className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[13px] text-muted transition-colors hover:bg-raised hover:text-ink">#{t}</Link>
                 </li>
               ))}
             </ul>
           )}
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[12px] text-faint">
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[13px] text-faint">
             <span>By {SITE_NAME}</span>
             {a.published_at && <time dateTime={a.published_at}>Published {fullDate(a.published_at)}</time>}
             {a.last_reviewed_at && <span>Reviewed {fullDate(a.last_reviewed_at)}</span>}
@@ -121,7 +121,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           {videoId ? (
             <YouTube url={a.video_url!} title={a.title} />
           ) : a.video_url ? (
-            <a href={a.video_url} target="_blank" rel="noopener noreferrer" className="card card-hover flex items-center justify-between rounded-xl px-5 py-4 text-[15px] font-medium">
+            <a href={a.video_url} target="_blank" rel="noopener noreferrer" className="card card-hover flex items-center justify-between rounded-xl px-5 py-4 text-[16px] font-medium">
               ▶ Watch the video <span aria-hidden className="text-faint">↗</span>
             </a>
           ) : (
@@ -135,8 +135,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {toc.length >= 3 && (
           <nav aria-label="On this page" className="mb-10 lg:order-last lg:mb-0">
             <details className="rounded-xl border border-line p-4 lg:sticky lg:top-24 lg:border-0 lg:p-0" open>
-              <summary className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.14em] text-faint lg:pointer-events-none lg:list-none">On this page</summary>
-              <ol className="mt-3 space-y-1.5 text-[13.5px]">
+              <summary className="cursor-pointer text-[13px] font-semibold uppercase tracking-[0.14em] text-faint lg:pointer-events-none lg:list-none">On this page</summary>
+              <ol className="mt-3 space-y-1.5 text-[14.5px]">
                 {toc.map((h) => (
                   <li key={h.id} className={h.depth === 3 ? "pl-3" : ""}>
                     <a href={`#${h.id}`} className="text-muted transition-colors hover:text-ink">{h.text}</a>
@@ -147,7 +147,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </nav>
         )}
         <div className="mx-auto w-full max-w-[68ch]">
-          {body ? <Markdown anchors>{body}</Markdown> : <p className="text-[14px] text-muted">This article has no body yet.</p>}
+          {body ? <Markdown anchors>{body}</Markdown> : <p className="text-[15px] text-muted">This article has no body yet.</p>}
 
           <div className="mt-14 border-t border-line pt-6">
             <ShareBar url={url} title={a.title} />
@@ -155,13 +155,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           {related.length > 0 && (
             <section aria-labelledby="related-heading" className="mt-14">
-              <h2 id="related-heading" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Related</h2>
+              <h2 id="related-heading" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Related</h2>
               <ul className="mt-4 grid gap-3">
                 {related.map((r) => (
                   <li key={r.slug}>
                     <Link href={`/articles/${r.slug}`} className="card card-hover ring-grad block rounded-xl p-4">
-                      <span className="block text-[15px] font-medium">{r.video_url ? "▶ " : ""}{r.title}</span>
-                      {r.dek && <span className="mt-1 line-clamp-2 block text-[13.5px] text-muted">{r.dek}</span>}
+                      <span className="block text-[16px] font-medium">{r.video_url ? "▶ " : ""}{r.title}</span>
+                      {r.dek && <span className="mt-1 line-clamp-2 block text-[14.5px] text-muted">{r.dek}</span>}
                     </Link>
                   </li>
                 ))}
@@ -173,14 +173,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <nav aria-label="More writing" className="mt-14 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
               {older ? (
                 <Link href={`/articles/${older.slug}`} className="card card-hover rounded-xl p-4">
-                  <span className="block text-[12px] text-faint">Previous</span>
-                  <span className="mt-1 block text-[15px] font-medium">{older.title}</span>
+                  <span className="block text-[13px] text-faint">Previous</span>
+                  <span className="mt-1 block text-[16px] font-medium">{older.title}</span>
                 </Link>
               ) : <span />}
               {newer && (
                 <Link href={`/articles/${newer.slug}`} className="card card-hover rounded-xl p-4 text-right">
-                  <span className="block text-[12px] text-faint">Next</span>
-                  <span className="mt-1 block text-[15px] font-medium">{newer.title}</span>
+                  <span className="block text-[13px] text-faint">Next</span>
+                  <span className="mt-1 block text-[16px] font-medium">{newer.title}</span>
                 </Link>
               )}
             </nav>

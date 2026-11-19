@@ -12,14 +12,14 @@ export function Footer({ visits, contact }: { visits: number | null; contact: Co
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="flex flex-wrap items-start justify-between gap-10">
           <div className="max-w-xs">
-            <p className="text-[15px] font-semibold">Aakif</p>
-            <p className="mt-2 text-[13.5px] leading-relaxed text-muted">
+            <p className="text-[16px] font-semibold">Aakif</p>
+            <p className="mt-2 text-[14.5px] leading-relaxed text-muted">
               Software engineer — backend systems, AI agent infrastructure and full-stack products.
             </p>
           </div>
-          <nav aria-label="Footer" className="flex gap-14 text-[13.5px]">
+          <nav aria-label="Footer" className="flex gap-14 text-[14.5px]">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wider text-faint">Explore</p>
+              <p className="font-mono text-[12px] uppercase tracking-wider text-faint">Explore</p>
               <ul className="mt-3 space-y-2 text-muted">
                 {NAV.map((l) => (
                   <li key={l.href}><Link href={l.href} className="ul hover:text-ink">{l.label}</Link></li>
@@ -27,7 +27,7 @@ export function Footer({ visits, contact }: { visits: number | null; contact: Co
               </ul>
             </div>
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-wider text-faint">Contact</p>
+              <p className="font-mono text-[12px] uppercase tracking-wider text-faint">Contact</p>
               <ul className="mt-3 space-y-2 text-muted">
                 <li><a href={`mailto:${contact.email}`} className="ul hover:text-ink">Email</a></li>
                 <li><a href={contact.github} target="_blank" rel="noopener" className="ul hover:text-ink">GitHub</a></li>
@@ -39,7 +39,7 @@ export function Footer({ visits, contact }: { visits: number | null; contact: Co
             </div>
           </nav>
         </div>
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[12.5px] text-faint">
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[13.5px] text-faint">
           <p>© {new Date().getFullYear()} Aakif. Built with Next.js, Supabase and Tailwind CSS.</p>
           {visits !== null && <p className="font-mono">{visits.toLocaleString()} page views</p>}
         </div>

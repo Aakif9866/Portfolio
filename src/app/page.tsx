@@ -36,7 +36,7 @@ export default async function Home() {
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6">
-          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3 py-1 text-[12.5px] text-muted backdrop-blur">
+          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3 py-1 text-[13.5px] text-muted backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -44,24 +44,24 @@ export default async function Home() {
             Open to software engineering roles
           </div>
 
-          <h1 className="animate-fade-up mt-7 max-w-4xl text-[clamp(40px,6vw,66px)] font-semibold leading-[1.03] tracking-tightest">
+          <h1 className="animate-fade-up mt-7 max-w-5xl text-[clamp(42px,6.4vw,74px)] font-semibold leading-[1.03] tracking-tightest">
             I build the <span className="grad-text">unglamorous parts</span>
             <br />
             that make software hold up.
           </h1>
 
-          <p className="animate-fade-up mt-7 max-w-2xl text-[19px] leading-relaxed text-muted">
+          <p className="animate-fade-up mt-7 max-w-2xl text-[20.5px] leading-relaxed text-muted">
             Software engineer working across backend systems, AI agent infrastructure and full-stack
             products. Most of what I build is the layer underneath the demo — routing, guardrails,
             storage, sync, tests. Every case study below is a row in a Postgres database I designed.
           </p>
 
           <div className="animate-fade-up mt-9 flex flex-wrap items-center gap-3">
-            <Link href="/projects" className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
+            <Link href="/projects" className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[15px] font-medium text-page transition-opacity hover:opacity-85">
               View projects
               <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
-            <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+            <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[15px] font-medium transition-colors hover:bg-raised">
               {contact.email}
             </a>
           </div>
@@ -74,8 +74,8 @@ export default async function Home() {
               { k: "Focus", v: "Backend · AI" },
             ].map((s) => (
               <div key={s.k} className="bg-card px-5 py-5">
-                <dt className="text-[11.5px] uppercase tracking-wider text-faint">{s.k}</dt>
-                <dd className="mt-1.5 text-[17px] font-medium">{s.v}</dd>
+                <dt className="text-[12.5px] uppercase tracking-wider text-faint">{s.k}</dt>
+                <dd className="font-accent mt-1 text-[30px] leading-none">{s.v}</dd>
               </div>
             ))}
           </dl>
@@ -88,10 +88,10 @@ export default async function Home() {
           <div className="rv">
             <div className="flex items-end justify-between gap-6">
               <div>
-                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">01 — Featured projects</p>
-                <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Selected case studies</h2>
+                <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">01 — Featured projects</p>
+                <h2 className="mt-3 text-[clamp(30px,4.4vw,44px)] font-semibold tracking-tightest">Selected case studies</h2>
               </div>
-              <Link href="/projects" className="hidden shrink-0 items-center gap-1.5 text-[13.5px] text-muted transition-colors hover:text-ink md:inline-flex">
+              <Link href="/projects" className="hidden shrink-0 items-center gap-1.5 text-[14.5px] text-muted transition-colors hover:text-ink md:inline-flex">
                 All {projects.length} projects
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </Link>
@@ -107,7 +107,7 @@ export default async function Home() {
               </div>
             ))}
           </div>
-          <Link href="/projects" className="mt-8 inline-flex items-center gap-1.5 text-[13.5px] text-muted transition-colors hover:text-ink md:hidden">
+          <Link href="/projects" className="mt-8 inline-flex items-center gap-1.5 text-[14.5px] text-muted transition-colors hover:text-ink md:hidden">
             All {projects.length} projects
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </Link>
@@ -118,9 +118,9 @@ export default async function Home() {
       <section className="border-t border-line py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="rv">
-            <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Tech stack</p>
-            <h2 className="mt-3 text-[clamp(28px,4vw,40px)] font-semibold tracking-tightest">Technologies I work with</h2>
-            <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
+            <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">02 — Tech stack</p>
+            <h2 className="mt-3 text-[clamp(30px,4.4vw,44px)] font-semibold tracking-tightest">Technologies I work with</h2>
+            <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-muted">
               {tech.length} technologies grouped by where they sit in a system. Each one links to the
               projects where I actually used it.
             </p>
@@ -131,11 +131,11 @@ export default async function Home() {
               <div key={g.key} className="rv">
                 <Link href={`/system#${g.key}`} className="card card-hover ring-grad block h-full rounded-2xl p-6">
                   <div className="h-1 w-9 rounded-full" style={{ background: `linear-gradient(90deg, ${g.accent}, transparent)` }} />
-                  <h3 className="mt-4 flex items-baseline justify-between text-[14.5px] font-semibold uppercase tracking-wider">
+                  <h3 className="mt-4 flex items-baseline justify-between text-[15.5px] font-semibold uppercase tracking-wider">
                     {g.label}
-                    <span className="font-mono text-[12px] font-normal text-faint">{g.n}</span>
+                    <span className="font-mono text-[13px] font-normal text-faint">{g.n}</span>
                   </h3>
-                  <p className="mt-3 text-[13.5px] leading-relaxed text-muted">
+                  <p className="mt-3 text-[14.5px] leading-relaxed text-muted">
                     {tech.filter((t) => t.category === g.key).slice(0, 5).map((t) => t.name).join(" · ")}
                   </p>
                 </Link>
@@ -150,23 +150,23 @@ export default async function Home() {
           <div className="mx-auto grid max-w-6xl gap-14 px-6 lg:grid-cols-2">
             {lab.length > 0 && (
               <div className="rv">
-                <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">03 — Experiments</p>
-                <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">Recent experiments</h2>
-                <p className="mt-3 text-[15px] leading-relaxed text-muted">Smaller tests with a hypothesis written down first — including the ones that failed.</p>
+                <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">03 — Experiments</p>
+                <h2 className="mt-3 text-[30px] font-semibold tracking-tightest">Recent experiments</h2>
+                <p className="mt-3 text-[16px] leading-relaxed text-muted">Smaller tests with a hypothesis written down first — including the ones that failed.</p>
                 <ul className="mt-7 space-y-3">
                   {lab.map((e) => (
                     <li key={e.id}>
                       <Link href={`/lab/${e.slug}`} className="card card-hover group block rounded-xl p-5">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-[15px] font-medium">{e.title}</span>
+                          <span className="text-[16px] font-medium">{e.title}</span>
                           <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
                         </div>
-                        <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{e.summary}</p>
+                        <p className="mt-2 line-clamp-2 text-[14.5px] leading-relaxed text-muted">{e.summary}</p>
                       </Link>
                     </li>
                   ))}
                 </ul>
-                <Link href="/lab" className="mt-5 inline-flex items-center gap-1.5 text-[13.5px] text-muted hover:text-ink">
+                <Link href="/lab" className="mt-5 inline-flex items-center gap-1.5 text-[14.5px] text-muted hover:text-ink">
                   All experiments
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </Link>
@@ -174,26 +174,26 @@ export default async function Home() {
             )}
 
             <div className="rv">
-              <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">04 — Contact</p>
-              <h2 className="mt-3 text-[28px] font-semibold tracking-tightest">
+              <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">04 — Contact</p>
+              <h2 className="mt-3 text-[30px] font-semibold tracking-tightest">
                 Hiring, or <span className="grad-text">curious how it works?</span>
               </h2>
-              <p className="mt-4 text-[16px] leading-relaxed text-muted">
+              <p className="mt-4 text-[17px] leading-relaxed text-muted">
                 Happy to walk through any of these systems — the architecture, the tradeoffs, and the
                 parts that broke first. Each case study has an architecture diagram and a decisions
                 section for exactly that conversation.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
+                <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[15px] font-medium text-page transition-opacity hover:opacity-85">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3 7 9 6 9-6" /></svg>
                   Email me
                 </a>
-                <a href={contact.github} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+                <a href={contact.github} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[15px] font-medium transition-colors hover:bg-raised">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.88-1.4-3.88-1.4-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.76.4-1.27.73-1.56-2.56-.3-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.48.11-3.08 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.6.23 2.78.12 3.07.74.82 1.18 1.85 1.18 3.11 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .3.2.66.8.55A11.5 11.5 0 0 0 23.5 12A11.5 11.5 0 0 0 12 .5Z" /></svg>
                   GitHub
                 </a>
                 {contact.linkedin && (
-                  <a href={contact.linkedin} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-raised">
+                  <a href={contact.linkedin} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-5 py-2.5 text-[15px] font-medium transition-colors hover:bg-raised">
                     LinkedIn
                   </a>
                 )}

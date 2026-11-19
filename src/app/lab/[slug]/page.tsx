@@ -39,13 +39,13 @@ export default async function ExperimentPage({ params }: { params: Promise<{ slu
       <header className="relative overflow-hidden spotlight border-b border-line pb-12 pt-32">
         <div className="pointer-events-none absolute inset-0 grid-bg opacity-50" />
         <div className="relative mx-auto max-w-3xl px-6">
-          <Link href="/lab" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
+          <Link href="/lab" className="inline-flex items-center gap-1.5 text-[14px] text-muted transition-colors hover:text-ink">
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
             All experiments
           </Link>
-          <h1 className="mt-6 text-[clamp(30px,5vw,46px)] font-semibold leading-[1.05] tracking-tightest">{e.title}</h1>
-          <p className="mt-5 text-[17px] leading-relaxed text-muted">{e.summary}</p>
-          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[12px] text-faint">
+          <h1 className="mt-6 text-[clamp(32px,5.4vw,52px)] font-semibold leading-[1.05] tracking-tightest">{e.title}</h1>
+          <p className="mt-5 text-[18px] leading-relaxed text-muted">{e.summary}</p>
+          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[13px] text-faint">
             <span className="inline-flex items-center gap-2">
               <StatusPill status={e.status} map={EXPERIMENT_STATUS} />
               {EXPERIMENT_STATUS[e.status]?.help && <span>{EXPERIMENT_STATUS[e.status].help}</span>}
@@ -64,7 +64,7 @@ export default async function ExperimentPage({ params }: { params: Promise<{ slu
       <div className="mx-auto max-w-3xl space-y-12 px-6 py-14">
         {e.hypothesis_md && (
           <section>
-            <h2 className="mb-4 flex items-baseline gap-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
+            <h2 className="mb-4 flex items-baseline gap-3 text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">
               <span className="h-px w-8 bg-line-strong" />Hypothesis
             </h2>
             <Markdown>{e.hypothesis_md}</Markdown>
@@ -72,20 +72,20 @@ export default async function ExperimentPage({ params }: { params: Promise<{ slu
         )}
         {e.outcome_md ? (
           <section>
-            <h2 className="mb-4 flex items-baseline gap-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
+            <h2 className="mb-4 flex items-baseline gap-3 text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">
               <span className="h-px w-8 bg-line-strong" />Outcome
             </h2>
             <Markdown>{e.outcome_md}</Markdown>
           </section>
         ) : (
-          <p className="card rounded-xl px-6 py-5 text-[13.5px] text-muted">
+          <p className="card rounded-xl px-6 py-5 text-[14.5px] text-muted">
             No outcome recorded yet — this experiment is {statusLabel(EXPERIMENT_STATUS, e.status).toLowerCase()}.
           </p>
         )}
         {e.tags && e.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 border-t border-line pt-6">
             {e.tags.map((t) => (
-              <span key={t} className="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[11.5px] text-muted">{t}</span>
+              <span key={t} className="rounded-md border border-line bg-raised px-2 py-0.5 font-mono text-[12.5px] text-muted">{t}</span>
             ))}
           </div>
         )}

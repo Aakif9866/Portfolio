@@ -18,12 +18,12 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
             <span className="absolute -left-[41px] top-2 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-page" />
             <div className="card rounded-2xl p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 className="text-[18px] font-semibold tracking-tight">{e.title}</h3>
-                <span className="font-mono text-[12px] text-faint">
+                <h3 className="text-[20px] font-semibold tracking-tight">{e.title}</h3>
+                <span className="font-mono text-[13px] text-faint">
                   {fmt(e.start_date)} — {fmt(e.end_date) ?? "Present"}
                 </span>
               </div>
-              <p className="mt-1 text-[14.5px] text-muted">
+              <p className="mt-1 text-[15.5px] text-muted">
                 {e.url ? (
                   <a href={e.url} target="_blank" rel="noopener" className="ul text-ink">{e.organisation}</a>
                 ) : (
@@ -35,7 +35,7 @@ function Timeline({ entries }: { entries: TimelineEntry[] }) {
               {e.bullets && e.bullets.length > 0 && (
                 <ul className="mt-4 space-y-2">
                   {e.bullets.map((b, j) => (
-                    <li key={j} className="flex gap-2.5 text-[14px] leading-relaxed text-muted">
+                    <li key={j} className="flex gap-2.5 text-[15px] leading-relaxed text-muted">
                       <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-faint" />
                       {b}
                     </li>
@@ -74,13 +74,13 @@ export default async function ExperiencePage() {
         )}
         {work.length > 0 && (
           <section>
-            <h2 className="mb-7 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Work experience</h2>
+            <h2 className="mb-7 text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">Work experience</h2>
             <Timeline entries={work} />
           </section>
         )}
         {education.length > 0 && (
           <section>
-            <h2 className="mb-7 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Education</h2>
+            <h2 className="mb-7 text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">Education</h2>
             <Timeline entries={education} />
           </section>
         )}

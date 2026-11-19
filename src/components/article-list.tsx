@@ -24,22 +24,22 @@ export function ArticleList({ articles }: { articles: ListArticle[] }) {
           <li key={a.id} className="rv py-6">
             <article className="flex gap-5">
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
+                <div className="flex flex-wrap items-center gap-2.5 font-mono text-[12.5px] uppercase tracking-wider text-faint">
                   {a.video_url && <span className="text-accent">▶ Video</span>}
                   {a.topics && <span className="text-accent">{a.topics.name}</span>}
                   {a.difficulty && <span>{a.difficulty}</span>}
                   {minutes && <span>{minutes} min</span>}
                   {a.published_at && <time dateTime={a.published_at}>{fullDate(a.published_at)}</time>}
                 </div>
-                <h2 className="mt-2 text-[21px] font-semibold tracking-tight">
+                <h2 className="mt-2 text-[23px] font-semibold tracking-tight">
                   <Link href={`/articles/${a.slug}`} className="transition-colors hover:text-accent">{a.title}</Link>
                 </h2>
-                {a.dek && <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-muted">{a.dek}</p>}
+                {a.dek && <p className="mt-2 max-w-2xl text-[15.5px] leading-relaxed text-muted">{a.dek}</p>}
                 {tags.length > 0 && (
                   <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tags">
                     {tags.map((t) => (
                       <li key={t}>
-                        <Link href={`/articles/tag/${tagSlug(t)}`} className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[11.5px] text-muted transition-colors hover:bg-raised hover:text-ink">#{t}</Link>
+                        <Link href={`/articles/tag/${tagSlug(t)}`} className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[12.5px] text-muted transition-colors hover:bg-raised hover:text-ink">#{t}</Link>
                       </li>
                     ))}
                   </ul>
@@ -64,10 +64,10 @@ export function TagCloud({ tags, active }: { tags: { name: string; slug: string;
   if (tags.length === 0) return null;
   return (
     <nav aria-label="Topics" className="mb-8 flex flex-wrap gap-2">
-      <Link href="/articles" className={`rounded-full border px-3 py-1 text-[13px] transition-colors ${!active ? "border-ink bg-ink text-page" : "border-line text-muted hover:bg-raised hover:text-ink"}`}>All</Link>
+      <Link href="/articles" className={`rounded-full border px-3 py-1 text-[14px] transition-colors ${!active ? "border-ink bg-ink text-page" : "border-line text-muted hover:bg-raised hover:text-ink"}`}>All</Link>
       {tags.map((t) => (
         <Link key={t.slug} href={`/articles/tag/${t.slug}`} aria-current={active === t.slug ? "page" : undefined}
-          className={`rounded-full border px-3 py-1 text-[13px] transition-colors ${active === t.slug ? "border-ink bg-ink text-page" : "border-line text-muted hover:bg-raised hover:text-ink"}`}>
+          className={`rounded-full border px-3 py-1 text-[14px] transition-colors ${active === t.slug ? "border-ink bg-ink text-page" : "border-line text-muted hover:bg-raised hover:text-ink"}`}>
           {t.name} <span className="opacity-60">{t.count}</span>
         </Link>
       ))}

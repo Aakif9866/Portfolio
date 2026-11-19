@@ -35,7 +35,7 @@ export function ArchitectureDiagram({ diagram }: { diagram: Diagram }) {
 
   return (
     <div className="not-prose">
-      {diagram.description && <p className="mb-5 text-[14.5px] leading-relaxed text-muted">{diagram.description}</p>}
+      {diagram.description && <p className="mb-5 text-[15.5px] leading-relaxed text-muted">{diagram.description}</p>}
 
       {diagram.image_url && (
         <button
@@ -146,7 +146,7 @@ export function ArchitectureDiagram({ diagram }: { diagram: Diagram }) {
               })}
             </svg>
             <div className="flex min-h-[64px] items-center border-t border-line bg-surface px-5 py-3.5">
-              <p className="text-[13.5px] leading-relaxed text-muted">
+              <p className="text-[14.5px] leading-relaxed text-muted">
                 {active?.explanation ?? (active ? active.label : "Hover or tab through a node to see what it does.")}
               </p>
             </div>
@@ -157,11 +157,11 @@ export function ArchitectureDiagram({ diagram }: { diagram: Diagram }) {
             {nodes.map((n, i) => (
               <li key={n.id} className="p-4">
                 <div className="flex items-baseline gap-2.5">
-                  <span className="font-mono text-[11px] text-faint">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-mono text-[12px] text-faint">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <p className="text-[14.5px] font-medium">{n.label}</p>
-                    {n.tech && <p className="font-mono text-[11px] text-faint">{n.tech}</p>}
-                    {n.explanation && <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{n.explanation}</p>}
+                    <p className="text-[15.5px] font-medium">{n.label}</p>
+                    {n.tech && <p className="font-mono text-[12px] text-faint">{n.tech}</p>}
+                    {n.explanation && <p className="mt-1.5 text-[14px] leading-relaxed text-muted">{n.explanation}</p>}
                   </div>
                 </div>
               </li>

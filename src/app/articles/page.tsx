@@ -29,7 +29,7 @@ export default async function ArticlesPage() {
           <>
             <TagCloud tags={tagCounts(articles)} />
             <ArticleList articles={articles} />
-            <p className="mt-10 text-[13px] text-faint">
+            <p className="mt-10 text-[14px] text-faint">
               Follow along with <a href="/feed.xml" className="underline underline-offset-2 hover:text-ink">RSS</a>.
             </p>
           </>
