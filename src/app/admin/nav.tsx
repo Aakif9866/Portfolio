@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 /** Admin sections, in sidebar order. Edit here to add, rename or drop a page from the menu. */
 export const ADMIN_GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
@@ -17,7 +18,7 @@ const isActive = (pathname: string, href: string) => (href === "/admin" ? pathna
 
 /**
  * A separate, full-height sidebar on desktop; a slide-in drawer from the top bar on phones and
- * tablets. `account` (email, view site, theme, sign out) is rendered by the server layout.
+ * tablets. `account` (who is signed in, sign out) is rendered by the server layout.
  */
 export function AdminNav({ account }: { account: React.ReactNode }) {
   const pathname = usePathname();
@@ -75,9 +76,15 @@ export function AdminNav({ account }: { account: React.ReactNode }) {
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-5">
           {brand}
+          <div className="flex items-center gap-0.5">
+            <a href="/" target="_blank" rel="noopener" aria-label="View site (opens a new tab)" title="View site" className="grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-raised hover:text-ink">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+            </a>
+            <ThemeToggle compact />
           <button type="button" onClick={() => setOpen(false)} aria-label="Close admin menu" className="grid h-9 w-9 place-items-center rounded-full text-muted hover:bg-raised hover:text-ink lg:hidden">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
+          </div>
         </div>
 
         <nav aria-label="Admin" className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -118,7 +125,7 @@ export function AdminNav({ account }: { account: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="shrink-0 border-t border-line p-4">{account}</div>
+        <div className="shrink-0 border-t border-line px-3 py-3">{account}</div>
       </aside>
     </>
   );
