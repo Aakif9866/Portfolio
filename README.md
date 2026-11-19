@@ -280,6 +280,8 @@ by the app.
 
 ## Deployment
 
+Step-by-step deploys, where settings and secrets live, and how migrations are applied: [docs/deploying.md](docs/deploying.md).
+
 The site is deployed on Vercel. The project `portfolio` is connected to this GitHub repository:
 
 - **A push to `main`** deploys to production.
