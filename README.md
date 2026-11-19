@@ -146,6 +146,13 @@ revision can be restored. A restore is itself a save, so it can be undone.
 
 ## Security
 
+The threat model (assets, actors, boundaries, and the test behind each mitigation) is in
+[SECURITY.md](SECURITY.md). Design decisions are recorded in [docs/adr/](docs/adr/):
+[RLS as the boundary](docs/adr/0001-rls-is-the-authorization-boundary.md),
+[the query wrapper](docs/adr/0002-public-queries-go-through-fetchorthrow.md),
+[Server Actions](docs/adr/0003-server-actions-for-a-single-writer-cms.md) and
+[ISR settings](docs/adr/0004-isr-every-five-minutes-plus-on-demand-revalidation.md).
+
 Three layers protect the admin. Only the last one is authoritative:
 
 1. **`src/middleware.ts`** redirects signed-out requests away from `/admin`. A convenience.
@@ -287,15 +294,15 @@ Details for all of these are in [docs/maintenance.md](docs/maintenance.md).
 - **The visit counter can miss counts** until `supabase/migrations/20261118000000_increment_visit_count.sql`
   is applied (needs approval). Until then it falls back to read-then-write.
 - **20 unused `site_config` settings** from an earlier design remain in the database, shown
-  read-only in Admin → Settings. The audit and cleanup plan are in `docs/maintenance.md`.
+  read-only in Admin → Settings. A pending migration removes the 9 obsolete ones; the audit
+  and the decisions on the rest are in `docs/maintenance.md`.
 - **Uploads** (Admin → Media, and an Upload button on the hero and diagram image fields) store
   files in the public `media` bucket: PNG, JPEG, GIF, WebP, AVIF or PDF, up to 4 MB, type checked
   from the file's bytes. Admin-only write policies are in
   `supabase/migrations/20261119000000_media_storage_policies.sql`, pending approval.
 - **Not built:**
   - live GitHub data
-  - browser end-to-end tests
-  - CI
+  - browser tests for admin journeys (the visitor smoke tests exist; admin ones need a test account)
   - error monitoring (server errors appear in Vercel's logs)
 
 ---
