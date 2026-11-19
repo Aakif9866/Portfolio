@@ -130,7 +130,8 @@ export function isFetchableUrl(raw: string) {
   const h = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local") || h.endsWith(".internal") || !h.includes(".") && !h.includes(":")) return false;
   if (/^(127|10|0)\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h)) return false;
-  if (h.includes(":") && (h === "::1" || /^(fc|fd|fe80)/.test(h))) return false;
+  // ::ffff:… is an IPv4 address in IPv6 form ([::ffff:127.0.0.1]), so refuse it rather than re-parse it.
+  if (h.includes(":") && (h === "::" || h === "::1" || /^(fc|fd|fe80|::ffff:)/.test(h))) return false;
   return true;
 }
 

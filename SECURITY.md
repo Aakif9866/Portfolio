@@ -46,7 +46,7 @@ described in the [README](README.md#security). This file doesn't repeat that.
 | Malicious upload (script inside an SVG, a disguised executable) | File type is read from the file's first bytes. SVG is not allowed. The stored name is generated. Max 4 MB. Storage RLS lets only the admin write or list | `tests/media.test.ts`; `check-rls.mjs` (anon can't list `media`) |
 | Stored XSS through Markdown | `react-markdown` without `rehype-raw`: raw HTML is never rendered, and its default URL filter removes `javascript:`-style links (`src/components/markdown.tsx`) | `tests/markdown-render.test.ts` |
 | Clickjacking, injected third-party scripts | CSP (`script-src 'self'`, `frame-ancestors 'none'`), `X-Frame-Options: DENY`, HSTS, `nosniff` (`next.config.ts`) | Response headers |
-| Link preview used to probe the internal network (SSRF) | `isFetchableUrl` refuses non-http(s) URLs, localhost, private and link-local addresses. 4 s timeout, 256 KB cap. Admin-only | `tests/entries.test.ts` |
+| Link preview used to probe the internal network (SSRF) | `isFetchableUrl` refuses non-http(s) URLs, localhost, private, link-local and IPv4-mapped IPv6 addresses. `fetchPage` repeats the check on every redirect hop (max 5) and on every address the host name resolves to. 4 s timeout, 256 KB cap. Admin-only | `tests/entries.test.ts`, `tests/fetch-page.test.ts` |
 | Private data sent to the AI provider, or runaway AI cost | Prompts include only the entry the admin pressed the button on, never salary or the career profile. Monthly token cap (default 2,000,000). AI is off without an API key | `tests/ai.test.ts` |
 | Visit count inflated from the browser | `increment_visit_count()` is executable by `service_role` only | `tests/migration-visits.test.ts` |
 | Login page reveals whether an account exists | The error message is generic | `src/app/login/form.tsx` |
@@ -56,10 +56,10 @@ described in the [README](README.md#security). This file doesn't repeat that.
 - **Base schema isn't in the repo.** The original tables, their RLS policies and `is_admin()`
   were created in the Supabase dashboard. Only later changes are migrations. `check-rls.mjs`
   checks the live result, but a fresh database can't be rebuilt from this repository yet.
-- **Link previews follow redirects** without checking where they lead, and the host check
-  doesn't resolve DNS. A public URL that redirects to, or resolves to, a private address gets
-  past `isFetchableUrl`. Only the admin can trigger a fetch, and on Vercel there's no internal
-  network to reach, so the risk is low. The fix is `redirect: "manual"` with the check repeated on each hop.
+- **DNS rebinding:** link previews check the resolved addresses, then `fetch` resolves the name
+  again. A hostile DNS server could answer differently the second time. Only the admin can
+  trigger a fetch, and on Vercel there's no internal network to reach. Pinning the checked IP
+  with a custom agent would close it.
 - **CSP allows inline scripts and styles**, because Next.js needs them without per-request
   nonces. External scripts and framing are still blocked.
 - **Login rate limiting** is Supabase Auth's own. The app adds none.

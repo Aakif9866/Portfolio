@@ -75,7 +75,7 @@ describe("helpers", () => {
 
   it("isFetchableUrl refuses local and private hosts", () => {
     expect(isFetchableUrl("https://github.com/x")).toBe(true);
-    for (const u of ["http://localhost:3000", "http://127.0.0.1", "http://10.0.0.5", "http://192.168.1.1", "http://172.20.0.1", "http://169.254.169.254/latest", "http://[::1]/", "file:///etc/passwd", "http://intranet"]) {
+    for (const u of ["http://localhost:3000", "http://127.0.0.1", "http://10.0.0.5", "http://192.168.1.1", "http://172.20.0.1", "http://169.254.169.254/latest", "http://[::1]/", "http://[::ffff:127.0.0.1]/", "http://[::ffff:a9fe:a9fe]/", "file:///etc/passwd", "http://intranet"]) {
       expect(isFetchableUrl(u), u).toBe(false);
     }
   });
