@@ -34,7 +34,7 @@ Last updated: 2026-11-19 (session 5).
 | Fix visit migration (value is jsonb) | `d838e1f` | ✅ done |
 | v2-5 removals (files + site_config migration) | `a0f3b13` | ✅ code done · ⏳ migration |
 | v2-6 CI workflow + Playwright visitor smoke tests | `26e0dda`, `4d2c005` | ✅ done |
-| **Apply pending migrations (5)** | — | ⏳ **blocked on the user** |
+| Apply all 6 migrations + app switch-over (RPC reorder, trigger revisions, no visit fallback) | `4924bcf` | ✅ done, check-rls passed |
 | v2-6 SECURITY.md, 4 ADRs, README screenshots | `ca045bb`, next | ✅ done |
 
 **Nothing in the workspace (`/admin` inbox, resources, logs, ideas, jobs, career, skills, resume) works on a
