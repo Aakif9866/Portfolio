@@ -67,7 +67,7 @@ Create `.env.local` with:
 | `/lab`, `/lab/[slug]` | **Experiments** — hypothesis and outcome; failed and abandoned ones stay published | `experiments` |
 | `/articles`, `/articles/[slug]` | **Writing**: a reading column with an "On this page" contents list, linkable headings, reading time, code blocks with a copy button, `> [!NOTE]` callouts, image captions, a reading-progress bar and previous/next links. RSS at `/feed.xml` | `articles` |
 | `/experience` | Work and education, newest first | `timeline_entries` |
-| `/about` | About me and contact | `site_config` |
+| `/about` | About me, contact, and recent public GitHub repos | `site_config`; the public GitHub API (no token, cached 1 hour, section hidden if GitHub can't be reached) |
 
 Navigation labels live in one place (`src/lib/labels.ts`) and are used by the nav, footer,
 headings and search. The command palette (⌘K / Ctrl K, or the search button) jumps to any page,
@@ -307,7 +307,6 @@ Details for all of these are in [docs/maintenance.md](docs/maintenance.md).
   from the file's bytes. Admin-only write policies are in
   `supabase/migrations/20261119000000_media_storage_policies.sql`, pending approval.
 - **Not built:**
-  - live GitHub data
   - browser tests for admin journeys (the visitor smoke tests exist; admin ones need a test account)
   - error monitoring (server errors appear in Vercel's logs)
 
@@ -331,6 +330,6 @@ src/
 supabase/migrations/    pending migrations (not yet applied)
 scripts/check-rls.mjs   read-only security check
 tests/                  Vitest tests; tests/e2e/ Playwright smoke tests
-.github/workflows/ci.yml lint, typecheck, test, build, e2e
+.github/workflows/ci.yml lint, typecheck, test; build + e2e only if Supabase secrets are set
 docs/maintenance.md     migration runbook, settings audit
 ```

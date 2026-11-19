@@ -32,7 +32,7 @@ Last updated: 2026-11-19 (session 4).
 | v2-4 Markdown editor + article reader + RSS | `2acfe91` | ✅ done |
 | Fix visit migration (value is jsonb) | `d838e1f` | ✅ done |
 | v2-5 removals (files + site_config migration) | `a0f3b13` | ✅ code done · ⏳ migration |
-| v2-6 CI workflow + Playwright visitor smoke tests | `26e0dda`, `4d2c005` | ✅ done · ⏳ repo secrets |
+| v2-6 CI workflow + Playwright visitor smoke tests | `26e0dda`, `4d2c005` | ✅ done |
 | **Apply pending migrations (5)** | — | ⏳ **blocked on the user** |
 | v2-6 SECURITY.md, 4 ADRs, README screenshots | `ca045bb`, next | ✅ done |
 
@@ -68,7 +68,10 @@ Before pushing, inspect existing storage policies (the media migration notes the
 If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks first.
 
 ### 2. v2-6 remaining
-- Repo secrets for CI: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (user sets them; CI only runs once pushed).
+- **Decided: no CI secrets.** CI runs lint, typecheck and unit tests; build + e2e are skipped unless
+  `NEXT_PUBLIC_SUPABASE_URL` is set as a secret. Run build + e2e locally before pushing.
+- About page shows public GitHub data (`src/lib/github.ts`): unauthenticated API, read-only, cached 1 h, hidden on
+  failure. The user wants it kept to a basic API call and display, so no token, charts or sync.
 - Admin Playwright journeys need a test account — ask the user before adding any.
 - Screenshots (`docs/screenshots/`) were taken from a local `next start` against the live DB; retake after visual changes.
 - Done in session 4: link previews re-check every redirect hop and resolved IPs, and refuse IPv4-mapped IPv6;

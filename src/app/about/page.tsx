@@ -4,6 +4,8 @@ import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { getContact } from "@/lib/contact";
 import { fetchOrThrow } from "@/lib/db";
+import { getGitHub, type GitHubSummary } from "@/lib/github";
+import { fullDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "About" };
 export const revalidate = 300;
@@ -14,6 +16,7 @@ export default async function AboutPage() {
     getContact(),
   ]);
   const body = typeof data?.value === "string" && data.value.trim() ? data.value : null;
+  const github = await getGitHub(contact.github);
 
   return (
     <>
@@ -43,6 +46,7 @@ export default async function AboutPage() {
               </p>
             </div>
           )}
+          {github && <GitHubSection gh={github} />}
         </div>
 
         <aside aria-labelledby="contact-heading" className="lg:sticky lg:top-24 lg:self-start">
@@ -72,5 +76,36 @@ export default async function AboutPage() {
         </aside>
       </div>
     </>
+  );
+}
+
+/** Live from the public GitHub API (src/lib/github.ts); left out entirely if GitHub can't be reached. */
+function GitHubSection({ gh }: { gh: GitHubSummary }) {
+  return (
+    <section aria-labelledby="github-heading" className="mt-14">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="github-heading" className="text-[20px] font-semibold tracking-tight">On GitHub</h2>
+        <a href={gh.url} target="_blank" rel="noopener" className="text-[13.5px] text-muted transition-colors hover:text-ink">
+          @{gh.login} · {gh.publicRepos} public repos · {gh.followers} followers <span aria-hidden>↗</span>
+        </a>
+      </div>
+      {gh.repos.length > 0 && (
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+          {gh.repos.map((r) => (
+            <li key={r.name}>
+              <a href={r.url} target="_blank" rel="noopener" className="card flex h-full flex-col rounded-xl p-4 transition-colors hover:bg-raised">
+                <span className="truncate font-mono text-[14px] font-medium">{r.name}</span>
+                {r.description && <span className="mt-1.5 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{r.description}</span>}
+                <span className="mt-auto flex flex-wrap gap-x-3 pt-3 text-[12px] text-faint">
+                  {r.language && <span>{r.language}</span>}
+                  {r.stars > 0 && <span>★ {r.stars}</span>}
+                  <span>Updated {fullDate(r.pushedAt)}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

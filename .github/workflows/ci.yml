@@ -1,6 +1,7 @@
-# The same checks AGENTS.md asks for before a commit. The build prerenders public pages
-# from the production database, so it needs the public (anon, RLS-bound) URL and key as
-# repository secrets. No service-role key here: CI never writes.
+# The same checks AGENTS.md asks for before a commit. Lint, typecheck and unit tests need
+# nothing. The build and browser tests prerender pages from the production database, so they
+# run only if the public (anon, RLS-bound) URL and key are set as repository secrets, and are
+# skipped otherwise. No service-role key here: CI never writes.
 name: CI
 on:
   push: { branches: [main] }
@@ -25,11 +26,11 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Build and browser tests (only with Supabase secrets)
+        if: env.NEXT_PUBLIC_SUPABASE_URL != ''
+        run: npm run build && npx playwright install --with-deps chromium && npm run test:e2e
       - name: Keep the browser test report
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && env.NEXT_PUBLIC_SUPABASE_URL != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
