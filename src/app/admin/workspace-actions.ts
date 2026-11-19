@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { isFetchableUrl, jobTitle, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, validateJobMeta, withStatusChange, type LinkPreview } from "@/lib/entries";
 import { validateRow } from "@/lib/admin-fields";
+import { CAREER_KEY, SKILLS_KEY, toggleTask, validateCareer, validateSkill, type Skills } from "@/lib/career";
 import type { ActionResult } from "./actions";
 
 /**
@@ -193,4 +194,57 @@ export async function startProject(formData: FormData): Promise<ActionResult> {
     return { ok: true, message: "Draft project created.", id: data.id };
   }
   return { ok: false, message: "A project with that name already exists. Rename the idea and try again." };
+}
+
+/* ── career (private_config) ──────────────────────────────────────────────── */
+
+export async function saveCareer(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const parsed = validateCareer(Object.fromEntries(formData));
+  if (!parsed.ok) return parsed;
+  const { error } = await supabase.from("private_config").upsert({ key: CAREER_KEY, value: parsed.value }, { onConflict: "key" });
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/admin/career");
+  return { ok: true, message: "Saved." };
+}
+
+/**
+ * One skill's private level / "want to learn" / note. The whole skills map is one JSON value.
+ * ponytail: read-modify-write; two tabs editing skills at the same instant could drop one change.
+ */
+export async function setSkill(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const parsed = validateSkill(String(formData.get("name") ?? ""), {
+    level: String(formData.get("level") ?? ""),
+    want: formData.get("want") === "true",
+    note: String(formData.get("note") ?? ""),
+  });
+  if (!parsed.ok) return parsed;
+
+  const { data, error: readErr } = await supabase.from("private_config").select("value").eq("key", SKILLS_KEY).maybeSingle();
+  if (readErr) return { ok: false, message: friendly(readErr) };
+  const skills = { ...((data?.value as Skills) ?? {}) };
+  if (parsed.value) skills[parsed.key] = parsed.value;
+  else delete skills[parsed.key];
+
+  const { error } = await supabase.from("private_config").upsert({ key: SKILLS_KEY, value: skills }, { onConflict: "key" });
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: "Saved." };
+}
+
+/** Tick a milestone (the n-th `- [ ]` item in a goal's notes) without opening the editor. */
+export async function toggleMilestone(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const index = Number(formData.get("index"));
+  if (!UUID_RE.test(id) || !Number.isInteger(index) || index < 0) return { ok: false, message: "Invalid milestone." };
+
+  const { data, error: readErr } = await supabase.from("entries").select("body_md").eq("id", id).maybeSingle();
+  if (readErr) return { ok: false, message: friendly(readErr) };
+  if (!data) return { ok: false, message: "That goal no longer exists." };
+  const { error } = await supabase.from("entries").update({ body_md: toggleTask(data.body_md, index) }).eq("id", id);
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: "Saved." };
 }
