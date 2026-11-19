@@ -6,6 +6,7 @@ import { JOB_FIELDS, type Entry, type StatusChange } from "@/lib/entries";
 import { ENTRY_KIND, ENTRY_STATUS } from "@/lib/labels";
 import { deleteEntry, saveEntry, togglePin } from "./workspace-actions";
 import { BTN, Banner, ConfirmButton, INPUT } from "./ui";
+import { MarkdownEditor } from "./markdown-editor";
 import type { ActionResult } from "./actions";
 
 /** Edit one entry. Every field is optional except a title or a link. */
@@ -79,7 +80,7 @@ export function EntryEditor({ entry, closeHref }: { entry: Entry; closeHref: str
         </Field>
       </div>
       <Field label="Notes" help={kind === "job" ? "Interview notes, recruiter conversations, anything. Markdown." : "Markdown."}>
-        <textarea name="body_md" defaultValue={entry.body_md} rows={10} spellCheck className={`${INPUT} font-mono text-[13px]`} />
+        <MarkdownEditor name="body_md" defaultValue={entry.body_md} rows={10} />
       </Field>
       <label className="flex items-center gap-2 text-[14px]">
         <input type="checkbox" name="pinned" defaultChecked={entry.pinned} className="h-4 w-4 accent-[var(--accent)]" />

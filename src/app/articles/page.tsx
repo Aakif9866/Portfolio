@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
-import { staleness } from "@/lib/dates";
+import { readingMinutes } from "@/lib/markdown";
 import { fetchOrThrow } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Writing" };
@@ -21,7 +21,7 @@ export default async function ArticlesPage() {
       <PageHeader
         eyebrow="Writing"
         title="Writing"
-        lede="Technical write-ups on things I've had to work out properly. Each one shows when it was last reviewed and what it was tested against, so you can judge whether it's still current."
+        lede="Technical write-ups on things I've had to work out properly, with what each was tested against so you can judge whether it still applies."
       />
       <section className="mx-auto max-w-4xl px-6 py-16">
         {articles.length === 0 ? (
@@ -34,11 +34,8 @@ export default async function ArticlesPage() {
                     <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
                       {a.topics && <span className="text-accent">{a.topics.name}</span>}
                       {a.difficulty && <span>{a.difficulty}</span>}
-                      {a.reading_minutes && <span>{a.reading_minutes} min</span>}
+                      {(a.reading_minutes ?? (a.body_md ? readingMinutes(a.body_md) : null)) && <span>{a.reading_minutes ?? readingMinutes(a.body_md ?? "")} min</span>}
                       {a.published_at && <span>{new Date(a.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>}
-                      {staleness(a.last_reviewed_at) && (
-                        <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-600 dark:text-amber-400">Review needed</span>
-                      )}
                     </div>
                     <h2 className="text-[21px] font-semibold tracking-tight transition-colors group-hover:text-accent">{a.title}</h2>
                     {a.dek && <p className="max-w-2xl text-[14.5px] leading-relaxed text-muted">{a.dek}</p>}

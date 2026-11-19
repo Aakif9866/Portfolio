@@ -58,7 +58,7 @@ Create `.env.local` with:
 | `/projects/[slug]` | Full case study: summary, facts, technologies, write-up sections, architecture diagrams, milestones, with an "On this page" contents list | `projects`, `project_sections`, `architecture_diagrams`, `project_milestones` |
 | `/system` | **Tech Stack** — every technology, grouped, each linked to the projects that use it | `technologies` |
 | `/lab`, `/lab/[slug]` | **Experiments** — hypothesis and outcome; failed and abandoned ones stay published | `experiments` |
-| `/articles`, `/articles/[slug]` | Articles, flagged "Review needed" after six months | `articles` |
+| `/articles`, `/articles/[slug]` | **Writing**: a reading column with an "On this page" contents list, linkable headings, reading time, code blocks with a copy button, `> [!NOTE]` callouts, image captions, a reading-progress bar and previous/next links. RSS at `/feed.xml` | `articles` |
 | `/experience` | Work and education, newest first | `timeline_entries` |
 | `/about` | About me and contact | `site_config` |
 
@@ -128,6 +128,8 @@ Unpublish, Archive, Restore), and the server rejects any other transition.
 
 **Previews** (`/admin/projects/[id]/preview`, `/admin/articles/[id]/preview`) render drafts with
 the admin's own session, so a draft is never publicly reachable.
+
+**Markdown fields** use one editor: Write / Preview / Split, a formatting toolbar, ⌘B ⌘I ⌘K ⌘S, and images pasted or dropped straight into Storage. The preview uses the public renderer and loads only when opened.
 
 **Forms** are generated from one definition per table in `src/lib/admin-fields.ts`: labels, help
 text, required fields, and advanced settings that start collapsed. The same definition is the
@@ -211,7 +213,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 235 tests, offline:
+`npm test` runs 251 tests, offline:
 
 | File | Covers |
 | --- | --- |
@@ -226,6 +228,7 @@ as 0.
 | `tests/career.test.ts` | Career profile and skill allowlists, milestone checklist counting and toggling |
 | `tests/ai.test.ts` | The AI client (request shape, error mapping without echoing bodies, no call without a key), monthly usage, prompts (fenced untrusted input, no salary in emails) |
 | `tests/resume.test.ts` | Resume format parsing, placeholders, the portfolio-based starter (no invented facts), log bullets, LaTeX escaping and export |
+| `tests/markdown.test.ts`, `tests/markdown-render.test.ts` | Heading slugs and TOC extraction (ids match the rendered headings), reading time, callouts, RSS escaping, renderer output, no raw HTML |
 | `tests/privacy.test.ts` | No file outside `src/app/admin` queries a private table; no client component imports the AI helper; no public AI key |
 
 There are no browser end-to-end tests and no CI workflow yet. The admin flows are verified by

@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Software engineer working across backend systems, AI agent infrastructure and full-stack products. Case studies, stack notes and experiments.",
   openGraph: { title: "Aakif — Software Engineer", type: "website" },
   robots: { index: true, follow: true },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://portfolio-pi-weld-92.vercel.app"),
+  alternates: { types: { "application/rss+xml": [{ url: "/feed.xml", title: "Aakif — Writing" }] } },
 };
 
 // Runs before paint: no theme flash, no layout shift.

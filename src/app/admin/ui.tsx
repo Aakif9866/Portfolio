@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { deleteRow, reorder, setState, uploadMedia, type ActionResult } from "./actions";
 import { ACCEPT, MAX_BYTES } from "@/lib/media";
+import { MarkdownEditor } from "./markdown-editor";
 import type { Field, Option } from "@/lib/admin-fields";
 import { stateActions } from "@/lib/form";
 import { PUBLISH_STATE, statusLabel } from "@/lib/labels";
@@ -106,15 +107,17 @@ function FieldInput({ f, value, projects }: { f: Field; value: unknown; projects
           <option value="">{f.required ? "Choose…" : "—"}</option>
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-      ) : ["textarea", "markdown", "json", "lines"].includes(f.type) ? (
+      ) : f.type === "markdown" ? (
+        <MarkdownEditor id={id} name={encode(f)} defaultValue={asText} rows={f.rows ?? 12} required={f.required} describedBy={f.help ? helpId : undefined} className="mt-1.5" />
+      ) : ["textarea", "json", "lines"].includes(f.type) ? (
         <textarea
           {...common}
           defaultValue={asText}
           required={f.required}
           placeholder={f.placeholder}
-          rows={f.rows ?? (f.type === "markdown" ? 12 : 4)}
-          spellCheck={f.type === "markdown" || f.type === "textarea"}
-          className={`${INPUT} mt-1.5 ${f.type === "json" || f.type === "markdown" ? "font-mono text-[13px]" : ""}`}
+          rows={f.rows ?? 4}
+          spellCheck={f.type === "textarea"}
+          className={`${INPUT} mt-1.5 ${f.type === "json" ? "font-mono text-[13px]" : ""}`}
         />
       ) : f.upload ? (
         <UploadableUrl common={common} defaultValue={asText} required={f.required} placeholder={f.placeholder} />

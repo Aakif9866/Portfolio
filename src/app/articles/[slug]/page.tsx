@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { supabasePublic } from "@/lib/supabase/server";
 import { Markdown } from "@/components/markdown";
-import { staleness } from "@/lib/dates";
+import { headings, readingMinutes } from "@/lib/markdown";
+import { fullDate } from "@/lib/dates";
 import type { Article } from "@/lib/types";
 import { fetchOrThrow } from "@/lib/db";
 
@@ -23,44 +24,91 @@ async function load(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const a = await load(slug);
-  return a ? { title: a.title, description: a.dek ?? undefined } : { title: "Not found" };
+  if (!a) return { title: "Not found" };
+  return {
+    title: a.title,
+    description: a.dek ?? undefined,
+    alternates: { canonical: `/articles/${a.slug}` },
+    openGraph: { type: "article", title: a.title, description: a.dek ?? undefined, publishedTime: a.published_at ?? undefined, modifiedTime: a.updated_at },
+  };
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const a = await load(slug);
+  const [a, list] = await Promise.all([
+    load(slug),
+    fetchOrThrow("article neighbours", (s) => supabasePublic().from("articles").select("slug,title").abortSignal(s)
+      .eq("state", "published").order("published_at", { ascending: false, nullsFirst: false })),
+  ]);
   if (!a) notFound();
+
+  const body = a.body_md ?? "";
+  const toc = headings(body);
+  const minutes = a.reading_minutes ?? (body ? readingMinutes(body) : null);
+  const all = (list.data ?? []) as { slug: string; title: string }[];
+  const i = all.findIndex((x) => x.slug === a.slug);
+  const newer = i > 0 ? all[i - 1] : null;
+  const older = i >= 0 && i < all.length - 1 ? all[i + 1] : null;
 
   return (
     <article>
-      <header className="relative overflow-hidden border-b border-line pb-10 pt-28">
-        <div className="relative mx-auto max-w-3xl px-6">
+      <div className="read-progress" aria-hidden />
+      <header className="border-b border-line pb-10 pt-28">
+        <div className="mx-auto max-w-3xl px-6">
           <Link href="/articles" className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-ink">
-            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-            All articles
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+            All writing
           </Link>
           <div className="mt-6 flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
             {a.topics && <span className="text-accent">{a.topics.name}</span>}
             {a.difficulty && <span>{a.difficulty}</span>}
-            {a.reading_minutes && <span>{a.reading_minutes} min read</span>}
+            {minutes && <span>{minutes} min read</span>}
           </div>
-          <h1 className="mt-4 text-[clamp(30px,5vw,46px)] font-semibold leading-[1.06] tracking-tightest">{a.title}</h1>
-          {a.dek && <p className="mt-5 text-[17.5px] leading-relaxed text-muted">{a.dek}</p>}
+          <h1 className="mt-4 text-[clamp(30px,5vw,46px)] font-semibold leading-[1.08] tracking-tightest">{a.title}</h1>
+          {a.dek && <p className="mt-5 text-[18px] leading-relaxed text-muted">{a.dek}</p>}
           <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[12px] text-faint">
-            {a.published_at && <span>Published {new Date(a.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>}
-            {a.last_reviewed_at && <span>Reviewed {new Date(a.last_reviewed_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</span>}
+            {a.published_at && <span>Published {fullDate(a.published_at)}</span>}
+            {a.last_reviewed_at && <span>Reviewed {fullDate(a.last_reviewed_at)}</span>}
             {a.tested_with && <span>Tested with {a.tested_with}</span>}
           </div>
-          {staleness(a.last_reviewed_at) && (
-            <p className="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-amber-700 dark:text-amber-300">
-              <strong className="font-semibold">Review needed.</strong> This note has not been checked in
-              over six months. Details may be out of date.
-            </p>
-          )}
         </div>
       </header>
-      <div className="mx-auto max-w-3xl px-6 py-14">
-        {a.body_md ? <Markdown>{a.body_md}</Markdown> : <p className="text-[14px] text-muted">This note has no body yet.</p>}
+
+      <div className={`mx-auto px-6 py-14 ${toc.length >= 3 ? "max-w-6xl lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-14" : "max-w-3xl"}`}>
+        {toc.length >= 3 && (
+          <nav aria-label="On this page" className="mb-10 lg:order-last lg:mb-0">
+            <details className="rounded-xl border border-line p-4 lg:sticky lg:top-24 lg:border-0 lg:p-0" open>
+              <summary className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.14em] text-faint lg:pointer-events-none lg:list-none">On this page</summary>
+              <ol className="mt-3 space-y-1.5 text-[13.5px]">
+                {toc.map((h) => (
+                  <li key={h.id} className={h.depth === 3 ? "pl-3" : ""}>
+                    <a href={`#${h.id}`} className="text-muted transition-colors hover:text-ink">{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          </nav>
+        )}
+        <div className="mx-auto w-full max-w-[68ch]">
+          {body ? <Markdown anchors>{body}</Markdown> : <p className="text-[14px] text-muted">This article has no body yet.</p>}
+
+          {(newer || older) && (
+            <nav aria-label="More writing" className="mt-16 grid gap-3 border-t border-line pt-8 sm:grid-cols-2">
+              {older ? (
+                <Link href={`/articles/${older.slug}`} className="card card-hover rounded-xl p-4">
+                  <span className="block text-[12px] text-faint">Previous</span>
+                  <span className="mt-1 block text-[15px] font-medium">{older.title}</span>
+                </Link>
+              ) : <span />}
+              {newer && (
+                <Link href={`/articles/${newer.slug}`} className="card card-hover rounded-xl p-4 text-right">
+                  <span className="block text-[12px] text-faint">Next</span>
+                  <span className="mt-1 block text-[15px] font-medium">{newer.title}</span>
+                </Link>
+              )}
+            </nav>
+          )}
+        </div>
       </div>
     </article>
   );
