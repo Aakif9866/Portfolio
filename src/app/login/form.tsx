@@ -29,33 +29,33 @@ export function LoginForm({ next }: { next: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <form onSubmit={onSubmit} className="mt-8 space-y-5">
       <div>
-        <label htmlFor="email" className="block text-[12.5px] font-medium text-muted">Email</label>
+        <label htmlFor="email" className="block text-[14px] font-medium text-ink">Email</label>
         <input
-          id="email" type="email" required autoComplete="username"
+          id="email" type="email" required autoComplete="username" placeholder="you@example.com"
           value={email} onChange={(e) => setEmail(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+          className="mt-2 h-12 w-full rounded-xl border border-line bg-raised/60 px-4 text-[16px] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-faint focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_20%,transparent)]"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-[12.5px] font-medium text-muted">Password</label>
+        <label htmlFor="password" className="block text-[14px] font-medium text-ink">Password</label>
         <input
-          id="password" type="password" required autoComplete="current-password"
+          id="password" type="password" required autoComplete="current-password" placeholder="Password"
           value={password} onChange={(e) => setPassword(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+          className="mt-2 h-12 w-full rounded-xl border border-line bg-raised/60 px-4 text-[16px] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-faint focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_20%,transparent)]"
         />
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3.5 py-2.5 text-[13px] text-rose-600 dark:text-rose-300">
+        <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-[14px] text-rose-600 dark:text-rose-300">
           {error}
         </p>
       )}
 
       <button
         type="submit" disabled={busy}
-        className="w-full rounded-lg bg-ink py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85 disabled:opacity-50"
+        className="btn-grad mt-2 h-12 w-full rounded-xl text-[16px] font-semibold disabled:opacity-60"
       >
         {busy ? "Signing in…" : "Sign in"}
       </button>

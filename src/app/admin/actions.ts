@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
+import { supabaseServer } from "@/lib/supabase/server";
 import { validateRow, type EditableTable } from "@/lib/admin-fields";
 import { assertTable, canTransition, parseRowForm } from "@/lib/form";
 import { isSiteKey } from "@/lib/site-content";
@@ -253,7 +254,8 @@ export async function deleteMedia(formData: FormData): Promise<ActionResult> {
 }
 
 export async function signOut() {
-  const { supabase } = await requireAdmin();
+  // No admin check needed to end your own session; skipping it saves two round trips.
+  const supabase = await supabaseServer();
   await supabase.auth.signOut();
   redirect("/login");
 }

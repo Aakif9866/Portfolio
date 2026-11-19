@@ -35,7 +35,7 @@ export default async function Home() {
       <section className="relative overflow-hidden spotlight pb-24 pt-36">
         <div className="pointer-events-none absolute inset-0 grid-bg opacity-70" />
         <div className="pointer-events-none absolute -top-48 left-1/2 h-[460px] w-[920px] -translate-x-1/2">
-          <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_210deg,#fb923c,#f43f5e,#a855f7,#38bdf8,#fb923c)]" />
+          <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_210deg,#0a84ff,#64d2ff,#30d158,#40c8e0,#0a84ff)]" />
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6">

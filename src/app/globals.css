@@ -34,16 +34,18 @@
   --ink: #08080a;
   --muted: #55555d;
   --faint: #6e6e78; /* ≥4.5:1 on white (WCAG AA) */
-  --accent: #7c3aed;
+  --accent: #0066cc; /* Apple link blue, AA on white */
 
   --glow: 0.2;
   --grain: 0.025;
-  --spot: rgba(124, 58, 237, 0.07);
+  --spot: rgba(0, 113, 227, 0.06);
   --sheen: rgba(0, 0, 0, 0.04);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.1);
   --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04), 0 24px 48px -20px rgba(0, 0, 0, 0.18);
-  /* v1's rose → violet (the logo mark). rose-600, not -500, so white text on it passes AA. */
-  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
+  /* Apple blue for the mark and primary actions (white text passes AA). */
+  --grad: linear-gradient(135deg, #0071e3, #0040dd);
+  /* the shiny highlight, deepened for white paper */
+  --grad-text: linear-gradient(100deg, #00a86b, #0095d9 45%, #0060df);
   color-scheme: light;
 }
 
@@ -58,15 +60,17 @@
   --ink: #f2f2f5;
   --muted: #9494a1;
   --faint: #7d7d8a; /* ≥4.5:1 on black (WCAG AA) */
-  --accent: #a78bfa;
+  --accent: #0a84ff;
 
   --glow: 0.42;
   --grain: 0.05;
-  --spot: rgba(167, 139, 250, 0.1);
+  --spot: rgba(10, 132, 255, 0.11);
   --sheen: rgba(255, 255, 255, 0.07);
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.9);
   --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 32px 64px -24px rgba(0, 0, 0, 1);
-  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
+  --grad: linear-gradient(135deg, #0a84ff, #0040dd);
+  /* the shiny highlight: green → cyan → blue on black */
+  --grad-text: linear-gradient(100deg, #30d158, #64d2ff 45%, #0a84ff);
   color-scheme: dark;
 }
 
@@ -127,10 +131,10 @@
       box-shadow: var(--shadow-lift);
     }
   }
-  /* The highlight: v1's four-colour gradient, set in Instrument Serif italic so it reads as emphasis.
+  /* The highlight: a shiny green → cyan → blue gradient, set in Instrument Serif italic so it reads as emphasis.
      The small right padding keeps the italic's last letter from being clipped by background-clip. */
   .grad-text {
-    background-image: linear-gradient(100deg, #fb923c, #f43f5e 36%, #a855f7 66%, #38bdf8);
+    background-image: var(--grad-text);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -221,10 +225,11 @@
 
 /* ── hero: the slow shimmer across the highlighted words, and the system pipeline ── */
 .grad-shimmer {
-  background-image: linear-gradient(100deg, #fb923c, #f43f5e 18%, #a855f7 33%, #38bdf8 50%, #a855f7 67%, #f43f5e 82%, #fb923c);
+  background-image: linear-gradient(100deg, #30d158, #40c8e0 18%, #64d2ff 33%, #0a84ff 50%, #64d2ff 67%, #40c8e0 82%, #30d158);
   background-size: 200% 100%;
   animation: shimmer 9s ease-in-out infinite alternate;
 }
+:root[data-theme="light"] .grad-shimmer { background-image: linear-gradient(100deg, #00a86b, #0095d9 25%, #0060df 50%, #0095d9 75%, #00a86b); }
 @keyframes shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 
 .hero-system { margin: 0; animation: fade-up 0.6s 0.3s var(--ease-out-soft) both; }
@@ -315,9 +320,9 @@
 .prose-doc .callout > * + * { margin-top: 0.6em; }
 .prose-doc .callout-title { color: var(--c); font-size: 13px; font-weight: 650; letter-spacing: 0.02em; text-transform: uppercase; }
 .prose-doc .callout-tip { --c: #10b981; }
-.prose-doc .callout-important { --c: #a855f7; }
+.prose-doc .callout-important { --c: #40c8e0; }
 .prose-doc .callout-warning { --c: #d97706; }
-.prose-doc .callout-caution { --c: #e11d48; }
+.prose-doc .callout-caution { --c: #ff453a; }
 
 /* reading progress along the top, driven by the page's scroll (no JavaScript) */
 .read-progress { position: fixed; inset: 0 0 auto; height: 2px; z-index: 59; background: var(--grad); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
@@ -329,13 +334,13 @@
 
 /* highlight.js — one palette, both themes */
 .hljs-comment, .hljs-quote { color: var(--faint); font-style: italic; }
-.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #c084fc; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #64d2ff; }
 .hljs-string, .hljs-attr { color: #34d399; }
 .hljs-number, .hljs-built_in { color: #fb923c; }
 .hljs-title, .hljs-section, .hljs-name { color: #60a5fa; }
 .hljs-type, .hljs-class .hljs-title { color: #fbbf24; }
-.hljs-variable, .hljs-template-variable { color: #f472b6; }
-:root[data-theme="light"] .hljs-keyword { color: #7c3aed; }
+.hljs-variable, .hljs-template-variable { color: #ff9f0a; }
+:root[data-theme="light"] .hljs-keyword { color: #0e7490; }
 :root[data-theme="light"] .hljs-string, :root[data-theme="light"] .hljs-attr { color: #047857; }
 :root[data-theme="light"] .hljs-number, :root[data-theme="light"] .hljs-built_in { color: #c2410c; }
 :root[data-theme="light"] .hljs-title, :root[data-theme="light"] .hljs-section, :root[data-theme="light"] .hljs-name { color: #1d4ed8; }

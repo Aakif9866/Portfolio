@@ -72,12 +72,12 @@ export const SECTION_LABEL: Record<string, string> = {
 };
 
 export const TECH_GROUPS: { key: TechCategory; label: string; accent: string }[] = [
-  { key: "language", label: "Languages", accent: "#f43f5e" },
-  { key: "frontend", label: "Frontend", accent: "#38bdf8" },
+  { key: "language", label: "Languages", accent: "#ff9f0a" },
+  { key: "frontend", label: "Frontend", accent: "#64d2ff" },
   { key: "backend", label: "Backend", accent: "#34d399" },
   { key: "database", label: "Database", accent: "#fbbf24" },
-  { key: "ai", label: "AI / ML", accent: "#a855f7" },
-  { key: "infrastructure", label: "Infrastructure", accent: "#fb923c" },
+  { key: "ai", label: "AI / ML", accent: "#0a84ff" },
+  { key: "infrastructure", label: "Infrastructure", accent: "#ff453a" },
   { key: "testing", label: "Testing", accent: "#22d3ee" },
   { key: "tooling", label: "Tooling", accent: "#94a3b8" },
 ];

@@ -34,7 +34,11 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Routing only: the cookie's session (refreshed here when it has expired) decides the redirect,
+  // without a network call on every admin click. requireAdmin() verifies the user on the server
+  // and RLS checks every query, so a forged cookie gets nowhere.
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   if (isAdmin && !user) {
     const url = request.nextUrl.clone();

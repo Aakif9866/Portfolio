@@ -16,8 +16,8 @@ export const NAV = [
 /** Project lifecycle (projects.status) — how far along the work is. */
 export const PROJECT_STATUS: Record<string, { label: string; tone: string }> = {
   active: { label: "In progress", tone: "#34d399" },
-  shipped: { label: "Shipped", tone: "#38bdf8" },
-  exploring: { label: "Exploring", tone: "#a855f7" },
+  shipped: { label: "Shipped", tone: "#64d2ff" },
+  exploring: { label: "Exploring", tone: "#0a84ff" },
   paused: { label: "Paused", tone: "#fbbf24" },
   archived: { label: "Archived", tone: "#8a8a93" },
 };
@@ -25,8 +25,8 @@ export const PROJECT_STATUS: Record<string, { label: string; tone: string }> = {
 /** Experiment outcome (experiments.status). */
 export const EXPERIMENT_STATUS: Record<string, { label: string; tone: string; help: string }> = {
   running: { label: "In progress", tone: "#34d399", help: "Still being tested" },
-  success: { label: "Succeeded", tone: "#38bdf8", help: "The hypothesis held" },
-  failed: { label: "Failed", tone: "#f43f5e", help: "The hypothesis did not hold — the notes say why" },
+  success: { label: "Succeeded", tone: "#64d2ff", help: "The hypothesis held" },
+  failed: { label: "Failed", tone: "#ff453a", help: "The hypothesis did not hold — the notes say why" },
   paused: { label: "Paused", tone: "#fbbf24", help: "On hold" },
   abandoned: { label: "Abandoned", tone: "#8a8a93", help: "Stopped deliberately — the notes say why" },
 };
@@ -61,11 +61,11 @@ export const ENTRY_KIND: Record<string, { label: string; plural: string; hint: s
 };
 
 export const ENTRY_STATUS: Record<string, Record<string, { label: string; tone: string }>> = {
-  link: { to_read: { label: "To read", tone: "#a855f7" }, reading: { label: "Reading", tone: "#38bdf8" }, done: { label: "Done", tone: "#34d399" } },
-  idea: { someday: { label: "Someday", tone: "#8a8a93" }, next: { label: "Next", tone: "#a855f7" }, active: { label: "Active", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
-  goal: { open: { label: "Open", tone: "#38bdf8" }, achieved: { label: "Achieved", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
+  link: { to_read: { label: "To read", tone: "#0a84ff" }, reading: { label: "Reading", tone: "#64d2ff" }, done: { label: "Done", tone: "#34d399" } },
+  idea: { someday: { label: "Someday", tone: "#8a8a93" }, next: { label: "Next", tone: "#0a84ff" }, active: { label: "Active", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
+  goal: { open: { label: "Open", tone: "#64d2ff" }, achieved: { label: "Achieved", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
   job: {
-    saved: { label: "Saved", tone: "#8a8a93" }, applied: { label: "Applied", tone: "#38bdf8" }, interviewing: { label: "Interviewing", tone: "#a855f7" },
-    offer: { label: "Offer", tone: "#34d399" }, rejected: { label: "Rejected", tone: "#f43f5e" }, closed: { label: "Closed", tone: "#8a8a93" },
+    saved: { label: "Saved", tone: "#8a8a93" }, applied: { label: "Applied", tone: "#64d2ff" }, interviewing: { label: "Interviewing", tone: "#0a84ff" },
+    offer: { label: "Offer", tone: "#34d399" }, rejected: { label: "Rejected", tone: "#ff453a" }, closed: { label: "Closed", tone: "#8a8a93" },
   },
 };
