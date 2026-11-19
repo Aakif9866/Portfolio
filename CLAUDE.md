@@ -7,6 +7,12 @@ migration and settings audit.
 
 Claude-specific notes on top of that:
 
+## Resuming work
+
+When the user says "continue" (or similar), read [docs/HANDOFF.md](docs/HANDOFF.md) first. It has the
+current status, the exact next steps and the decisions not to re-ask. Work on branch `v2`; update the handoff
+at the end of the session.
+
 ## Orientation
 
 - **Entry points:** `src/app/` routes, `src/app/admin/actions.ts` (every admin write),
