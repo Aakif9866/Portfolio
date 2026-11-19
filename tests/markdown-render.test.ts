@@ -29,4 +29,14 @@ describe("Markdown renderer", () => {
   it("never renders raw HTML from the Markdown", () => {
     expect(html).not.toContain("<script>");
   });
+
+  it("embeds a YouTube link on its own line, but not one inside a sentence", () => {
+    const out = renderToStaticMarkup(createElement(Markdown, {
+      children: "https://youtu.be/dQw4w9WgXcQ?t=30\n\nWatch [the video](https://youtu.be/dQw4w9WgXcQ) first.\n\nhttps://youtube.com.evil.com/watch?v=dQw4w9WgXcQ",
+    }));
+    expect(out.match(/<iframe/g)).toHaveLength(1);
+    expect(out).toContain('src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=30"');
+    expect(out).toContain('href="https://youtu.be/dQw4w9WgXcQ"');
+    expect(out).toContain("youtube.com.evil.com");
+  });
 });

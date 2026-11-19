@@ -4,12 +4,15 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { headingSlugger, remarkCallouts } from "@/lib/markdown";
 import { CopyCode } from "./copy-code";
+import { YouTube } from "./youtube";
+import { youtubeId } from "@/lib/blog";
 
 /**
  * The one Markdown renderer: public articles and case studies, admin previews and the
  * workspace. GFM (tables, task lists), highlighted code with a language label and copy
  * button, GitHub-style `> [!NOTE]` callouts, linkable headings whose ids match the table of
- * contents (lib/markdown.ts headings()), and images with captions from their title.
+ * contents (lib/markdown.ts headings()), images with captions from their title, and a
+ * YouTube link alone on its own line becomes an embedded player.
  * No raw HTML is rendered, so stored Markdown can't inject markup.
  */
 type HastNode = { type: string; value?: string; tagName?: string; properties?: Record<string, unknown>; children?: HastNode[] };
@@ -44,6 +47,14 @@ export function Markdown({ children, className = "", anchors = false }: { childr
           <pre tabIndex={0}>{children}</pre>
         </div>
       );
+    },
+    // A paragraph that is only a bare YouTube link (autolinked by GFM) becomes a player.
+    p: ({ node, children, ...rest }) => {
+      const kids = ((node as HastNode | undefined)?.children ?? []).filter((c) => !(c.type === "text" && !c.value?.trim()));
+      const only = kids.length === 1 && kids[0].tagName === "a" ? kids[0] : null;
+      const href = typeof only?.properties?.href === "string" ? only.properties.href : null;
+      if (href && textOf(only!).trim() === href && youtubeId(href)) return <YouTube url={href} />;
+      return <p {...rest}>{children}</p>;
     },
     a: ({ href, children }) => (
       <a href={href} target={href?.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{children}</a>

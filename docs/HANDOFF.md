@@ -42,11 +42,12 @@ real database until the migrations are applied.** Pages show "the workspace tabl
 
 ## Next steps (in order)
 
-### 1. Apply the 5 pending migrations — needs the user
+### 1. Apply the 6 pending migrations — needs the user
 Runbook: [`docs/maintenance.md` §0](maintenance.md). Files in `supabase/migrations/`:
 `20261017000000_atomic_reorder_and_revisions.sql`, `20261118000000_increment_visit_count.sql`,
 `20261119000000_media_storage_policies.sql`, `20261119000001_workspace_entries.sql`,
-`20261119000002_remove_obsolete_site_config.sql` (data delete; rollback insert in the file).
+`20261119000002_remove_obsolete_site_config.sql` (data delete; rollback insert in the file),
+`20261119000003_article_media.sql` (article tags/cover/video; **until applied, saving an article in the admin fails**).
 The visit migration was fixed on 2026-11-19: it assumed `site_config.value` was text, but it's jsonb.
 
 **Approved by the user on 2026-11-19** ("do a migration"). Blocked only on credentials: `SUPABASE_DB_PASSWORD` in
@@ -54,7 +55,7 @@ The visit migration was fixed on 2026-11-19: it assumed `site_config.value` was 
 (the direct host is IPv6-only and unreachable here): `aws-0-ap-south-1.pooler.supabase.com:5432`, user
 `postgres.yajgzliiwwkvqvsfqtfs`, password from `.env` through `PGPASSWORD` (never echo it), e.g.
 `npx supabase db push --db-url "postgresql://postgres.yajgzliiwwkvqvsfqtfs:<urlencoded pw>@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"`.
-Fresh snapshot: `backups/2026-11-19T12-39-18-728Z/`. Dry-run first; stop if it lists anything but the 5 files.
+Fresh snapshot: `backups/2026-11-19T12-39-18-728Z/`. Dry-run first; stop if it lists anything but the 6 files.
 ```bash
 node --env-file=.env.local scripts/backup-db.mjs        # fresh snapshot (you can run this)
 npx supabase login                                      # user: opens a browser
@@ -95,6 +96,11 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
   reminders, Excalidraw).
 
 ## Decisions already made (don't re-ask)
+
+- **Blog = companion to the user's future YouTube channel.** Built: companion video per post, in-text YouTube
+  embeds, tags + tag pages, related posts, cover images, share links, OG cards, JSON-LD, sitemap/robots, RSS
+  categories. Not built (ask before adding): comments (giscus needs a public repo with Discussions),
+  email newsletter, series/playlists.
 
 - **Visual theme = v1** (tag `v1`): the user disliked the v2 declutter. Keep v1 effects; new UI should use them.
 

@@ -2,7 +2,7 @@
 
 ## 0. One approval window for every pending migration
 
-Five migrations are written (four tested in PGlite) and **not applied**. They are applied together:
+Six migrations are written (five tested in PGlite) and **not applied**. They are applied together:
 
 | File | What it does | App behaviour until applied |
 | --- | --- | --- |
@@ -11,6 +11,7 @@ Five migrations are written (four tested in PGlite) and **not applied**. They ar
 | `20261119000000_media_storage_policies.sql` | Admin-only write/list policies on the `media` bucket; drops SVG, adds PDF/GIF | Uploads depend on whatever policies the bucket has today |
 | `20261119000001_workspace_entries.sql` | Private workspace tables `entries` and `private_config` (admin-only RLS) | Inbox says the tables don't exist yet |
 | `20261119000002_remove_obsolete_site_config.sql` | Deletes the 9 obsolete `site_config` rows (§2); rollback insert in the file | They sit read-only under Admin → Settings → "Other stored settings" |
+| `20261119000003_article_media.sql` | Adds `tags`, `cover_image_url`, `video_url` to `articles` | Public pages work (they read `*`), but saving an article in the admin fails on the unknown columns |
 
 Steps (each needs your go-ahead):
 

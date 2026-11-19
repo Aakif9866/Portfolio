@@ -53,6 +53,13 @@ describe("remarkCallouts", () => {
 });
 
 describe("rssFeed", () => {
+  it("adds tags as categories and the companion video to the description", () => {
+    const xml = rssFeed({ url: "https://site.dev", title: "t", description: "d" },
+      [{ title: "T", slug: "t", dek: "Summary", published_at: null, tags: ["Postgres", " "], video_url: "https://youtu.be/dQw4w9WgXcQ" }]);
+    expect(xml).toContain("<category>Postgres</category>");
+    expect(xml.match(/<category>/g)).toHaveLength(1);
+    expect(xml).toContain("<description>Summary\n\nVideo: https://youtu.be/dQw4w9WgXcQ</description>");
+  });
   it("escapes XML and links each article", () => {
     const xml = rssFeed({ url: "https://site.dev/", title: "A & B", description: "d" }, [{ title: "<RLS> & you", slug: "rls", dek: null, published_at: "2026-11-19T00:00:00Z" }]);
     expect(xml).toContain("<title>A &amp; B</title>");

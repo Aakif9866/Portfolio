@@ -93,7 +93,7 @@ function convert(quote: MdNode) {
 
 const xml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 
-export function rssFeed(site: { url: string; title: string; description: string }, items: { title: string; slug: string; dek: string | null; published_at: string | null }[]) {
+export function rssFeed(site: { url: string; title: string; description: string }, items: { title: string; slug: string; dek: string | null; published_at: string | null; tags?: string[] | null; video_url?: string | null }[]) {
   const base = site.url.replace(/\/+$/, "");
   const entries = items.map((a) => {
     const link = `${base}/articles/${encodeURIComponent(a.slug)}`;
@@ -103,7 +103,8 @@ export function rssFeed(site: { url: string; title: string; description: string 
       `      <link>${xml(link)}</link>`,
       `      <guid isPermaLink="true">${xml(link)}</guid>`,
       a.published_at ? `      <pubDate>${new Date(a.published_at).toUTCString()}</pubDate>` : null,
-      a.dek ? `      <description>${xml(a.dek)}</description>` : null,
+      a.dek || a.video_url ? `      <description>${xml([a.dek, a.video_url && `Video: ${a.video_url}`].filter(Boolean).join("\n\n"))}</description>` : null,
+      ...(a.tags ?? []).filter((t) => t.trim()).map((t) => `      <category>${xml(t.trim())}</category>`),
       "    </item>",
     ].filter(Boolean).join("\n");
   });

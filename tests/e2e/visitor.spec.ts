@@ -64,3 +64,14 @@ test("no public page scrolls sideways at 320px", async ({ page }) => {
     expect(overflow, path).toBe(0);
   }
 });
+
+test("robots.txt hides the admin and points to a sitemap listing public pages", async ({ request }) => {
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toMatch(/Disallow: \/admin/);
+  expect(robots).toMatch(/Sitemap: https?:\/\/.+\/sitemap\.xml/);
+  const res = await request.get("/sitemap.xml");
+  expect(res.status()).toBe(200);
+  const xml = await res.text();
+  for (const path of ["/articles", "/projects", "/about"]) expect(xml).toContain(`${path}</loc>`);
+  expect(xml).not.toContain("/admin");
+});

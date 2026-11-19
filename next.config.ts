@@ -7,6 +7,8 @@ const csp = [
   "img-src 'self' data: https:",
   "font-src 'self'",
   `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} https://api.github.com`,
+  // Article videos: the privacy-enhanced YouTube player only.
+  "frame-src https://www.youtube-nocookie.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

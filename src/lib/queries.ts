@@ -1,5 +1,6 @@
+import { cache } from "react";
 import { supabasePublic } from "./supabase/server";
-import type { Project, Technology } from "./types";
+import type { Article, Project, Technology } from "./types";
 import { fetchOrThrow } from "./db";
 
 /** Tech names keyed by project id, in one round trip instead of N. */
@@ -30,3 +31,15 @@ export async function allTechnologies() {
     sb.from("technologies").select("*").abortSignal(s).order("category").order("position", { ascending: true }));
   return (data ?? []) as Technology[];
 }
+
+/**
+ * Every published article, newest first, with its topic. One query per render (cached), shared
+ * by the Writing page, tag pages, article neighbours/related posts and the sitemap. "*" rather
+ * than a column list, so it works before and after the article-media migration.
+ */
+export const publishedArticles = cache(async () => {
+  const { data } = await fetchOrThrow("articles", (s) => supabasePublic()
+    .from("articles").select("*, topics(name,slug)").abortSignal(s).eq("state", "published")
+    .order("published_at", { ascending: false, nullsFirst: false }));
+  return (data ?? []) as (Article & { topics: { name: string; slug: string } | null })[];
+});

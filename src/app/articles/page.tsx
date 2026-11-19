@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Empty } from "@/components/empty";
-import { supabasePublic } from "@/lib/supabase/server";
-import type { Article } from "@/lib/types";
-import { readingMinutes } from "@/lib/markdown";
-import { fetchOrThrow } from "@/lib/db";
+import { ArticleList, TagCloud } from "@/components/article-list";
+import { publishedArticles } from "@/lib/queries";
+import { tagCounts } from "@/lib/blog";
 
-export const metadata: Metadata = { title: "Writing" };
+export const metadata: Metadata = {
+  title: "Writing",
+  description: "Technical write-ups and the written companions to my videos.",
+  alternates: { canonical: "/articles" },
+};
 export const revalidate = 300;
 
 export default async function ArticlesPage() {
-  const { data } = await fetchOrThrow("articles", (s) => supabasePublic()
-    .from("articles").select("*, topics(name)").abortSignal(s).eq("state", "published")
-    .order("published_at", { ascending: false, nullsFirst: false }));
-  const articles = (data ?? []) as (Article & { topics: { name: string } | null })[];
+  const articles = await publishedArticles();
 
   return (
     <>
@@ -27,22 +26,13 @@ export default async function ArticlesPage() {
         {articles.length === 0 ? (
           <Empty title="No articles published yet." body="Write-ups are on the way. Until then, each project's case study covers the engineering decisions in detail." action={{ href: "/projects", label: "Read the case studies" }} />
         ) : (
-          <ul className="divide-y divide-line">
-            {articles.map((a, i) => (
-              <li key={a.id} className="rv">
-                  <Link href={`/articles/${a.slug}`} className="group flex flex-col gap-2 py-6 transition-opacity hover:opacity-100">
-                    <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11.5px] uppercase tracking-wider text-faint">
-                      {a.topics && <span className="text-accent">{a.topics.name}</span>}
-                      {a.difficulty && <span>{a.difficulty}</span>}
-                      {(a.reading_minutes ?? (a.body_md ? readingMinutes(a.body_md) : null)) && <span>{a.reading_minutes ?? readingMinutes(a.body_md ?? "")} min</span>}
-                      {a.published_at && <span>{new Date(a.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>}
-                    </div>
-                    <h2 className="text-[21px] font-semibold tracking-tight transition-colors group-hover:text-accent">{a.title}</h2>
-                    {a.dek && <p className="max-w-2xl text-[14.5px] leading-relaxed text-muted">{a.dek}</p>}
-                  </Link>
-                </li>
-            ))}
-          </ul>
+          <>
+            <TagCloud tags={tagCounts(articles)} />
+            <ArticleList articles={articles} />
+            <p className="mt-10 text-[13px] text-faint">
+              Follow along with <a href="/feed.xml" className="underline underline-offset-2 hover:text-ink">RSS</a>.
+            </p>
+          </>
         )}
       </section>
     </>

@@ -27,6 +27,8 @@ export type Article = {
   topic_id: string | null; difficulty: string | null; reading_minutes: number | null;
   state: PublishState; published_at: string | null; last_reviewed_at: string | null;
   tested_with: string | null; position: number; updated_at: string;
+  // Optional until migration 20261119000003 is applied.
+  tags?: string[] | null; cover_image_url?: string | null; video_url?: string | null;
 };
 
 export type Experiment = {
