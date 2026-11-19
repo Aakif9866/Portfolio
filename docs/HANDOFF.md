@@ -4,7 +4,7 @@
 keep going without re-asking anything listed under **Decisions already made**. Update this
 file (status table and next steps) at the end of every session.
 
-Last updated: 2026-11-19 (session 3).
+Last updated: 2026-11-19 (session 4).
 
 ## Where things are
 
@@ -71,9 +71,12 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
 - Repo secrets for CI: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (user sets them; CI only runs once pushed).
 - Admin Playwright journeys need a test account — ask the user before adding any.
 - Screenshots (`docs/screenshots/`) were taken from a local `next start` against the live DB; retake after visual changes.
-- Possible next work (ask first): fix the link-preview redirect SSRF gap (SECURITY.md "Known limits"); a baseline
-  migration capturing the dashboard-created schema so a fresh DB can be built; the empty grey cell in the
-  project page facts row when only 2 facts exist.
+- Done in session 4: link previews re-check every redirect hop and resolved IPs, and refuse IPv4-mapped IPv6;
+  the project facts row fills its width (no empty cells).
+- Possible next work (ask first): a baseline migration capturing the dashboard-created schema so a fresh DB can
+  be built. It needs a schema dump (`npx supabase db dump --schema public`, after `link`) or the Supabase MCP.
+- Gotcha: `pkill -f "next start"` misses the server (its process is named `next-server`). Stop it by port:
+  `kill $(lsof -tiTCP:3100 -sTCP:LISTEN)`.
 
 ### Small follow-ups noticed
 - Vercel env: set `NEXT_PUBLIC_SITE_URL=https://portfolio-pi-weld-92.vercel.app` (local `.env.local` has

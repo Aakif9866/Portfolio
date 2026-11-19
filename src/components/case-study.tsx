@@ -126,9 +126,10 @@ export function CaseStudyView({ data }: { data: CaseStudyData }) {
           </details>
         )}
         {facts.length > 0 && (
-          <dl className="mb-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
+          // Wrapping flex, not a fixed grid: cells grow to fill each row, so 2 facts never leave empty (line-coloured) cells.
+          <dl className="mb-14 flex flex-wrap gap-px overflow-hidden rounded-2xl border border-line bg-line">
             {facts.map(([k, v]) => (
-              <div key={k} className="bg-card px-4 py-4">
+              <div key={k} className="min-w-0 flex-1 basis-32 bg-card px-4 py-4">
                 <dt className="text-[11px] uppercase tracking-wider text-faint">{k}</dt>
                 <dd className="mt-1 text-[14px] font-medium capitalize">{v}</dd>
               </div>
