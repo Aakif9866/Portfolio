@@ -7,6 +7,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { validateRow, type EditableTable } from "@/lib/admin-fields";
 import { assertTable, canTransition, parseRowForm } from "@/lib/form";
 import { isSiteKey } from "@/lib/site-content";
+import { PALETTE_KEY, isPalette } from "@/lib/palettes";
 import { MEDIA_BUCKET, checkUpload, isMediaPath, mediaPath } from "@/lib/media";
 
 export type ActionResult = { ok: true; message: string; id?: string } | { ok: false; message: string };
@@ -159,6 +160,16 @@ export async function reorder(formData: FormData): Promise<ActionResult> {
  * recoverable. The articles_snapshot_revision trigger does it in the same transaction as the
  * update (migration 20261017000000); restoring is just another save, so it is undoable too.
  */
+/** Switch the public site's colour scheme (admin dashboard). Every page picks it up at once. */
+export async function setPalette(id: string): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  if (!isPalette(id)) return { ok: false, message: "Unknown colour scheme." };
+  const { error } = await supabase.from("site_config").upsert({ key: PALETTE_KEY, value: id, label: "Colour scheme", group: "appearance" }, { onConflict: "key" });
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/", "layout");
+  return { ok: true, message: "Colour scheme updated." };
+}
+
 export async function saveArticle(formData: FormData): Promise<ActionResult> {
   return saveRow(formData);
 }

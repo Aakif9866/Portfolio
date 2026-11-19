@@ -3,6 +3,7 @@ import { saveRow } from "../actions";
 import { AdminHeader } from "../ui";
 import { SiteConfigRow } from "./row";
 import { SITE_KEYS, isSiteKey } from "@/lib/site-content";
+import { PALETTE_KEY } from "@/lib/palettes";
 
 type Row = { key: string; value: unknown; label: string | null; group: string | null };
 
@@ -11,8 +12,8 @@ export default async function AdminSettings() {
   const { data } = await supabase.from("site_config").select("key, value, label, group").order("group").order("position");
   const rows = (data ?? []) as Row[];
   const byKey = new Map(rows.map((r) => [r.key, r]));
-  // visit_count is the visit counter's own storage, shown on the dashboard instead.
-  const unused = rows.filter((r) => !isSiteKey(r.key) && r.key !== "visit_count");
+  // visit_count and the colour scheme have their own controls on the dashboard.
+  const unused = rows.filter((r) => !isSiteKey(r.key) && r.key !== "visit_count" && r.key !== PALETTE_KEY);
 
   return (
     <div className="space-y-8">

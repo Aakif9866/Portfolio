@@ -4,7 +4,7 @@ import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { getVisitCount } from "@/lib/visits";
-import { getContact } from "@/lib/contact";
+import { getContact, getPalette } from "@/lib/contact";
 import { SITE_URL } from "@/lib/site";
 import { ScrollReveal } from "@/components/scroll-reveal";
 
@@ -27,9 +27,9 @@ const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["nor
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}try{if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('rv-ready');}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [visits, contact] = await Promise.all([getVisitCount(), getContact()]);
+  const [visits, contact, palette] = await Promise.all([getVisitCount(), getContact(), getPalette()]);
   return (
-    <html lang="en" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
+    <html lang="en" data-palette={palette} suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-page">

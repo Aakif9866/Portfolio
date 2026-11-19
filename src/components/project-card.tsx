@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Project } from "@/lib/types";
 import { PROJECT_STATUS, statusLabel } from "@/lib/labels";
 
-const ACCENTS = ["#0a84ff", "#64d2ff", "#ffd60a", "#30d158", "#ff9f0a", "#40c8e0", "#63e6e2", "#a3e635", "#ff453a"];
+const ACCENTS = ["#a855f7", "#38bdf8", "#fbbf24", "#34d399", "#f43f5e", "#22d3ee", "#818cf8", "#a3e635", "#fb923c"];
 export const accentFor = (i: number) => ACCENTS[i % ACCENTS.length];
 
 /** Coloured status badge. Defaults to project lifecycle labels; pass `map` for other vocabularies. */

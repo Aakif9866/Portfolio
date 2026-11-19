@@ -9,7 +9,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden spotlight px-6">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[380px] w-[700px] -translate-x-1/2">
-        <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_200deg,#0a84ff,#64d2ff,#30d158,#40c8e0,#0a84ff)]" />
+        <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_210deg,var(--aurora))]" />
       </div>
 
       <div className="relative w-full max-w-[400px]">

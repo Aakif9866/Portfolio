@@ -34,18 +34,16 @@
   --ink: #08080a;
   --muted: #55555d;
   --faint: #6e6e78; /* ≥4.5:1 on white (WCAG AA) */
-  --accent: #0066cc; /* Apple link blue, AA on white */
+  --accent: #7c3aed;
 
   --glow: 0.2;
   --grain: 0.025;
-  --spot: rgba(0, 113, 227, 0.06);
+  --spot: rgba(124, 58, 237, 0.07);
   --sheen: rgba(0, 0, 0, 0.04);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.1);
   --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04), 0 24px 48px -20px rgba(0, 0, 0, 0.18);
-  /* Apple blue for the mark and primary actions (white text passes AA). */
-  --grad: linear-gradient(135deg, #0071e3, #0040dd);
-  /* the shiny highlight, deepened for white paper */
-  --grad-text: linear-gradient(100deg, #00a86b, #0095d9 45%, #0060df);
+  /* v1's rose → violet (the logo mark). rose-600, not -500, so white text on it passes AA. */
+  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
   color-scheme: light;
 }
 
@@ -60,18 +58,104 @@
   --ink: #f2f2f5;
   --muted: #9494a1;
   --faint: #7d7d8a; /* ≥4.5:1 on black (WCAG AA) */
-  --accent: #0a84ff;
+  --accent: #a78bfa;
 
   --glow: 0.42;
   --grain: 0.05;
-  --spot: rgba(10, 132, 255, 0.11);
+  --spot: rgba(167, 139, 250, 0.1);
   --sheen: rgba(255, 255, 255, 0.07);
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.9);
   --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 32px 64px -24px rgba(0, 0, 0, 1);
-  --grad: linear-gradient(135deg, #0a84ff, #0040dd);
-  /* the shiny highlight: green → cyan → blue on black */
-  --grad-text: linear-gradient(100deg, #30d158, #64d2ff 45%, #0a84ff);
+  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
   color-scheme: dark;
+}
+
+
+/* ───────────────────────────── colour schemes ─────────────────────────────
+   Picked on the admin dashboard (src/lib/palettes.ts), set as <html data-palette>. Aurora, the
+   original, is the default below; each other scheme overrides the mark, the shine (highlight text,
+   shimmer, glow, hero wire) and the accent, with deeper shades for light mode. */
+:root {
+  --grad-text: linear-gradient(100deg, #fb923c, #f43f5e 35%, #a855f7 68%, #38bdf8);
+  --shimmer: linear-gradient(100deg, #fb923c, #f43f5e 18%, #a855f7 33%, #38bdf8 50%, #a855f7 67%, #f43f5e 82%, #fb923c);
+  --aurora: #fb923c, #f43f5e, #a855f7, #38bdf8, #fb923c;
+  --h1: #fb923c; --h2: #f43f5e; --h3: #a855f7; --h4: #38bdf8; --pulse: #f43f5e; --pulse2: #38bdf8;
+  --on-accent: #fff;
+}
+:root[data-palette="apple"] {
+  --grad: linear-gradient(135deg, #0071e3, #0040dd);
+  --grad-text: linear-gradient(100deg, #30d158, #64d2ff 35%, #0a84ff 68%, #409cff);
+  --shimmer: linear-gradient(100deg, #30d158, #64d2ff 18%, #0a84ff 33%, #409cff 50%, #0a84ff 67%, #64d2ff 82%, #30d158);
+  --aurora: #30d158, #64d2ff, #0a84ff, #409cff, #30d158;
+  --h1: #30d158; --h2: #64d2ff; --h3: #0a84ff; --h4: #409cff; --pulse: #64d2ff; --pulse2: #409cff;
+}
+:root[data-palette="apple"][data-theme="dark"] { --accent: #0a84ff; --spot: rgba(10, 132, 255, 0.11); --on-accent: #fff; }
+:root[data-palette="apple"]:not([data-theme="dark"]) {
+  --accent: #0066cc; --spot: rgba(10, 132, 255, 0.07); --on-accent: #fff;
+  --grad-text: linear-gradient(100deg, #00a86b, #0095d9 35%, #0060df 68%, #0040dd);
+  --shimmer: linear-gradient(100deg, #00a86b, #0095d9 18%, #0060df 33%, #0040dd 50%, #0060df 67%, #0095d9 82%, #00a86b);
+  --aurora: #30d158, #64d2ff, #0a84ff, #409cff, #30d158;
+  --h1: #00a86b; --h2: #0095d9; --h3: #0060df; --h4: #0040dd; --pulse: #0095d9; --pulse2: #0040dd;
+}
+:root[data-palette="emerald"] {
+  --grad: linear-gradient(135deg, #047857, #0f766e);
+  --grad-text: linear-gradient(100deg, #a3e635, #34d399 35%, #2dd4bf 68%, #22d3ee);
+  --shimmer: linear-gradient(100deg, #a3e635, #34d399 18%, #2dd4bf 33%, #22d3ee 50%, #2dd4bf 67%, #34d399 82%, #a3e635);
+  --aurora: #a3e635, #34d399, #2dd4bf, #22d3ee, #a3e635;
+  --h1: #a3e635; --h2: #34d399; --h3: #2dd4bf; --h4: #22d3ee; --pulse: #34d399; --pulse2: #22d3ee;
+}
+:root[data-palette="emerald"][data-theme="dark"] { --accent: #34d399; --spot: rgba(52, 211, 153, 0.11); --on-accent: #000; }
+:root[data-palette="emerald"]:not([data-theme="dark"]) {
+  --accent: #047857; --spot: rgba(52, 211, 153, 0.07); --on-accent: #fff;
+  --grad-text: linear-gradient(100deg, #4d7c0f, #047857 35%, #0f766e 68%, #0e7490);
+  --shimmer: linear-gradient(100deg, #4d7c0f, #047857 18%, #0f766e 33%, #0e7490 50%, #0f766e 67%, #047857 82%, #4d7c0f);
+  --aurora: #a3e635, #34d399, #2dd4bf, #22d3ee, #a3e635;
+  --h1: #4d7c0f; --h2: #047857; --h3: #0f766e; --h4: #0e7490; --pulse: #047857; --pulse2: #0e7490;
+}
+:root[data-palette="solar"] {
+  --grad: linear-gradient(135deg, #b45309, #c2410c);
+  --grad-text: linear-gradient(100deg, #fde047, #fbbf24 35%, #fb923c 68%, #f97316);
+  --shimmer: linear-gradient(100deg, #fde047, #fbbf24 18%, #fb923c 33%, #f97316 50%, #fb923c 67%, #fbbf24 82%, #fde047);
+  --aurora: #fde047, #fbbf24, #fb923c, #f97316, #fde047;
+  --h1: #fde047; --h2: #fbbf24; --h3: #fb923c; --h4: #f97316; --pulse: #fbbf24; --pulse2: #f97316;
+}
+:root[data-palette="solar"][data-theme="dark"] { --accent: #fbbf24; --spot: rgba(251, 191, 36, 0.11); --on-accent: #000; }
+:root[data-palette="solar"]:not([data-theme="dark"]) {
+  --accent: #b45309; --spot: rgba(251, 191, 36, 0.07); --on-accent: #fff;
+  --grad-text: linear-gradient(100deg, #a16207, #b45309 35%, #c2410c 68%, #9a3412);
+  --shimmer: linear-gradient(100deg, #a16207, #b45309 18%, #c2410c 33%, #9a3412 50%, #c2410c 67%, #b45309 82%, #a16207);
+  --aurora: #fde047, #fbbf24, #fb923c, #f97316, #fde047;
+  --h1: #a16207; --h2: #b45309; --h3: #c2410c; --h4: #9a3412; --pulse: #b45309; --pulse2: #9a3412;
+}
+:root[data-palette="ocean"] {
+  --grad: linear-gradient(135deg, #0369a1, #4338ca);
+  --grad-text: linear-gradient(100deg, #22d3ee, #38bdf8 35%, #3b82f6 68%, #818cf8);
+  --shimmer: linear-gradient(100deg, #22d3ee, #38bdf8 18%, #3b82f6 33%, #818cf8 50%, #3b82f6 67%, #38bdf8 82%, #22d3ee);
+  --aurora: #22d3ee, #38bdf8, #3b82f6, #818cf8, #22d3ee;
+  --h1: #22d3ee; --h2: #38bdf8; --h3: #3b82f6; --h4: #818cf8; --pulse: #38bdf8; --pulse2: #818cf8;
+}
+:root[data-palette="ocean"][data-theme="dark"] { --accent: #38bdf8; --spot: rgba(56, 189, 248, 0.11); --on-accent: #000; }
+:root[data-palette="ocean"]:not([data-theme="dark"]) {
+  --accent: #0369a1; --spot: rgba(56, 189, 248, 0.07); --on-accent: #fff;
+  --grad-text: linear-gradient(100deg, #0e7490, #0369a1 35%, #1d4ed8 68%, #4338ca);
+  --shimmer: linear-gradient(100deg, #0e7490, #0369a1 18%, #1d4ed8 33%, #4338ca 50%, #1d4ed8 67%, #0369a1 82%, #0e7490);
+  --aurora: #22d3ee, #38bdf8, #3b82f6, #818cf8, #22d3ee;
+  --h1: #0e7490; --h2: #0369a1; --h3: #1d4ed8; --h4: #4338ca; --pulse: #0369a1; --pulse2: #4338ca;
+}
+:root[data-palette="titanium"] {
+  --grad: linear-gradient(135deg, #71717a, #27272a);
+  --grad-text: linear-gradient(100deg, #ffffff, #d4d4d8 35%, #a1a1aa 68%, #f4f4f5);
+  --shimmer: linear-gradient(100deg, #ffffff, #d4d4d8 18%, #a1a1aa 33%, #f4f4f5 50%, #a1a1aa 67%, #d4d4d8 82%, #ffffff);
+  --aurora: #a1a1aa, #52525b, #d4d4d8, #3f3f46, #a1a1aa;
+  --h1: #ffffff; --h2: #d4d4d8; --h3: #a1a1aa; --h4: #f4f4f5; --pulse: #d4d4d8; --pulse2: #f4f4f5;
+}
+:root[data-palette="titanium"][data-theme="dark"] { --accent: #e4e4e7; --spot: rgba(228, 228, 231, 0.11); --on-accent: #000; }
+:root[data-palette="titanium"]:not([data-theme="dark"]) {
+  --accent: #3f3f46; --spot: rgba(228, 228, 231, 0.07); --on-accent: #fff;
+  --grad-text: linear-gradient(100deg, #18181b, #71717a 35%, #3f3f46 68%, #27272a);
+  --shimmer: linear-gradient(100deg, #18181b, #71717a 18%, #3f3f46 33%, #27272a 50%, #3f3f46 67%, #71717a 82%, #18181b);
+  --aurora: #a1a1aa, #52525b, #d4d4d8, #3f3f46, #a1a1aa;
+  --h1: #18181b; --h2: #71717a; --h3: #3f3f46; --h4: #27272a; --pulse: #71717a; --pulse2: #27272a;
 }
 
 @layer base {
@@ -92,7 +176,7 @@
   }
   h1, h2, h3 { text-wrap: balance; }
   p, li, dd { text-wrap: pretty; }
-  ::selection { background: var(--accent); color: #fff; }
+  ::selection { background: var(--accent); color: var(--on-accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
   /* film grain — the single cheapest trick that kills flat-black banding */
@@ -131,7 +215,7 @@
       box-shadow: var(--shadow-lift);
     }
   }
-  /* The highlight: a shiny green → cyan → blue gradient, set in Instrument Serif italic so it reads as emphasis.
+  /* The highlight: v1's four-colour gradient, set in Instrument Serif italic so it reads as emphasis.
      The small right padding keeps the italic's last letter from being clipped by background-clip. */
   .grad-text {
     background-image: var(--grad-text);
@@ -225,11 +309,10 @@
 
 /* ── hero: the slow shimmer across the highlighted words, and the system pipeline ── */
 .grad-shimmer {
-  background-image: linear-gradient(100deg, #30d158, #40c8e0 18%, #64d2ff 33%, #0a84ff 50%, #64d2ff 67%, #40c8e0 82%, #30d158);
+  background-image: var(--shimmer);
   background-size: 200% 100%;
   animation: shimmer 9s ease-in-out infinite alternate;
 }
-:root[data-theme="light"] .grad-shimmer { background-image: linear-gradient(100deg, #00a86b, #0095d9 25%, #0060df 50%, #0095d9 75%, #00a86b); }
 @keyframes shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 
 .hero-system { margin: 0; animation: fade-up 0.6s 0.3s var(--ease-out-soft) both; }
@@ -320,9 +403,9 @@
 .prose-doc .callout > * + * { margin-top: 0.6em; }
 .prose-doc .callout-title { color: var(--c); font-size: 13px; font-weight: 650; letter-spacing: 0.02em; text-transform: uppercase; }
 .prose-doc .callout-tip { --c: #10b981; }
-.prose-doc .callout-important { --c: #40c8e0; }
+.prose-doc .callout-important { --c: #a855f7; }
 .prose-doc .callout-warning { --c: #d97706; }
-.prose-doc .callout-caution { --c: #ff453a; }
+.prose-doc .callout-caution { --c: #e11d48; }
 
 /* reading progress along the top, driven by the page's scroll (no JavaScript) */
 .read-progress { position: fixed; inset: 0 0 auto; height: 2px; z-index: 59; background: var(--grad); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
@@ -334,13 +417,13 @@
 
 /* highlight.js — one palette, both themes */
 .hljs-comment, .hljs-quote { color: var(--faint); font-style: italic; }
-.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #64d2ff; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: #c084fc; }
 .hljs-string, .hljs-attr { color: #34d399; }
 .hljs-number, .hljs-built_in { color: #fb923c; }
 .hljs-title, .hljs-section, .hljs-name { color: #60a5fa; }
 .hljs-type, .hljs-class .hljs-title { color: #fbbf24; }
-.hljs-variable, .hljs-template-variable { color: #ff9f0a; }
-:root[data-theme="light"] .hljs-keyword { color: #0e7490; }
+.hljs-variable, .hljs-template-variable { color: #f472b6; }
+:root[data-theme="light"] .hljs-keyword { color: #7c3aed; }
 :root[data-theme="light"] .hljs-string, :root[data-theme="light"] .hljs-attr { color: #047857; }
 :root[data-theme="light"] .hljs-number, :root[data-theme="light"] .hljs-built_in { color: #c2410c; }
 :root[data-theme="light"] .hljs-title, :root[data-theme="light"] .hljs-section, :root[data-theme="light"] .hljs-name { color: #1d4ed8; }

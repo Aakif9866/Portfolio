@@ -21,13 +21,13 @@ export function HeroSystem() {
         <defs>
           {/* userSpaceOnUse: a vertical line has zero width, so a bounding-box gradient would not render */}
           <linearGradient id="hs-line" gradientUnits="userSpaceOnUse" x1="0" y1="28" x2="0" y2={h - 28}>
-            <stop offset="0" stopColor="#30d158" />
-            <stop offset=".4" stopColor="#40c8e0" />
-            <stop offset=".7" stopColor="#64d2ff" />
-            <stop offset="1" stopColor="#0a84ff" />
+            <stop offset="0" style={{ stopColor: "var(--h1)" }} />
+            <stop offset=".4" style={{ stopColor: "var(--h2)" }} />
+            <stop offset=".7" style={{ stopColor: "var(--h3)" }} />
+            <stop offset="1" style={{ stopColor: "var(--h4)" }} />
           </linearGradient>
-          <radialGradient id="hs-req"><stop offset="0" stopColor="#fff" /><stop offset=".35" stopColor="#30d158" /><stop offset="1" stopColor="#30d158" stopOpacity="0" /></radialGradient>
-          <radialGradient id="hs-res"><stop offset="0" stopColor="#fff" /><stop offset=".35" stopColor="#64d2ff" /><stop offset="1" stopColor="#64d2ff" stopOpacity="0" /></radialGradient>
+          <radialGradient id="hs-req"><stop offset="0" stopColor="#fff" /><stop offset=".35" style={{ stopColor: "var(--pulse)" }} /><stop offset="1" style={{ stopColor: "var(--pulse)" }} stopOpacity="0" /></radialGradient>
+          <radialGradient id="hs-res"><stop offset="0" stopColor="#fff" /><stop offset=".35" style={{ stopColor: "var(--pulse2)" }} /><stop offset="1" style={{ stopColor: "var(--pulse2)" }} stopOpacity="0" /></radialGradient>
         </defs>
         {/* the wire */}
         <line x1="22" y1="28" x2="22" y2={h - 28} stroke="url(#hs-line)" strokeWidth="1.5" strokeOpacity=".55" />
