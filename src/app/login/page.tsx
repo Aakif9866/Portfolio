@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </p>
           )}
 
-          <LoginForm next={next ?? "/admin"} />
+          <LoginForm next={next ?? "/admin/site"} />
         </div>
 
         <p className="mt-5 text-center text-[12px] text-faint">

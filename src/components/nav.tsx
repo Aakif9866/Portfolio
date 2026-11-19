@@ -7,10 +7,25 @@ import { CommandPalette } from "./command-palette";
 import { NAV } from "@/lib/labels";
 import type { Contact } from "@/lib/contact";
 
+/** Shortcuts shown in the header when you're signed in. The admin pages still check access on the server. */
+const ADMIN_LINKS = [
+  { href: "/admin/site", label: "Dashboard" },
+  { href: "/admin", label: "Inbox" },
+  { href: "/admin/resources", label: "Resources" },
+  { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/articles", label: "Articles" },
+  { href: "/admin/settings", label: "Settings" },
+];
+
+/** True when a Supabase session cookie is present (read locally; no network call). */
+const hasSession = () => document.cookie.split(";").some((c) => /^\s*sb-[^=]+-auth-token/.test(c));
+
 export function Nav({ contact }: { contact: Contact }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => setSignedIn(hasSession()), [pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -59,6 +74,16 @@ export function Nav({ contact }: { contact: Contact }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {signedIn && (
+            <details key={pathname} className="relative hidden md:block">
+              <summary className="cursor-pointer list-none rounded-full border border-line px-3.5 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Admin ▾</summary>
+              <ul className="card absolute right-0 mt-2 w-48 rounded-xl p-1.5 shadow-lg">
+                {ADMIN_LINKS.map((l) => (
+                  <li key={l.href}><Link href={l.href} className="block rounded-lg px-3 py-2 text-[14px] text-muted hover:bg-raised hover:text-ink">{l.label}</Link></li>
+                ))}
+              </ul>
+            </details>
+          )}
           <CommandPalette />
           <ThemeToggle />
           <a
@@ -103,6 +128,14 @@ export function Nav({ contact }: { contact: Contact }) {
               );
             })}
           </ul>
+          {signedIn && (
+            <div className="mt-4">
+              <p className="font-mono text-[11.5px] uppercase tracking-wider text-faint">Admin</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {ADMIN_LINKS.map((l) => <Link key={l.href} href={l.href} className="rounded-full border border-line px-3.5 py-2 text-[14px] text-muted">{l.label}</Link>)}
+              </div>
+            </div>
+          )}
           <div className="mt-4 flex flex-wrap gap-2">
             <a href={`mailto:${contact.email}`} className="rounded-full bg-ink px-4 py-2 text-[14.5px] font-medium text-page">Email me</a>
             <a href={contact.github} target="_blank" rel="noopener" className="rounded-full border border-line bg-card px-4 py-2 text-[14.5px] font-medium">GitHub</a>

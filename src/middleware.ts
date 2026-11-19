@@ -42,11 +42,11 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
-  // A signed-in user on /login goes to /admin — unless /admin just sent them
+  // A signed-in user on /login goes to the admin dashboard — unless /admin just sent them
   // back here as not allowlisted (?error=…); redirecting again would loop forever.
   if (isLogin && user && !request.nextUrl.searchParams.has("error")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/admin";
+    url.pathname = "/admin/site";
     url.search = "";
     return NextResponse.redirect(url);
   }

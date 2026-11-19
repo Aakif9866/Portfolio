@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { getVisitCount } from "@/lib/visits";
 import { getContact } from "@/lib/contact";
 import { SITE_URL } from "@/lib/site";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 export const metadata: Metadata = {
   title: { default: "Aakif — Software Engineer", template: "%s · Aakif" },
@@ -22,8 +23,8 @@ const sans = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swa
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-instrument", display: "swap" });
 
-// Runs before paint: no theme flash, no layout shift.
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();`;
+// Runs before paint: no theme flash, no layout shift; marks the page ready for the scroll reveal.
+const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}try{if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('rv-ready');}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [visits, contact] = await Promise.all([getVisitCount(), getContact()]);
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Nav contact={contact} />
         <main id="main">{children}</main>
         <Footer visits={visits} contact={contact} />
+        <ScrollReveal />
       </body>
     </html>
   );

@@ -11,34 +11,26 @@ export const metadata: Metadata = { title: "Admin", robots: { index: false, foll
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = await requireAdmin();
 
+  const account = (
+    <div className="space-y-3">
+      <p className="truncate font-mono text-[11.5px] text-faint" title={user.email ?? undefined}>{user.email}</p>
+      <div className="flex items-center gap-2">
+        <Link href="/" target="_blank" className="flex-1 rounded-full border border-line px-3 py-1.5 text-center text-[12.5px] text-muted transition-colors hover:bg-raised hover:text-ink">
+          View site ↗
+        </Link>
+        <ThemeToggle />
+      </div>
+      <form action={signOut}>
+        <button className="w-full rounded-full bg-ink px-3 py-1.5 text-[12.5px] font-medium text-page transition-opacity hover:opacity-85">Sign out</button>
+      </form>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-page print:bg-white">
-      <header className="sticky top-0 z-40 border-b border-line glass print:hidden">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
-          <div className="flex items-center gap-3">
-            <Link href="/admin" className="flex items-center gap-2 text-[14.5px] font-semibold tracking-tight">
-              <span className="brand-mark">SA</span>
-              Admin
-            </Link>
-            <span className="hidden font-mono text-[11.5px] text-faint sm:inline">{user.email}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/" target="_blank" className="rounded-full border border-line px-3.5 py-1.5 text-[12.5px] text-muted transition-colors hover:bg-raised hover:text-ink">
-              View site
-            </Link>
-            <ThemeToggle />
-            <form action={signOut}>
-              <button className="rounded-full bg-ink px-3.5 py-1.5 text-[12.5px] font-medium text-page transition-opacity hover:opacity-85">
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:flex lg:gap-8 print:block print:max-w-none print:p-0">
-        <AdminNav />
-        <div className="min-w-0 flex-1">
+      <AdminNav account={account} />
+      <div className="lg:pl-64 print:pl-0">
+        <div className="mx-auto max-w-6xl px-5 py-8 print:max-w-none print:p-0">
           <QuickCapture />
           {children}
         </div>
