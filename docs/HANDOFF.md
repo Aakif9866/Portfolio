@@ -37,7 +37,9 @@ Last updated: 2026-11-19 (session 5).
 | Apply all 6 migrations + app switch-over (RPC reorder, trigger revisions, no visit fallback) | `4924bcf` | ✅ done, check-rls passed |
 | v2-6 SECURITY.md, 4 ADRs, README screenshots | `ca045bb`, next | ✅ done |
 | Separate v2 deployment (Vercel project `portfolio-v2`), GitHub section on home + About | this session | ✅ live |
-| Shareable project card (`/projects/[slug]/card`) + share block + og image; docs/features.md | this session | ✅ done · not yet redeployed |
+| Shareable project card (`/projects/[slug]/card`) + share block + og image; docs/features.md | `d640ae2` | ✅ live |
+| Recruiter view, GitHub stats, admin sidebar + Admin menu, v1 scroll reveal, Apple design pass, faster admin auth, sign-in card | `8fdda53`…`cec3fcc` | ✅ live (2026-11-19) |
+| Six colour schemes picked on the dashboard (`theme.palette` in site_config); graphite favicon; calmer dashboard; project card v2 (1200×600, home-page view via hero image → Microlink screenshot → mock-up) | `4c7a554`…`9c12f79` | ✅ live (2026-11-19) |
 
 **Nothing in the workspace
 
@@ -56,7 +58,7 @@ explicit approval before they touch production.
 v2 is its own Vercel project, `portfolio-v2`: https://portfolio-v2-iota-ochre.vercel.app (`NEXT_PUBLIC_SITE_URL`
 set there). v1 stays at https://portfolio-pi-weld-92.vercel.app (project `portfolio`, which this folder is still
 linked to, and which a push to `main` deploys). Redeploy v2 from branch `v2` with:
-`VERCEL_ORG_ID=team_5S8p37bdz33SKj2xanpfvQcl VERCEL_PROJECT_ID=prj_fWi1loEvat4oedWjx0ODiFxhnY7G vercel deploy --prod`.
+`VERCEL_ORG_ID=team_5S8p37bdz33SKj2xanpfvQcl VERCEL_PROJECT_ID=prj_fWi1loEvat4oedWjx0ODiFxhnY7G npx -y vercel@latest deploy --prod --yes` (the CLI isn't on PATH; npx reuses the saved login).
 Only when the user asks. The user keeps the existing data (don't wipe it). Optional: `GITHUB_TOKEN` (read-only)
 in Vercel if the GitHub section ever drops out from rate limits; `DEEPSEEK_API_KEY` for AI help.
 
