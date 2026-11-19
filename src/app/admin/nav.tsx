@@ -56,7 +56,7 @@ export function AdminNav({ account }: { account: React.ReactNode }) {
         </button>
       </div>
 
-      {open && <button type="button" aria-label="Close admin menu" onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-black/50 lg:hidden" />}
+      {open && <button type="button" aria-label="Close admin menu" onClick={() => setOpen(false)} className="scrim-in fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] lg:hidden" />}
 
       <aside
         id="admin-sidebar"

@@ -13,7 +13,7 @@ import { PUBLISH_STATE, statusLabel } from "@/lib/labels";
 type Action = (fd: FormData) => Promise<ActionResult>;
 
 export const INPUT =
-  "w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-faint focus:border-accent aria-[invalid=true]:border-rose-500";
+  "w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-faint focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--accent)_18%,transparent)] aria-[invalid=true]:border-rose-500";
 
 export const BTN = {
   primary: "inline-flex items-center justify-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-[13.5px] font-medium text-page transition-opacity hover:opacity-85 disabled:opacity-50",
@@ -35,7 +35,7 @@ export function AdminHeader({ title, description, actions }: { title: string; de
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="text-[26px] font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em]">{title}</h1>
         {description && <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-muted">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

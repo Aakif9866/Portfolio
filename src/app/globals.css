@@ -84,7 +84,10 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
   }
+  h1, h2, h3 { text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
   ::selection { background: var(--accent); color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
@@ -117,10 +120,12 @@
     box-shadow: var(--shadow-card);
     transition: transform 0.4s var(--ease-out-soft), border-color 0.3s, box-shadow 0.4s var(--ease-out-soft);
   }
-  .card-hover:hover {
-    transform: translateY(-3px);
-    border-color: var(--line-strong);
-    box-shadow: var(--shadow-lift);
+  @media (hover: hover) {
+    .card-hover:hover {
+      transform: translateY(-3px);
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-lift);
+    }
   }
   /* The highlight: v1's four-colour gradient, set in Instrument Serif italic so it reads as emphasis.
      The small right padding keeps the italic's last letter from being clipped by background-clip. */
@@ -372,4 +377,41 @@
   body:has(.recruiter) { color: #111 !important; }
   .recruiter .text-muted, .recruiter .text-faint { color: #444 !important; }
   .recruiter .card { background: none !important; border: 1px solid #ddd !important; box-shadow: none !important; }
+}
+
+/* ───────────────────────────── feel (Apple design pass) ─────────────────────────────
+   Unlayered on purpose, so these beat the per-component utilities everywhere (public + admin). */
+
+/* Response: feedback on press, not on release. `scale` is its own property, so it never fights
+   the hover lift's `transform`, and it is instant, like a real button going down. */
+:where(button, summary, [role="button"], a[class*="rounded-full"], a[class*="rounded-lg"]):active:not(:disabled) { scale: 0.97; }
+.card-hover:active { scale: 0.99; }
+
+/* Phones: 16px fields, so iOS doesn't zoom the page when a field is focused. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"], [type="radio"]), textarea, select { font-size: max(16px, 1em); }
+}
+
+/* Overlays materialize from where they were opened: scale + fade together, then settle. */
+@keyframes materialize { from { opacity: 0; scale: 0.96; } to { opacity: 1; scale: 1; } }
+@keyframes scrim-in { from { opacity: 0; } to { opacity: 1; } }
+.materialize { animation: materialize 0.32s var(--ease-out-soft) both; }
+.scrim-in { animation: scrim-in 0.24s ease-out both; }
+details[open] > .materialize { transform-origin: top right; }
+
+/* Theme switch cross-fades (startViewTransition in theme-toggle) instead of flashing. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.3s; }
+
+/* Accessibility settings: frostier/solid materials, firmer edges, and no motion. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--card); backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --line: var(--line-strong); --faint: var(--muted); }
+  .glass { background: var(--card); backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .materialize, .scrim-in { animation: none !important; }
+  :where(button, summary, [role="button"], a):active, .card-hover:active { scale: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }

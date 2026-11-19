@@ -77,7 +77,7 @@ export function Nav({ contact }: { contact: Contact }) {
           {signedIn && (
             <details key={pathname} className="relative hidden md:block">
               <summary className="cursor-pointer list-none rounded-full border border-line px-3.5 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Admin ▾</summary>
-              <ul className="card absolute right-0 mt-2 w-48 rounded-xl p-1.5 shadow-lg">
+              <ul className="glass materialize absolute right-0 mt-2 w-48 rounded-xl border border-line p-1.5">
                 {ADMIN_LINKS.map((l) => (
                   <li key={l.href}><Link href={l.href} className="block rounded-lg px-3 py-2 text-[14px] text-muted hover:bg-raised hover:text-ink">{l.label}</Link></li>
                 ))}
@@ -100,7 +100,7 @@ export function Nav({ contact }: { contact: Contact }) {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-colors hover:bg-raised hover:text-ink md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-line text-muted transition-colors hover:bg-raised hover:text-ink md:hidden"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
@@ -110,7 +110,7 @@ export function Nav({ contact }: { contact: Contact }) {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-line px-6 pb-6 pt-2 md:hidden">
+        <div id="mobile-menu" className="materialize origin-top h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain border-t border-line px-6 pb-6 pt-2 md:hidden">
           <ul className="divide-y divide-line">
             {NAV.map((l) => {
               const active = pathname.startsWith(l.href);
