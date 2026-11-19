@@ -16,3 +16,7 @@ graphify-out
 
 # database snapshots (scripts/backup-db.mjs) — contain drafts and the admin allowlist
 backups
+
+# playwright output
+playwright-report
+test-results
