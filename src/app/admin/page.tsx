@@ -60,6 +60,7 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
     { label: "To read", n: (facets ?? []).filter((f) => f.kind === "link" && f.status === "to_read").length, href: "/admin/resources" },
     { label: "Logs this week", n: (facets ?? []).filter((f) => f.kind === "log" && weekOf(f.created_at) === thisWeek).length, href: "/admin/logs" },
     { label: "Active ideas", n: (facets ?? []).filter((f) => f.kind === "idea" && f.status === "active").length, href: "/admin/ideas" },
+    { label: "Job follow-ups", n: (facets ?? []).filter((f) => f.kind === "job" && f.due_on && f.due_on <= localDay(new Date()) && !FINISHED.includes(f.status ?? "")).length, href: "/admin/jobs" },
     { label: "Due in 7 days", n: (facets ?? []).filter((f) => f.due_on && f.due_on <= soon && !FINISHED.includes(f.status ?? "")).length, href: "/admin?due=soon" },
   ];
 
@@ -91,14 +92,14 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
       ) : (
         <>
           {!q && !kind && !tag && !due && total > 0 && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
               {glance.map((g) => (
                 <Link key={g.label} href={g.href} className="card card-hover rounded-xl px-3.5 py-2.5">
                   <span className="block text-[20px] font-semibold leading-tight">{g.n}</span>
                   <span className="text-[12px] text-muted">{g.label}</span>
                 </Link>
               ))}
-              <a href={PLOS_URL} target="_blank" rel="noopener noreferrer" className="card card-hover col-span-2 rounded-xl px-3.5 py-2.5 sm:col-span-1">
+              <a href={PLOS_URL} target="_blank" rel="noopener noreferrer" className="card card-hover rounded-xl px-3.5 py-2.5">
                 <span className="block text-[14px] font-semibold leading-tight">PLOS ↗</span>
                 <span className="text-[12px] text-muted">Daily to-dos and habits</span>
               </a>

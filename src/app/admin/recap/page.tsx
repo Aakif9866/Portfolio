@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { weekLabel, weekOf, type Entry } from "@/lib/entries";
+import { weekLabel, weekOf, type Entry, type StatusChange } from "@/lib/entries";
+import { ENTRY_STATUS } from "@/lib/labels";
 import { AdminHeader, BTN } from "../ui";
 import { WorkspaceError } from "../workspace-error";
 
@@ -30,6 +31,9 @@ export default async function Recap({ searchParams }: { searchParams: Promise<{ 
   const [from, to] = [Date.parse(start), Date.parse(end)];
   const created = (e: Entry) => { const t = Date.parse(e.created_at); return t >= from && t < to; };
 
+  // Jobs keep a status history, so their recap line is exact: the last change made this week.
+  const changesInWeek = (e: Entry) =>
+    (Array.isArray(e.meta?.history) ? (e.meta.history as StatusChange[]) : []).filter((h) => { const t = Date.parse(h.at); return t >= from && t < to; });
   // ponytail: "achieved" and "done" count if the entry was touched this week; there is no status-changed-at
   // column. Add one if a goal edited long after it was achieved shows up as noise.
   const groups: { title: string; items: Entry[] }[] = [
@@ -38,7 +42,7 @@ export default async function Recap({ searchParams }: { searchParams: Promise<{ 
     { title: "Finished reading", items: rows.filter((e) => e.kind === "link" && e.status === "done") },
     { title: "Saved resources", items: rows.filter((e) => e.kind === "link" && created(e)) },
     { title: "New ideas", items: rows.filter((e) => e.kind === "idea" && created(e)) },
-    { title: "Jobs", items: rows.filter((e) => e.kind === "job") },
+    { title: "Jobs", items: rows.filter((e) => e.kind === "job" && (created(e) || changesInWeek(e).length > 0)) },
     { title: "Notes", items: rows.filter((e) => e.kind === "note" && created(e)) },
   ].filter((g) => g.items.length > 0);
 
@@ -69,7 +73,7 @@ export default async function Recap({ searchParams }: { searchParams: Promise<{ 
                 {g.items.map((e) => (
                   <li key={e.id} className="text-[13.5px]">
                     <Link href={`/admin?e=${e.id}`} className="text-ink hover:text-accent">{e.title || e.url}</Link>
-                    {e.kind === "job" && e.status && <span className="ml-1.5 text-faint">· {e.status}</span>}
+                    {e.kind === "job" && changesInWeek(e).length > 0 && <span className="ml-1.5 text-faint">→ {ENTRY_STATUS.job[changesInWeek(e).at(-1)!.status ?? ""]?.label ?? "no status"}</span>}
                   </li>
                 ))}
               </ul>

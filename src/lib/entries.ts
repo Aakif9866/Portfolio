@@ -234,3 +234,64 @@ export const ideaColumn = (status: string | null) => (status && (IDEA_COLUMNS as
 export function slugify(title: string) {
   return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60).replace(/-+$/, "") || "project";
 }
+
+/* ── jobs ─────────────────────────────────────────────────────────────────── */
+
+/**
+ * The job-specific details an entry of kind "job" may carry in `meta`. Everything optional.
+ * The follow-up date is the entry's own `due_on`; the notes are its `body_md`.
+ */
+export const JOB_FIELDS = [
+  { key: "company", label: "Company", max: 120 },
+  { key: "role", label: "Role", max: 120 },
+  { key: "location", label: "Location", max: 120 },
+  { key: "contact", label: "Recruiter / contact", max: 200 },
+  { key: "salary", label: "Salary range", max: 60 },
+  { key: "applied_on", label: "Applied on", max: 10 },
+  { key: "jd", label: "Job description", max: 20000 },
+] as const;
+
+export type JobMeta = Partial<Record<(typeof JOB_FIELDS)[number]["key"], string>>;
+
+const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
+
+/** Reads `job.<key>` form fields. Empty fields are removed so they don't linger in meta. */
+export function validateJobMeta(input: Record<string, unknown>): { ok: true; meta: JobMeta; cleared: string[] } | { ok: false; message: string } {
+  const meta: JobMeta = {};
+  const cleared: string[] = [];
+  for (const f of JOB_FIELDS) {
+    const raw = input[`job.${f.key}`];
+    if (raw === undefined) continue; // field not on this form: leave whatever is stored
+    const v = typeof raw === "string" ? raw.trim() : "";
+    if (!v) { cleared.push(f.key); continue; }
+    if (v.length > f.max) return { ok: false, message: `${f.label} can be at most ${f.max} characters.` };
+    if (f.key === "applied_on" && !isDate(v)) return { ok: false, message: "That applied date isn't valid." };
+    meta[f.key] = v;
+  }
+  return { ok: true, meta, cleared };
+}
+
+/** "Backend Engineer at Acme", falling back to whichever half exists. */
+export function jobTitle(role?: string, company?: string) {
+  return [role, company].filter(Boolean).join(" at ").slice(0, MAX_TITLE);
+}
+
+export type StatusChange = { status: string | null; at: string };
+
+/**
+ * Meta after a job's status changes: the change is appended to `history` (which makes the
+ * job's timeline and the recap exact), and moving to "applied" fills `applied_on` with today
+ * if it's empty. Other kinds and unchanged statuses pass through untouched.
+ */
+export function withStatusChange(kind: string, meta: Record<string, unknown>, from: string | null, to: string | null, now = new Date()) {
+  if (kind !== "job" || from === to) return meta;
+  const history = Array.isArray(meta.history) ? (meta.history as StatusChange[]) : [];
+  const next: Record<string, unknown> = { ...meta, history: [...history, { status: to, at: now.toISOString() }].slice(-50) };
+  if (to === "applied" && !meta.applied_on) next.applied_on = localDay(now);
+  return next;
+}
+
+/** Whole days from `day` (YYYY-MM-DD) to today in WORKSPACE_TZ; negative = in the future. */
+export function daysSince(day: string, now = new Date()) {
+  return Math.round((Date.parse(`${localDay(now)}T00:00:00Z`) - Date.parse(`${day}T00:00:00Z`)) / 864e5);
+}

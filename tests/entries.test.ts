@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanSearch, ideaColumn, isFetchableUrl, localDay, normalizeTags, parseCapture, parsePreview, slugify, sourceOf, urlTitle, validateEntry, weekLabel, weekOf } from "@/lib/entries";
+import { cleanSearch, daysSince, ideaColumn, isFetchableUrl, jobTitle, localDay, normalizeTags, parseCapture, parsePreview, slugify, sourceOf, urlTitle, validateEntry, validateJobMeta, weekLabel, weekOf, withStatusChange } from "@/lib/entries";
 
 describe("parseCapture", () => {
   it("a bare URL becomes a resource with no title yet", () => {
@@ -138,5 +138,40 @@ describe("view helpers", () => {
     expect(ideaColumn("weird")).toBe("someday");
     expect(slugify("A CLI for pgvector benchmarks!")).toBe("a-cli-for-pgvector-benchmarks");
     expect(slugify("¿¿")).toBe("project");
+  });
+});
+
+describe("jobs", () => {
+
+  it("validateJobMeta keeps filled fields, reports cleared ones, ignores absent ones", () => {
+    const r = validateJobMeta({ "job.company": " Acme ", "job.role": "", "job.applied_on": "2026-11-10", other: "x" });
+    expect(r).toEqual({ ok: true, meta: { company: "Acme", applied_on: "2026-11-10" }, cleared: ["role"] });
+  });
+
+  it("validateJobMeta rejects bad dates and over-long values", () => {
+    expect(validateJobMeta({ "job.applied_on": "10/11/2026" }).ok).toBe(false);
+    expect(validateJobMeta({ "job.company": "x".repeat(121) }).ok).toBe(false);
+  });
+
+  it("jobTitle", () => {
+    expect(jobTitle("Backend Engineer", "Acme")).toBe("Backend Engineer at Acme");
+    expect(jobTitle(undefined, "Acme")).toBe("Acme");
+    expect(jobTitle("", "")).toBe("");
+  });
+
+  it("withStatusChange records history and fills applied_on once", () => {
+    const now = new Date("2026-11-19T06:00:00Z");
+    const m1 = withStatusChange("job", {}, "saved", "applied", now);
+    expect(m1).toEqual({ history: [{ status: "applied", at: now.toISOString() }], applied_on: "2026-11-19" });
+    const m2 = withStatusChange("job", { ...m1, applied_on: "2026-11-01" }, "applied", "interviewing", now);
+    expect(m2.applied_on).toBe("2026-11-01");
+    expect((m2.history as unknown[]).length).toBe(2);
+    expect(withStatusChange("job", m2, "interviewing", "interviewing", now)).toBe(m2);
+    expect(withStatusChange("idea", { a: 1 }, null, "next", now)).toEqual({ a: 1 });
+  });
+
+  it("daysSince counts IST calendar days", () => {
+    expect(daysSince("2026-11-17", new Date("2026-11-19T06:00:00Z"))).toBe(2);
+    expect(daysSince("2026-11-20", new Date("2026-11-19T06:00:00Z"))).toBe(-1);
   });
 });

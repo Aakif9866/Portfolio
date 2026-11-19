@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import type { Entry } from "@/lib/entries";
+import { JOB_FIELDS, type Entry, type StatusChange } from "@/lib/entries";
 import { ENTRY_KIND, ENTRY_STATUS } from "@/lib/labels";
 import { deleteEntry, saveEntry, togglePin } from "./workspace-actions";
 import { BTN, Banner, ConfirmButton, INPUT } from "./ui";
@@ -62,15 +62,16 @@ export function EntryEditor({ entry, closeHref }: { entry: Entry; closeHref: str
       <Field label="Link">
         <input name="url" type="url" defaultValue={entry.url ?? ""} placeholder="https://…" className={INPUT} />
       </Field>
+      {kind === "job" && <JobFields meta={entry.meta} history={entry.meta?.history} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Tags" help="Separated by spaces or commas.">
           <input name="tags" defaultValue={entry.tags.join(" ")} className={`${INPUT} font-mono text-[13px]`} />
         </Field>
-        <Field label="Due date" help="Optional.">
+        <Field label={kind === "job" ? "Follow up on" : "Due date"} help="Optional.">
           <input name="due_on" type="date" defaultValue={entry.due_on ?? ""} className={INPUT} />
         </Field>
       </div>
-      <Field label="Notes" help="Markdown.">
+      <Field label="Notes" help={kind === "job" ? "Interview notes, recruiter conversations, anything. Markdown." : "Markdown."}>
         <textarea name="body_md" defaultValue={entry.body_md} rows={10} spellCheck className={`${INPUT} font-mono text-[13px]`} />
       </Field>
       <label className="flex items-center gap-2 text-[14px]">
@@ -136,5 +137,37 @@ export function PinButton({ id, pinned }: { id: string; pinned: boolean }) {
         <path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />
       </svg>
     </button>
+  );
+}
+
+/** Company, role and the rest for a job. All optional; stored in the entry's meta. */
+function JobFields({ meta, history }: { meta: Record<string, unknown>; history: unknown }) {
+  const val = (k: string) => (typeof meta?.[k] === "string" ? (meta[k] as string) : "");
+  const short = JOB_FIELDS.filter((f) => f.key !== "jd");
+  const changes = Array.isArray(history) ? (history as StatusChange[]) : [];
+  return (
+    <fieldset className="space-y-4 rounded-xl border border-line p-3">
+      <legend className="px-1 text-[12.5px] font-medium text-muted">Job details</legend>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {short.map((f) => (
+          <Field key={f.key} label={f.label}>
+            <input name={`job.${f.key}`} type={f.key === "applied_on" ? "date" : "text"} defaultValue={val(f.key)} maxLength={f.max} className={INPUT} />
+          </Field>
+        ))}
+      </div>
+      <Field label="Job description" help="Paste it here so it's still around when the posting disappears.">
+        <textarea name="job.jd" defaultValue={val("jd")} rows={6} maxLength={20000} className={`${INPUT} text-[13px]`} />
+      </Field>
+      {changes.length > 0 && (
+        <div>
+          <p className="text-[12.5px] font-medium text-muted">History</p>
+          <ol className="mt-1 space-y-0.5 text-[12.5px] text-faint">
+            {changes.map((c, i) => (
+              <li key={i}>{new Date(c.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" })} · {c.status ? ENTRY_STATUS.job[c.status]?.label ?? c.status : "No status"}</li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </fieldset>
   );
 }

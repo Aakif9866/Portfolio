@@ -11,6 +11,7 @@ const GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
       { href: "/admin/resources", label: "Resources" },
       { href: "/admin/logs", label: "Logs" },
       { href: "/admin/ideas", label: "Ideas" },
+      { href: "/admin/jobs", label: "Jobs" },
       { href: "/admin/recap", label: "Weekly recap" },
     ],
   },

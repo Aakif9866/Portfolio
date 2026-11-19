@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { isFetchableUrl, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, type LinkPreview } from "@/lib/entries";
+import { isFetchableUrl, jobTitle, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, validateJobMeta, withStatusChange, type LinkPreview } from "@/lib/entries";
 import { validateRow } from "@/lib/admin-fields";
 import type { ActionResult } from "./actions";
 
@@ -62,7 +62,12 @@ export async function captureEntry(formData: FormData): Promise<ActionResult> {
 
   const { data, error } = await supabase
     .from("entries")
-    .insert({ kind: capture.kind, title, body_md: capture.body_md, url: capture.url, tags: capture.tags, meta })
+    .insert({
+      kind: capture.kind, title, body_md: capture.body_md, url: capture.url, tags: capture.tags,
+      // A captured job starts as "Saved", like one added on the Jobs page.
+      status: capture.kind === "job" ? "saved" : null,
+      meta: withStatusChange(capture.kind, meta, null, capture.kind === "job" ? "saved" : null),
+    })
     .select("id")
     .single();
   if (error) return { ok: false, message: friendly(error) };
@@ -75,13 +80,43 @@ export async function saveEntry(formData: FormData): Promise<ActionResult> {
   const id = String(formData.get("id") ?? "");
   if (!UUID_RE.test(id)) return { ok: false, message: "Invalid entry." };
 
-  const parsed = validateEntry(Object.fromEntries(formData));
+  const input = Object.fromEntries(formData);
+  const parsed = validateEntry(input);
   if (!parsed.ok) return parsed;
+  const job = parsed.row.kind === "job" ? validateJobMeta(input) : null;
+  if (job && !job.ok) return job;
 
-  const { error } = await supabase.from("entries").update(parsed.row).eq("id", id);
+  // meta is merged, not replaced: link previews, project links and job history must survive an edit.
+  const { data: current, error: readErr } = await supabase.from("entries").select("kind, status, meta").eq("id", id).maybeSingle();
+  if (readErr) return { ok: false, message: friendly(readErr) };
+  if (!current) return { ok: false, message: "That entry no longer exists." };
+  let meta: Record<string, unknown> = { ...(current.meta as Record<string, unknown>), ...(job?.ok ? job.meta : {}) };
+  if (job?.ok) for (const k of job.cleared) delete meta[k];
+  meta = withStatusChange(parsed.row.kind, meta, current.kind === parsed.row.kind ? current.status : null, parsed.row.status);
+
+  const { error } = await supabase.from("entries").update({ ...parsed.row, meta }).eq("id", id);
   if (error) return { ok: false, message: friendly(error) };
   revalidatePath("/admin", "layout");
   return { ok: true, message: "Saved." };
+}
+
+/** A job from the Jobs page form. Only a company, role or link is needed. */
+export async function createJob(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const input = Object.fromEntries(formData);
+  const job = validateJobMeta(input);
+  if (!job.ok) return job;
+  const url = String(input.url ?? "").trim();
+  const title = jobTitle(job.meta.role, job.meta.company) || (url ? urlTitle(url) : "");
+
+  const parsed = validateEntry({ kind: "job", title, url, status: "saved", body_md: "", tags: String(input.tags ?? "") });
+  if (!parsed.ok) return { ok: false, message: parsed.message === "Give it a title or a link." ? "Add a company, a role or a link." : parsed.message };
+
+  const meta = withStatusChange("job", job.meta, null, "saved");
+  const { data, error } = await supabase.from("entries").insert({ ...parsed.row, meta }).select("id").single();
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: "Job saved.", id: data.id };
 }
 
 export async function deleteEntry(formData: FormData): Promise<ActionResult> {
@@ -112,12 +147,13 @@ export async function setEntryStatus(formData: FormData): Promise<ActionResult> 
   const status = String(formData.get("status") ?? "") || null;
   if (!UUID_RE.test(id)) return { ok: false, message: "Invalid entry." };
 
-  const { data: entry, error: readErr } = await supabase.from("entries").select("kind").eq("id", id).maybeSingle();
+  const { data: entry, error: readErr } = await supabase.from("entries").select("kind, status, meta").eq("id", id).maybeSingle();
   if (readErr) return { ok: false, message: friendly(readErr) };
   if (!entry) return { ok: false, message: "That entry no longer exists." };
   if (status && !statusesFor(entry.kind).includes(status)) return { ok: false, message: "That status doesn't apply to this kind of entry." };
 
-  const { error } = await supabase.from("entries").update({ status }).eq("id", id);
+  const meta = withStatusChange(entry.kind, entry.meta as Record<string, unknown>, entry.status, status);
+  const { error } = await supabase.from("entries").update({ status, meta }).eq("id", id);
   if (error) return { ok: false, message: friendly(error) };
   revalidatePath("/admin", "layout");
   return { ok: true, message: "Saved." };
