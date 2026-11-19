@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { githubLogin, pickRepos } from "@/lib/github";
+import { githubLogin, pickRepos, repoStats } from "@/lib/github";
 
 describe("githubLogin", () => {
   it("reads the login from a profile URL", () => {
@@ -28,4 +28,14 @@ describe("pickRepos", () => {
     expect(out[0]).toMatchObject({ stars: 3, language: "TypeScript", description: null });
   });
   it("returns [] for a non-array (an API error body)", () => expect(pickRepos({ message: "rate limited" })).toEqual([]));
+});
+
+describe("repoStats", () => {
+  it("sums stars and ranks languages over own repos only", () => {
+    const r = (language: string | null, stargazers_count: number, fork = false) => ({ language, stargazers_count, fork });
+    expect(repoStats([r("Python", 2), r("Python", 1), r("TypeScript", 4), r(null, 0), r("Go", 9, true)])).toEqual({
+      stars: 7, languages: [{ name: "Python", repos: 2 }, { name: "TypeScript", repos: 1 }],
+    });
+  });
+  it("handles an API error body", () => expect(repoStats({ message: "x" })).toEqual({ stars: 0, languages: [] }));
 });

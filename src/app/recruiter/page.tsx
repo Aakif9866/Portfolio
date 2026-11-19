@@ -7,6 +7,7 @@ import { fetchOrThrow } from "@/lib/db";
 import { TECH_GROUPS, type TimelineEntry } from "@/lib/types";
 import { SITE_NAME } from "@/lib/site";
 import { PrintButton } from "./print-button";
+import { getGitHub } from "@/lib/github";
 
 /**
  * Recruiter view: the whole profile on one screen, readable in about 30 seconds. Off the main
@@ -40,7 +41,7 @@ export default async function RecruiterPage() {
   const education = entries.filter((e) => e.kind === "education");
   const current = work.find((e) => !e.end_date);
   const featured = (projects.some((p) => p.featured) ? projects.filter((p) => p.featured) : projects).slice(0, 3);
-  const techMap = await techByProject(featured.map((p) => p.id));
+  const [techMap, gh] = await Promise.all([techByProject(featured.map((p) => p.id)), getGitHub(contact.github)]);
   const skills = TECH_GROUPS.map((g) => ({ ...g, names: tech.filter((t) => t.category === g.key).map((t) => t.name) })).filter((g) => g.names.length > 0);
 
   const chip = "inline-flex items-center rounded-full border border-line px-3.5 py-1.5 text-[14px] transition-colors hover:bg-raised";
@@ -96,6 +97,25 @@ export default async function RecruiterPage() {
               </div>
             ))}
           </dl>
+        </section>
+      )}
+
+      {gh && (
+        <section className="mt-10 break-inside-avoid">
+          <H>Open source</H>
+          <p className="text-[15px] text-muted">
+            <a href={gh.url} target="_blank" rel="noopener" className="font-medium text-ink hover:underline">github.com/{gh.login}</a>
+            {" "}· {gh.publicRepos} public repositories · {gh.stars} stars{gh.since ? ` · active since ${gh.since}` : ""}
+          </p>
+          {gh.languages.length > 0 && <p className="mt-1.5 text-[15px] text-muted">Most used: {gh.languages.map((l) => `${l.name} (${l.repos})`).join(", ")}</p>}
+          {gh.repos.length > 0 && (
+            <p className="mt-1.5 text-[15px] text-muted">
+              Recently pushed:{" "}
+              {gh.repos.slice(0, 3).map((r, i) => (
+                <span key={r.name}>{i > 0 && ", "}<a href={r.url} target="_blank" rel="noopener" className="text-ink hover:underline">{r.name}</a></span>
+              ))}
+            </p>
+          )}
         </section>
       )}
 

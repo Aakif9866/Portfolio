@@ -18,7 +18,22 @@ export type GitHubRepo = {
   pushedAt: string;
 };
 
-export type GitHubSummary = { login: string; url: string; publicRepos: number; followers: number; repos: GitHubRepo[] };
+export type GitHubSummary = {
+  login: string; url: string; publicRepos: number; followers: number; repos: GitHubRepo[];
+  stars: number; since: number | null; languages: { name: string; repos: number }[];
+};
+
+/** Stars across own (non-fork) repos and the most used languages, by repo count. */
+export function repoStats(raw: unknown, top = 5): { stars: number; languages: { name: string; repos: number }[] } {
+  if (!Array.isArray(raw)) return { stars: 0, languages: [] };
+  const own = raw.filter((r) => r && !r.fork);
+  const counts = new Map<string, number>();
+  for (const r of own) if (typeof r.language === "string") counts.set(r.language, (counts.get(r.language) ?? 0) + 1);
+  return {
+    stars: own.reduce((n, r) => n + (Number(r.stargazers_count) || 0), 0),
+    languages: [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, top).map(([name, repos]) => ({ name, repos })),
+  };
+}
 
 /** "https://github.com/Aakif9866/" → "Aakif9866"; null for anything that isn't a GitHub profile URL. */
 export function githubLogin(profileUrl: string): string | null {
@@ -68,7 +83,7 @@ export async function getGitHub(profileUrl: string): Promise<GitHubSummary | nul
   try {
     const [user, repos] = (await Promise.all([
       get(`/users/${login}`),
-      get(`/users/${login}/repos?sort=pushed&per_page=30&type=owner`),
+      get(`/users/${login}/repos?sort=pushed&per_page=100&type=owner`),
     ])) as [Record<string, unknown>, unknown];
     return {
       login,
@@ -76,6 +91,8 @@ export async function getGitHub(profileUrl: string): Promise<GitHubSummary | nul
       publicRepos: Number(user.public_repos) || 0,
       followers: Number(user.followers) || 0,
       repos: pickRepos(repos),
+      ...repoStats(repos),
+      since: user.created_at ? new Date(String(user.created_at)).getFullYear() : null,
     };
   } catch {
     return null;

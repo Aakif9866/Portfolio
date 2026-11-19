@@ -10,8 +10,15 @@ export function GitHubRepos({ gh, columns = 2 }: { gh: GitHubSummary; columns?: 
   return (
     <>
       <a href={gh.url} target="_blank" rel="noopener" className="font-mono text-[14px] text-muted transition-colors hover:text-ink">
-        @{gh.login} · {gh.publicRepos} public repos · {gh.followers} followers <span aria-hidden>↗</span>
+        @{gh.login} · {gh.publicRepos} public repos · {gh.stars} stars · {gh.followers} followers{gh.since ? ` · since ${gh.since}` : ""} <span aria-hidden>↗</span>
       </a>
+      {gh.languages.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Most used languages">
+          {gh.languages.map((l) => (
+            <li key={l.name} className="rounded-full border border-line px-2.5 py-0.5 font-mono text-[12.5px] text-muted">{l.name} <span className="text-faint">{l.repos}</span></li>
+          ))}
+        </ul>
+      )}
       {gh.repos.length > 0 && (
         <ul className={`mt-6 grid gap-4 sm:grid-cols-2 ${columns === 3 ? "lg:grid-cols-3" : ""}`}>
           {gh.repos.map((r) => (
