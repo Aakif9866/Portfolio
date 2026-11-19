@@ -164,7 +164,8 @@ Three layers protect the admin. Only the last one is authoritative:
 1. **`src/middleware.ts`** redirects signed-out requests away from `/admin`. A convenience.
 2. **`requireAdmin()`** (`src/lib/auth.ts`) runs again on the server in every admin page and
    server action. It requires a session *and* an `admin_allowlist` row.
-3. **Postgres RLS** checks `admin_allowlist`. If the first two layers were removed, a signed-out
+3. **Postgres RLS** calls `is_admin()`, which checks `profiles.role = 'admin'`. That role is set at
+   sign-up, only for an email in `admin_allowlist`. If the first two layers were removed, a signed-out
    client still could not read a draft or write a row.
 
 Admin membership is a database row, not a client-side flag or a token claim the browser could
@@ -234,7 +235,7 @@ as 0.
 | `tests/admin-rules.test.ts` | Form parsing, field allowlist, validation (slugs, links, dates, options), publishing transitions |
 | `tests/db-fetch.test.ts` | Zero rows vs. failure, retry limits, which errors are retried, no data leaking into logs, every public query uses `fetchOrThrow` |
 | `tests/settings-usage.test.ts` | The site only reads settings the admin can edit, and every editable setting is used |
-| `tests/migration-atomic.test.ts` | The pending migration's SQL, run against a real Postgres engine (PGlite) with simplified tables |
+| `tests/migration-atomic.test.ts` | The atomic reorder/revision migration's SQL, run against a real Postgres engine (PGlite) with simplified tables |
 | `tests/migration-visits.test.ts` | The visit-counter migration: one per call, first-use insert, service-role only |
 | `tests/media.test.ts` | Upload checks: type from magic bytes (no SVG), size limit, generated paths, path validation |
 | `tests/entries.test.ts` | Quick-capture parsing, the workspace save allowlist, link-preview parsing and the private-host guard, Markdown export |
@@ -266,8 +267,8 @@ The schema predates this repo and lives in Supabase; there is no baseline migrat
 | `experiments` | Experiments |
 | `timeline_entries` | Work and education |
 | `site_config` | Key/value site content (`key` is the primary key), plus `visit_count` |
-| `admin_allowlist` | Who is admin. The authorization source of truth |
-| `entries`, `private_config` | The private workspace (pending migration). Admin-only RLS, no anon grants, never read by a public page |
+| `admin_allowlist` | Who may become admin: sign-up gives these emails `profiles.role = 'admin'`, which RLS checks |
+| `entries`, `private_config` | The private workspace. Admin-only RLS, no anon grants, never read by a public page |
 
 `topics`, `tags`, `claims`, `sources` and a few other tables exist in the schema but aren't used
 by the app.
@@ -291,21 +292,11 @@ the database.
 
 Details for all of these are in [docs/maintenance.md](docs/maintenance.md).
 
-- **Reordering and article revisions aren't atomic yet.**
-  - Reordering is two separate updates, and saving a revision then the article is two requests.
-    A failure in between can leave two items sharing a position, or a stray revision.
-  - The fix is a ready, tested migration: `supabase/migrations/20261017000000_atomic_reorder_and_revisions.sql`.
-  - Applying it needs `npx supabase login` and explicit approval. The app code switches over in
-    the same deploy.
-- **The visit counter can miss counts** until `supabase/migrations/20261118000000_increment_visit_count.sql`
-  is applied (needs approval). Until then it falls back to read-then-write.
-- **20 unused `site_config` settings** from an earlier design remain in the database, shown
-  read-only in Admin → Settings. A pending migration removes the 9 obsolete ones; the audit
-  and the decisions on the rest are in `docs/maintenance.md`.
+- **11 unused `site_config` settings** from an earlier design remain (the 9 obsolete ones were
+  removed), shown read-only in Admin → Settings. The audit is in `docs/maintenance.md` §2.
 - **Uploads** (Admin → Media, and an Upload button on the hero and diagram image fields) store
   files in the public `media` bucket: PNG, JPEG, GIF, WebP, AVIF or PDF, up to 4 MB, type checked
-  from the file's bytes. Admin-only write policies are in
-  `supabase/migrations/20261119000000_media_storage_policies.sql`, pending approval.
+  from the file's bytes. Only the admin can upload, list, replace or delete (storage RLS).
 - **Not built:**
   - browser tests for admin journeys (the visitor smoke tests exist; admin ones need a test account)
   - error monitoring (server errors appear in Vercel's logs)
@@ -327,7 +318,7 @@ src/
     labels.ts           navigation and status vocabulary
     contact.ts, site-content.ts   settings the site reads
   middleware.ts         session refresh, /admin redirect, visit counter
-supabase/migrations/    pending migrations (not yet applied)
+supabase/migrations/    schema changes since the dashboard-created base (all applied 2026-11-19)
 scripts/check-rls.mjs   read-only security check
 tests/                  Vitest tests; tests/e2e/ Playwright smoke tests
 .github/workflows/ci.yml lint, typecheck, test; build + e2e only if Supabase secrets are set

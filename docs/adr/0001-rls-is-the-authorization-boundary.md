@@ -10,8 +10,8 @@ through the Next.js app. Any check that runs only in the app can be bypassed by 
 ## Decision
 
 Postgres row-level security decides every read and write. Policies allow anon to read only
-published rows, and give full access to users for whom `public.is_admin()` (a lookup in
-`admin_allowlist`) is true. The app talks to Postgres with the anon key plus the user's own
+published rows, and give full access to users for whom `public.is_admin()` is true: their
+`profiles.role` is `admin`, which sign-up assigns only to emails in `admin_allowlist`. The app talks to Postgres with the anon key plus the user's own
 session (`supabaseServer()`), so RLS applies to the app's own queries too. `requireAdmin()` and
 the middleware redirect are extra layers, never the only check. The service-role key is used
 only by the visit counter.

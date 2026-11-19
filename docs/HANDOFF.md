@@ -4,7 +4,7 @@
 keep going without re-asking anything listed under **Decisions already made**. Update this
 file (status table and next steps) at the end of every session.
 
-Last updated: 2026-11-19 (session 4).
+Last updated: 2026-11-19 (session 5).
 
 ## Where things are
 
@@ -42,37 +42,16 @@ real database until the migrations are applied.** Pages show "the workspace tabl
 
 ## Next steps (in order)
 
-### 1. Apply the 6 pending migrations — needs the user
-Runbook: [`docs/maintenance.md` §0](maintenance.md). Files in `supabase/migrations/`:
-`20261017000000_atomic_reorder_and_revisions.sql`, `20261118000000_increment_visit_count.sql`,
-`20261119000000_media_storage_policies.sql`, `20261119000001_workspace_entries.sql`,
-`20261119000002_remove_obsolete_site_config.sql` (data delete; rollback insert in the file),
-`20261119000003_article_media.sql` (article tags/cover/video; **until applied, saving an article in the admin fails**).
-The visit migration was fixed on 2026-11-19: it assumed `site_config.value` was text, but it's jsonb.
+### 1. Deploy v2 — needs the user's OK
+Migrations are applied (2026-11-19) and the app is switched over, so `v2` is ready to release. The live site is
+still v1 and is the measured cause of the sluggish navigation. Merge `v2` into `main` and push only when the user
+says so (a push to `main` deploys). Before that: set `NEXT_PUBLIC_SITE_URL` in Vercel (feed/sitemap/share links),
+optionally `DEEPSEEK_API_KEY`. After the deploy: click through the workspace (capture, edit, export, upload/delete a
+file, resume master) and check Vercel logs.
 
-**Approved by the user on 2026-11-19** ("do a migration"). Blocked only on credentials: `SUPABASE_DB_PASSWORD` in
-`.env` held a URL, not the DB password; the user is fixing it. Connect without `supabase login` via the IPv4 pooler
-(the direct host is IPv6-only and unreachable here): `aws-0-ap-south-1.pooler.supabase.com:5432`, user
-`postgres.yajgzliiwwkvqvsfqtfs`, password from `.env` through `PGPASSWORD` (never echo it), e.g.
-`npx supabase db push --db-url "postgresql://postgres.yajgzliiwwkvqvsfqtfs:<urlencoded pw>@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"`.
-Fresh snapshot: `backups/2026-11-19T12-39-18-728Z/`. Dry-run first; stop if it lists anything but the 6 files.
-```bash
-node --env-file=.env.local scripts/backup-db.mjs        # fresh snapshot (you can run this)
-npx supabase login                                      # user: opens a browser
-npx supabase link --project-ref yajgzliiwwkvqvsfqtfs    # user: asks for the DB password
-npx supabase db push --dry-run                          # show output, get explicit OK
-npx supabase db push
-```
-Before pushing, inspect existing storage policies (the media migration notes the query). Afterwards:
-- do the §1 app switch-over in `src/app/admin/actions.ts` (`reorder()` → `rpc("swap_positions")`;
-  `saveArticle` → `saveRow`), as described in `docs/maintenance.md` §1;
-- delete the read-then-write fallback in `src/lib/visits.ts` (marked `ponytail:`);
-- run `node --env-file=.env.local scripts/check-rls.mjs` (anon must see 0 rows in `entries` and
-  `private_config`, and can't list `media`);
-- click through: capture a link and a note, edit one, export JSON, upload and delete a file, create the
-  resume master. Then update this file.
-
-If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks first.
+DB access for future checks: IPv4 pooler `aws-0-ap-south-1.pooler.supabase.com:5432`, user
+`postgres.yajgzliiwwkvqvsfqtfs`, password `SUPABASE_DB_PASSWORD` in `.env` via `PGPASSWORD` (never echo it).
+The direct host is IPv6-only. Writes still need explicit approval.
 
 ### 2. v2-6 remaining
 - **Decided: no CI secrets.** CI runs lint, typecheck and unit tests; build + e2e are skipped unless
@@ -87,6 +66,10 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
   be built. It needs a schema dump (`npx supabase db dump --schema public`, after `link`) or the Supabase MCP.
 - Gotcha: `pkill -f "next start"` misses the server (its process is named `next-server`). Stop it by port:
   `kill $(lsof -tiTCP:3100 -sTCP:LISTEN)`.
+
+### UI ideas offered to the user (pending their pick, 2026-11-19)
+Project screenshots on cards (field exists), case-study summary box, "Latest video" strip from the YouTube channel
+feed, active-section highlight in the article TOC, View Transitions crossfade, 44px tap targets on chips.
 
 ### Small follow-ups noticed
 - Vercel env: set `NEXT_PUBLIC_SITE_URL=https://portfolio-pi-weld-92.vercel.app` (local `.env.local` has

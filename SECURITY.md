@@ -19,8 +19,10 @@ described in the [README](README.md#security). This file doesn't repeat that.
 
 - **Visitor**: anonymous, no session. Uses the site and can call the Supabase API directly
   with the public anon key, which ships to the browser.
-- **Signed-in non-admin**: someone with a valid Supabase account who isn't in `admin_allowlist`.
-- **Admin**: one person, signed in with email and password, whose email is in `admin_allowlist`.
+- **Signed-in non-admin**: someone with a valid Supabase account whose profile role isn't `admin`.
+- **Admin**: one person, signed in with email and password. Sign-up gave their profile `role = 'admin'`
+  because their email is in `admin_allowlist`; RLS (`is_admin()`) checks that role, and `requireAdmin()`
+  checks the allowlist too.
 - **Third parties**: the AI provider (DeepSeek by default) and any site the admin saves a link to.
 
 ## Trust boundaries
@@ -38,7 +40,7 @@ described in the [README](README.md#security). This file doesn't repeat that.
 | Threat | Mitigation | Proof |
 | --- | --- | --- |
 | Visitor reads a draft, revision or private row through the API | RLS lets anon see published rows only. Children of unpublished projects are hidden. Private tables have no anon grants | `scripts/check-rls.mjs` (read-only, against production); `tests/migration-workspace.test.ts` |
-| Signed-in non-admin reads or writes admin data | RLS policies call `public.is_admin()` (allowlist lookup), not just "authenticated". `requireAdmin()` also redirects on the server | `tests/migration-workspace.test.ts` (non-admin locked out); e2e `/admin` redirect |
+| Signed-in non-admin reads or writes admin data | RLS policies call `public.is_admin()` (`profiles.role = 'admin'`), not just "authenticated". `requireAdmin()` also redirects on the server | `tests/migration-workspace.test.ts` (non-admin locked out); e2e `/admin` redirect |
 | Admin form sets a protected column (`state`, `published_at`, `id`, timestamps) or writes to an unlisted table | `src/lib/admin-fields.ts` is the server allowlist. Publishing goes only through the transitions in `src/lib/form.ts` | `tests/admin-rules.test.ts` |
 | Private workspace leaks onto a public page or into the cache | Only `src/app/admin` may query `entries` / `private_config`, and nothing there is revalidated on a public path | `tests/privacy.test.ts` |
 | A server-only secret or module reaches the browser bundle | Only the anon key has a `NEXT_PUBLIC_` prefix. No client component imports `@/lib/ai`, `ai-prompts` or `fetch-page` | `tests/privacy.test.ts` |
@@ -66,8 +68,9 @@ described in the [README](README.md#security). This file doesn't repeat that.
 - **Uploaded files are public by URL.** Don't upload anything private to Media.
 - **AI text leaves the system.** Whatever entry the admin sends goes to the configured provider
   and is subject to its retention policy.
-- **Pending migrations:** until the migrations in `docs/maintenance.md` §0 are applied, the
-  `media` bucket runs on whatever policies it has today, and the workspace tables don't exist.
+- **Removing an admin takes two steps.** Deleting an email from `admin_allowlist` stops
+  `requireAdmin()` at once, but RLS checks `profiles.role`, which was set at sign-up. Also set that
+  profile's role to `viewer` (or delete the user), or their session can still pass RLS through the API.
 
 ## Deployment checklist
 

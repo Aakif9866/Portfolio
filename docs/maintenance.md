@@ -2,7 +2,8 @@
 
 ## 0. One approval window for every pending migration
 
-Six migrations are written (five tested in PGlite) and **not applied**. They are applied together:
+**Applied on 2026-11-19** (`supabase db push` through the IPv4 pooler, after a dry run and a fresh backup in
+`backups/2026-11-19T14-27-02-003Z`). `scripts/check-rls.mjs` passed afterwards. The table records what each one did:
 
 | File | What it does | App behaviour until applied |
 | --- | --- | --- |
@@ -34,7 +35,7 @@ Each file ends with its own `-- rollback` block.
 
 ---
 
-## 1. Atomic reordering and article revisions — migration ready, not applied
+## 1. Atomic reordering and article revisions — applied 2026-11-19; the app uses them
 
 **Problem.** Two admin operations are made of several separate requests:
 

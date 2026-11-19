@@ -144,40 +144,21 @@ export async function reorder(formData: FormData): Promise<ActionResult> {
   const j = i + dir;
   if (i < 0 || j < 0 || j >= list.length) return { ok: false, message: dir < 0 ? "Already first." : "Already last." };
 
-  const [a, b] = [list[i], list[j]];
-  // equal positions would swap to the same values; spread them first
-  const [pa, pb] = a.position === b.position ? [b.position + (dir < 0 ? -1 : 1), a.position] : [b.position, a.position];
-  const r1 = await supabase.from(table).update({ position: pa }).eq("id", a.id);
-  const r2 = await supabase.from(table).update({ position: pb }).eq("id", b.id);
-  if (r1.error || r2.error) return { ok: false, message: friendly((r1.error ?? r2.error)!) };
+  // One atomic call (migration 20261017000000): afterwards `first` sorts before `second`, ties included.
+  const [first, second] = dir < 0 ? [list[i], list[j]] : [list[j], list[i]];
+  const { error: swapErr } = await supabase.rpc("swap_positions", { tbl: table, a: first.id, b: second.id });
+  if (swapErr) return { ok: false, message: friendly(swapErr) };
 
   revalidateFor(table);
   return { ok: true, message: "Moved." };
 }
 
 /**
- * Every article save snapshots the previous body into article_revisions, so a
- * bad edit is recoverable. Restoring is just another save, which itself
- * snapshots — so restore is undoable too.
- * ponytail: snapshot and save are two requests, not one transaction; a
- * trigger on articles would make it atomic (needs a migration).
+ * Every article save keeps the previous title/body in article_revisions, so a bad edit is
+ * recoverable. The articles_snapshot_revision trigger does it in the same transaction as the
+ * update (migration 20261017000000); restoring is just another save, so it is undoable too.
  */
 export async function saveArticle(formData: FormData): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
-  const id = formData.get("__id") ? String(formData.get("__id")) : null;
-
-  if (id) {
-    const { data: before } = await supabase
-      .from("articles").select("title, body_md").eq("id", id).maybeSingle();
-    if (before) {
-      const { error: revErr } = await supabase.from("article_revisions").insert({
-        article_id: id,
-        title: (before as { title: string }).title,
-        body_md: (before as { body_md: string | null }).body_md,
-      });
-      if (revErr) return { ok: false, message: `Could not keep the previous version: ${friendly(revErr)}` };
-    }
-  }
   return saveRow(formData);
 }
 
