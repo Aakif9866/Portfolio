@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProjectCard } from "@/components/project-card";
+import { HeroSystem } from "@/components/hero-system";
 import { publishedProjects, techByProject, allTechnologies } from "@/lib/queries";
 import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
@@ -45,7 +46,7 @@ export default async function Home() {
           </div>
 
           <h1 className="animate-fade-up mt-7 max-w-5xl text-[clamp(42px,6.4vw,74px)] font-semibold leading-[1.03] tracking-tightest">
-            I build the <span className="grad-text">unglamorous parts</span>
+            I build the <span className="grad-text grad-shimmer">unglamorous parts</span>
             <br />
             that make software hold up.
           </h1>
@@ -79,6 +80,11 @@ export default async function Home() {
               </div>
             ))}
           </dl>
+
+          {/* wide screens only: the space right of the lede and stats */}
+          <div className="pointer-events-none absolute bottom-0 right-6 hidden xl:block">
+            <HeroSystem />
+          </div>
         </div>
       </section>
 

@@ -107,6 +107,10 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
   (`.grad-text`, `.font-accent`: article summaries, home stats, blockquotes), self-hosted via `next/font`. Public
   text was bumped one step; prose is 18px in v1's muted colour. Verified against a v1 build: backgrounds match
   (0.2% pixel diff = logo/nav label).
+- **Navigation sluggishness root cause (measured 2026-11-19):** the *live* site is v1: `/projects` takes 2.3–3.3 s
+  (cache MISS, rendered per request) and a nav click 1.85 s + 0.6 s fade. v2 swaps pages in ~55 ms. Deploying v2
+  is the fix (needs the user's OK to merge/push; a push to `main` deploys). Page headers no longer fade in on
+  every navigation; only the home hero animates.
 - **Speed:** pages are static (4–25 ms TTFB vs v1's 90–690 ms). The aurora glow renders at 1/4 size ×4 scale;
   don't add `will-change` to it (measured: dropped scroll frames). Entrance animations are 0.35 s.
 

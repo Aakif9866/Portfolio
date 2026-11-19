@@ -214,6 +214,26 @@
   .nav-rail::before { content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--grad); }
 }
 
+/* ── hero: the slow shimmer across the highlighted words, and the system pipeline ── */
+.grad-shimmer {
+  background-image: linear-gradient(100deg, #fb923c, #f43f5e 18%, #a855f7 33%, #38bdf8 50%, #a855f7 67%, #f43f5e 82%, #fb923c);
+  background-size: 200% 100%;
+  animation: shimmer 9s ease-in-out infinite alternate;
+}
+@keyframes shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+.hero-system { margin: 0; animation: fade-up 0.6s 0.3s var(--ease-out-soft) both; }
+.hero-system .hs-title { font: 500 14px var(--font-mono); fill: var(--ink); }
+.hero-system .hs-sub { font: 400 11.5px var(--font-mono); fill: var(--faint); }
+.hero-system .hs-node { fill: var(--card); stroke: var(--line-strong); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: hs-node 3.6s ease-in-out infinite; }
+@keyframes hs-node { 0%, 14%, 100% { stroke: var(--line-strong); transform: scale(1); } 4% { stroke: var(--accent); transform: scale(1.35); } }
+/* full shorthand per element: a name-less shorthand gets minified to `animation: none` */
+.hero-system .hs-down { animation: hs-down 3.6s ease-in-out infinite; }
+.hero-system .hs-up { animation: hs-up 3.6s ease-in-out infinite; }
+/* 3 gaps × 92px = 276px of wire */
+@keyframes hs-down { 0% { transform: translateY(0); opacity: 0; } 5% { opacity: 1; } 45% { transform: translateY(276px); opacity: 1; } 50%, 100% { transform: translateY(276px); opacity: 0; } }
+@keyframes hs-up { 0%, 50% { transform: translateY(0); opacity: 0; } 55% { opacity: 1; } 95% { transform: translateY(-276px); opacity: 1; } 100% { transform: translateY(-276px); opacity: 0; } }
+
 @keyframes drift {
   from { transform: translate3d(-4%, 0, 0) scale(1); }
   to { transform: translate3d(4%, -3%, 0) scale(1.14); }
@@ -233,7 +253,7 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rv { animation: none !important; }
-  .aurora, .animate-fade-up { animation: none !important; }
+  .aurora, .animate-fade-up, .grad-shimmer, .hero-system, .hero-system * { animation: none !important; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 
