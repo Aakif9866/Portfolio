@@ -75,7 +75,8 @@ function Section({ title, empty, items }: { title: string; empty: string; items:
 }
 
 function ResourceRow({ e, compact }: { e: Entry & { source: { label: string } }; compact?: boolean }) {
-  const description = typeof e.meta?.description === "string" ? e.meta.description : null;
+  // An AI summary (if one was made) beats the page's own description.
+  const description = typeof e.meta?.summary === "string" ? e.meta.summary : typeof e.meta?.description === "string" ? e.meta.description : null;
   return (
     <li className={`flex items-start gap-3 ${compact ? "py-2.5" : "px-4 py-3"}`}>
       {!compact && <PinButton id={e.id} pinned={e.pinned} />}

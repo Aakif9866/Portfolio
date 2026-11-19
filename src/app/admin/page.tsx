@@ -6,6 +6,8 @@ import { Markdown } from "@/components/markdown";
 import { AdminHeader, BTN } from "./ui";
 import { EntryEditor, PinButton } from "./entry-editor";
 import { WorkspaceError } from "./workspace-error";
+import { AiPanel } from "./ai-panel";
+import { aiConfig } from "@/lib/ai";
 
 /**
  * The private workspace inbox: everything captured, newest first (pinned on top), with
@@ -138,6 +140,7 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
             {open && (
               <section aria-label="Edit entry" className="card order-first rounded-2xl p-5 xl:order-last xl:sticky xl:top-20 xl:self-start">
                 <EntryEditor key={open.id + open.updated_at} entry={open} closeHref={href({ e: undefined })} />
+                <AiPanel key={`ai-${open.id}`} entry={open} enabled={aiConfig().enabled} />
                 {open.body_md && (
                   <details className="mt-5 border-t border-line pt-4">
                     <summary className="cursor-pointer text-[13px] font-medium text-muted">Preview notes</summary>

@@ -17,6 +17,7 @@ export function EntryEditor({ entry, closeHref }: { entry: Entry; closeHref: str
   const statuses = ENTRY_STATUS[kind];
   const image = typeof entry.meta?.image === "string" ? entry.meta.image : null;
   const description = typeof entry.meta?.description === "string" ? entry.meta.description : null;
+  const summary = typeof entry.meta?.summary === "string" ? entry.meta.summary : null;
 
   return (
     <form
@@ -33,6 +34,12 @@ export function EntryEditor({ entry, closeHref }: { entry: Entry; closeHref: str
         <Link href={closeHref} scroll={false} className={BTN.quiet}>Close</Link>
       </div>
 
+      {summary && (
+        <div className="rounded-xl border border-line bg-surface p-3">
+          <p className="text-[12px] font-medium text-muted">AI summary</p>
+          <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-ink">{summary}</p>
+        </div>
+      )}
       {(image || description) && (
         <div className="flex gap-3 rounded-xl border border-line bg-surface p-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- remote link preview image */}

@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { isFetchableUrl, jobTitle, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, validateJobMeta, withStatusChange, type LinkPreview } from "@/lib/entries";
+import { jobTitle, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, validateJobMeta, withStatusChange, type LinkPreview } from "@/lib/entries";
 import { validateRow } from "@/lib/admin-fields";
+import { fetchPage } from "@/lib/fetch-page";
 import { CAREER_KEY, SKILLS_KEY, toggleTask, validateCareer, validateSkill, type Skills } from "@/lib/career";
 import type { ActionResult } from "./actions";
 
@@ -22,29 +23,9 @@ function friendly(error: { code?: string; message: string }) {
 
 /** Title, site and image for a link, in at most 4 s. Any failure just means no preview. */
 async function preview(url: string): Promise<LinkPreview | null> {
-  if (!isFetchableUrl(url)) return null;
-  try {
-    const res = await fetch(url, {
-      signal: AbortSignal.timeout(4000),
-      headers: { "user-agent": "Mozilla/5.0 (compatible; PortfolioLinkPreview/1.0)", accept: "text/html" },
-      redirect: "follow",
-    });
-    if (!res.ok || !res.body || !(res.headers.get("content-type") ?? "").includes("html")) return null;
-    // The <head> is near the top; never read more than 256 KB of a page.
-    const reader = res.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let size = 0;
-    while (size < 256 * 1024) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      size += value.length;
-    }
-    reader.cancel().catch(() => {});
-    return parsePreview(new TextDecoder().decode(Buffer.concat(chunks)), res.url || url);
-  } catch {
-    return null;
-  }
+  // The <head> is near the top; 256 KB is plenty.
+  const page = await fetchPage(url);
+  return page ? parsePreview(page.html, page.url) : null;
 }
 
 /** Quick capture: one line of text in, one entry out. */

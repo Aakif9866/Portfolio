@@ -30,6 +30,9 @@ Create `.env.local` with:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (anon) key. Safe in the browser because every table has RLS |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only. Used **only** by the visit counter in `middleware.ts`. Never prefix with `NEXT_PUBLIC_` |
+| `AI_API_KEY` (or `DEEPSEEK_API_KEY`) | Optional. Server-only key for the workspace AI buttons. Without it the buttons are hidden |
+| `AI_BASE_URL`, `AI_MODEL` | Optional. Default `https://api.deepseek.com` and `deepseek-chat`; any OpenAI-compatible provider works |
+| `AI_MONTHLY_TOKEN_CAP` | Optional. Default 2,000,000; AI calls are refused past it for the rest of the month |
 
 > Running the app locally against the production database counts your page views in the
 > production visit counter. Set `SUPABASE_SERVICE_ROLE_KEY` to an invalid value to browse
@@ -100,7 +103,7 @@ A single admin account; there is no public sign-up. Sign in at `/login`.
 | Area | Screens |
 | --- | --- |
 | **Inbox** (private workspace, the `/admin` home) | A quick-capture box on every admin page (⌘J): paste a link (its title, site and image are fetched) or type a note; `log:` `idea:` `goal:` `job:` set the kind and `#tags` are pulled out. The inbox lists everything with search, kind and tag filters, pinning, and an editor where every field is optional. Export as JSON or Markdown. **Never shown on the public site** |
-| **Workspace views** | **Resources**: links by source (YouTube, GitHub, docs, …), a learning queue and one-click status. **Logs**: a timeline by week (IST), filterable by area tag. **Ideas**: a Someday → Next → Active → Dropped board; *Start project* creates a draft project. **Jobs**: add a job with just a role, company or link; a Saved → Applied → Interviewing → Offer board and a list of all jobs; optional details (location, contact, salary range, pasted job description), a follow-up date, notes, and a status history (moving to Applied fills the applied date). Follow-ups due show on the Jobs page and the Inbox, never as notifications. **Career** (strictly private): an optional profile (current and target salary, roles, companies, short- and long-term plans, strategy notes), goals with optional deadlines and `- [ ]` milestones you can tick in place, and at-a-glance counts. Goals connect to resources and logs through shared tags. **Skills**: your public tech list plus private levels, "want to learn" flags and extra skills, with resource counts by tag; the public Tech Stack page is unchanged. **Weekly recap**: what was logged, saved, finished and achieved that week. The Inbox also shows at-a-glance counts and links to PLOS for daily to-dos |
+| **Workspace views** | **Resources**: links by source (YouTube, GitHub, docs, …), a learning queue and one-click status. **Logs**: a timeline by week (IST), filterable by area tag. **Ideas**: a Someday → Next → Active → Dropped board; *Start project* creates a draft project. **Jobs**: add a job with just a role, company or link; a Saved → Applied → Interviewing → Offer board and a list of all jobs; optional details (location, contact, salary range, pasted job description), a follow-up date, notes, and a status history (moving to Applied fills the applied date). Follow-ups due show on the Jobs page and the Inbox, never as notifications. **Career** (strictly private): an optional profile (current and target salary, roles, companies, short- and long-term plans, strategy notes), goals with optional deadlines and `- [ ]` milestones you can tick in place, and at-a-glance counts. Goals connect to resources and logs through shared tags. **Skills**: your public tech list plus private levels, "want to learn" flags and extra skills, with resource counts by tag; the public Tech Stack page is unchanged. **AI help** (optional, DeepSeek by default): buttons in the entry editor to summarise a linked page (saved on the entry), structure a rough log into sections with resume bullets, improve writing, and draft a follow-up or thank-you email for a job. Suggestions are previewed and only replace your notes if you accept. Prompts use only that entry, never the career profile or salary; usage is capped per month. **Weekly recap**: what was logged, saved, finished and achieved that week. The Inbox also shows at-a-glance counts and links to PLOS for daily to-dos |
 | **Site dashboard** (`/admin/site`) | Published / draft / archived counts per content type, a "needs attention" list (drafts, case studies missing key pieces), recent changes, quick actions, total page views |
 | **Content** | Projects · Articles · Experiments · Experience |
 | **Project builder** | Case-study sections · Architecture diagrams · Milestones · Technologies, across all projects |
@@ -208,7 +211,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 180 tests, offline:
+`npm test` runs 219 tests, offline:
 
 | File | Covers |
 | --- | --- |
@@ -221,7 +224,8 @@ as 0.
 | `tests/entries.test.ts` | Quick-capture parsing, the workspace save allowlist, link-preview parsing and the private-host guard, Markdown export |
 | `tests/migration-workspace.test.ts` | The workspace tables in PGlite: admin-only RLS, non-admins and anon locked out, shape constraints, `updated_at` |
 | `tests/career.test.ts` | Career profile and skill allowlists, milestone checklist counting and toggling |
-| `tests/privacy.test.ts` | No file outside `src/app/admin` queries a private table |
+| `tests/ai.test.ts` | The AI client (request shape, error mapping without echoing bodies, no call without a key), monthly usage, prompts (fenced untrusted input, no salary in emails) |
+| `tests/privacy.test.ts` | No file outside `src/app/admin` queries a private table; no client component imports the AI helper; no public AI key |
 
 There are no browser end-to-end tests and no CI workflow yet. The admin flows are verified by
 hand.
