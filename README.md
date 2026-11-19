@@ -99,7 +99,8 @@ A single admin account; there is no public sign-up. Sign in at `/login`.
 
 | Area | Screens |
 | --- | --- |
-| **Dashboard** | Published / draft / archived counts per content type, a "needs attention" list (drafts, case studies missing key pieces), recent changes, quick actions, total page views |
+| **Inbox** (private workspace, the `/admin` home) | A quick-capture box on every admin page (⌘J): paste a link (its title, site and image are fetched) or type a note; `log:` `idea:` `goal:` `job:` set the kind and `#tags` are pulled out. The inbox lists everything with search, kind and tag filters, pinning, and an editor where every field is optional. Export as JSON or Markdown. **Never shown on the public site** |
+| **Site dashboard** (`/admin/site`) | Published / draft / archived counts per content type, a "needs attention" list (drafts, case studies missing key pieces), recent changes, quick actions, total page views |
 | **Content** | Projects · Articles · Experiments · Experience |
 | **Project builder** | Case-study sections · Architecture diagrams · Milestones · Technologies, across all projects |
 | **Media** | Upload, copy the link of, and delete files in Supabase Storage |
@@ -206,7 +207,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 95 tests, offline:
+`npm test` runs 163 tests, offline:
 
 | File | Covers |
 | --- | --- |
@@ -216,6 +217,9 @@ as 0.
 | `tests/migration-atomic.test.ts` | The pending migration's SQL, run against a real Postgres engine (PGlite) with simplified tables |
 | `tests/migration-visits.test.ts` | The visit-counter migration: one per call, first-use insert, service-role only |
 | `tests/media.test.ts` | Upload checks: type from magic bytes (no SVG), size limit, generated paths, path validation |
+| `tests/entries.test.ts` | Quick-capture parsing, the workspace save allowlist, link-preview parsing and the private-host guard, Markdown export |
+| `tests/migration-workspace.test.ts` | The workspace tables in PGlite: admin-only RLS, non-admins and anon locked out, shape constraints, `updated_at` |
+| `tests/privacy.test.ts` | No file outside `src/app/admin` queries a private table |
 
 There are no browser end-to-end tests and no CI workflow yet. The admin flows are verified by
 hand.
@@ -239,6 +243,7 @@ The schema predates this repo and lives in Supabase; there is no baseline migrat
 | `timeline_entries` | Work and education |
 | `site_config` | Key/value site content (`key` is the primary key), plus `visit_count` |
 | `admin_allowlist` | Who is admin. The authorization source of truth |
+| `entries`, `private_config` | The private workspace (pending migration). Admin-only RLS, no anon grants, never read by a public page |
 
 `topics`, `tags`, `claims`, `sources` and a few other tables exist in the schema but aren't used
 by the app.

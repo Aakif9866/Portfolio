@@ -60,7 +60,7 @@ for (const table of ["projects", "articles", "experiments", "timeline_entries"])
 }
 
 // 4. private tables stay private
-for (const table of ["admin_allowlist", "article_revisions", "profiles"]) {
+for (const table of ["admin_allowlist", "article_revisions", "profiles", "entries", "private_config"]) {
   const { data, error } = await anon.from(table).select("*").limit(1);
   check(`anon cannot read ${table}`, !!error || (data ?? []).length === 0, error?.code ?? "0 rows");
 }

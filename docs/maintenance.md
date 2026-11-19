@@ -1,4 +1,36 @@
-# Maintenance: pending migration and settings audit
+# Maintenance: pending migrations and settings audit
+
+## 0. One approval window for every pending migration
+
+Four migrations are written, tested in PGlite, and **not applied**. They are applied together:
+
+| File | What it does | App behaviour until applied |
+| --- | --- | --- |
+| `20261017000000_atomic_reorder_and_revisions.sql` | Atomic reorder and article revisions (§1) | Works, non-atomically |
+| `20261118000000_increment_visit_count.sql` | Atomic page-view counter, callable by service_role only | Falls back to read-then-write |
+| `20261119000000_media_storage_policies.sql` | Admin-only write/list policies on the `media` bucket; drops SVG, adds PDF/GIF | Uploads depend on whatever policies the bucket has today |
+| `20261119000001_workspace_entries.sql` | Private workspace tables `entries` and `private_config` (admin-only RLS) | Inbox says the tables don't exist yet |
+
+Steps (each needs your go-ahead):
+
+1. `node --env-file=.env.local scripts/backup-db.mjs` (fresh snapshot).
+2. Inspect the storage policies the media migration sits next to, and drop any that let
+   non-admins write:
+   ```sql
+   select policyname, cmd, roles, qual, with_check
+   from pg_policies where schemaname = 'storage' and tablename = 'objects';
+   ```
+3. `npx supabase login` and `npx supabase link --project-ref yajgzliiwwkvqvsfqtfs` (once).
+4. `npx supabase db push --dry-run`, then review the output and give an explicit OK.
+5. `npx supabase db push`.
+6. Do the §1 app switch-over in the same deploy.
+7. `node --env-file=.env.local scripts/check-rls.mjs`: anon must see 0 rows in `entries` and
+   `private_config`, and can't list `media`.
+8. In the admin: capture a link and a note, edit one, export JSON, then upload and delete a file.
+
+Each file ends with its own `-- rollback` block.
+
+---
 
 ## 1. Atomic reordering and article revisions — migration ready, not applied
 

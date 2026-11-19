@@ -46,3 +46,26 @@ export const PUBLISH_STATE: Record<string, { label: string; tone: string; help: 
 
 export const statusLabel = (map: Record<string, { label: string }>, key: string | null | undefined) =>
   (key && map[key]?.label) || (key ? key.charAt(0).toUpperCase() + key.slice(1) : "");
+
+/**
+ * Private workspace (admin only). An entry's kind can change at any time; status is
+ * optional and its words depend on the kind. Kinds without statuses (note, log) have none.
+ */
+export const ENTRY_KIND: Record<string, { label: string; plural: string; hint: string }> = {
+  note: { label: "Note", plural: "Notes", hint: "Anything" },
+  link: { label: "Resource", plural: "Resources", hint: "A link worth keeping" },
+  log: { label: "Log", plural: "Logs", hint: "What you worked on or learned" },
+  idea: { label: "Idea", plural: "Ideas", hint: "Something to build or try someday" },
+  goal: { label: "Goal", plural: "Goals", hint: "Where you want to get to" },
+  job: { label: "Job", plural: "Jobs", hint: "An opportunity or application" },
+};
+
+export const ENTRY_STATUS: Record<string, Record<string, { label: string; tone: string }>> = {
+  link: { to_read: { label: "To read", tone: "#a855f7" }, reading: { label: "Reading", tone: "#38bdf8" }, done: { label: "Done", tone: "#34d399" } },
+  idea: { someday: { label: "Someday", tone: "#8a8a93" }, next: { label: "Next", tone: "#a855f7" }, active: { label: "Active", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
+  goal: { open: { label: "Open", tone: "#38bdf8" }, achieved: { label: "Achieved", tone: "#34d399" }, dropped: { label: "Dropped", tone: "#8a8a93" } },
+  job: {
+    saved: { label: "Saved", tone: "#8a8a93" }, applied: { label: "Applied", tone: "#38bdf8" }, interviewing: { label: "Interviewing", tone: "#a855f7" },
+    offer: { label: "Offer", tone: "#34d399" }, rejected: { label: "Rejected", tone: "#f43f5e" }, closed: { label: "Closed", tone: "#8a8a93" },
+  },
+};

@@ -36,6 +36,10 @@ Next.js 15 App Router portfolio whose content lives in Supabase Postgres, edited
   is both the form and the server allowlist. `state`, `published_at`, `id` and timestamps are
   never settable through a normal save.
 - **Publishing transitions** come from `src/lib/form.ts`; the server rejects anything else.
+- **The private workspace (`entries`, `private_config`) is admin-only.** Only code under
+  `src/app/admin` may query it (`tests/privacy.test.ts`), its writes go through
+  `src/lib/entries.ts` (the allowlist, like `admin-fields.ts` for the CMS), and nothing in it is
+  ever revalidated or rendered on a public path.
 - **Navigation and status vocabulary lives in `src/lib/labels.ts`** — not inlined in components.
 - **Public routes export `revalidate = 300`** and detail routes have `generateStaticParams`.
 

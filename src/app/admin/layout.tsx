@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { signOut } from "./actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AdminNav } from "./nav";
+import { QuickCapture } from "./capture";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
@@ -37,7 +38,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="mx-auto max-w-7xl px-5 py-8 lg:flex lg:gap-8">
         <AdminNav />
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="min-w-0 flex-1">
+          <QuickCapture />
+          {children}
+        </div>
       </div>
     </div>
   );
