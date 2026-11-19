@@ -77,6 +77,7 @@ export default async function AboutPage() {
                 </li>
               )}
             </ul>
+            <a href="/recruiter" className="mt-4 block text-[14px] text-muted transition-colors hover:text-ink">Recruiter view: one-page profile and PDF →</a>
           </div>
         </aside>
       </div>

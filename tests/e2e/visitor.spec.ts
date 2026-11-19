@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { NAV } from "../../src/lib/labels";
 
-const PUBLIC = ["/", ...NAV.map((i) => i.href)];
+const PUBLIC = ["/", ...NAV.map((i) => i.href), "/recruiter"];
 
 async function expectRendered(page: Page, path: string) {
   const res = await page.goto(path);

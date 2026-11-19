@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     at("/"),
     ...NAV.map((n) => at(n.href)),
+    at("/recruiter"),
     ...articles.map((a) => at(`/articles/${a.slug}`, a.updated_at)),
     ...tagCounts(articles).map((t) => at(`/articles/tag/${t.slug}`)),
     ...((projects.data ?? []) as { slug: string; updated_at: string | null }[]).map((p) => at(`/projects/${p.slug}`, p.updated_at)),

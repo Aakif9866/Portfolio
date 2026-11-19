@@ -44,6 +44,10 @@ ones stay visible.
 
 **About (`/about`)**: about text, contact details and your GitHub repositories.
 
+**Recruiter view (`/recruiter`)**: your profile on one screen for a 30-second read: intro, current role,
+experience, core skills, three featured projects, education and contact links. **Download PDF** prints it
+as a one-page resume. Not in the menu; linked from About.
+
 **Everywhere**
 - Search palette (⌘K / Ctrl K, or the search button) to jump to any page, project, experiment,
   article or technology
