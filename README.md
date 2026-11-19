@@ -314,11 +314,8 @@ src/
     labels.ts           navigation and status vocabulary
     contact.ts, site-content.ts   settings the site reads
   middleware.ts         session refresh, /admin redirect, visit counter
-supabase/migrations/    pending migration (not yet applied)
+supabase/migrations/    pending migrations (not yet applied)
 scripts/check-rls.mjs   read-only security check
 tests/                  Vitest tests
 docs/maintenance.md     migration runbook, settings audit
 ```
-
-`index.html` in the repository root is a static page from an earlier version of the site. The
-Next.js app doesn't use it. `info.txt` is the original project brief.

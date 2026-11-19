@@ -81,5 +81,3 @@ Supabase clients.
 
 - The Supabase MCP server (`.mcp.json`) is for schema inspection, RLS checks and docs. It needs
   authorization in an interactive session.
-- `index.html` at the root is a dead static page from v1, and `info.txt` is the original brief —
-  neither is used by the app. Don't "fix" them.

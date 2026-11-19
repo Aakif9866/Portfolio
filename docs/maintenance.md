@@ -2,7 +2,7 @@
 
 ## 0. One approval window for every pending migration
 
-Four migrations are written, tested in PGlite, and **not applied**. They are applied together:
+Five migrations are written (four tested in PGlite) and **not applied**. They are applied together:
 
 | File | What it does | App behaviour until applied |
 | --- | --- | --- |
@@ -10,6 +10,7 @@ Four migrations are written, tested in PGlite, and **not applied**. They are app
 | `20261118000000_increment_visit_count.sql` | Atomic page-view counter, callable by service_role only | Falls back to read-then-write |
 | `20261119000000_media_storage_policies.sql` | Admin-only write/list policies on the `media` bucket; drops SVG, adds PDF/GIF | Uploads depend on whatever policies the bucket has today |
 | `20261119000001_workspace_entries.sql` | Private workspace tables `entries` and `private_config` (admin-only RLS) | Inbox says the tables don't exist yet |
+| `20261119000002_remove_obsolete_site_config.sql` | Deletes the 9 obsolete `site_config` rows (§2); rollback insert in the file | They sit read-only under Admin → Settings → "Other stored settings" |
 
 Steps (each needs your go-ahead):
 
@@ -145,13 +146,15 @@ storage and is not part of this audit.
 **Summary (22):** 2 in use · 2 useful and implementable · 3 intros implementable · 6 need your
 decision · 9 obsolete or duplicate.
 
-### Proposed cleanup (nothing below has been done)
+### Proposed cleanup
 
 1. **You decide** the “needs clarification” rows and which intros, if any, should be editable.
 2. **Connect** the chosen keys: add each to `SITE_KEYS` in `src/lib/site-content.ts` (makes it
    editable in Admin → Settings) and read it where it's shown, with the current text as fallback.
    `tests/settings-usage.test.ts` fails if a page reads a key that isn't editable, or vice versa.
-3. **Back up, then delete** the obsolete rows (only with approval — this changes production data):
+3. **Back up, then delete** the obsolete rows — written as migration
+   `20261119000002_remove_obsolete_site_config.sql` (applied with the others in §0; it changes
+   production data, so it needs approval). Equivalent SQL:
    ```sql
    -- backup first
    select jsonb_agg(c) from site_config c where key in (
