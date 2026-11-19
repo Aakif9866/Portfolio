@@ -1,0 +1,10 @@
+# Never upload secrets, database snapshots or local output with `vercel deploy`.
+.env
+.env.*
+backups
+graphify-out
+node_modules
+.next
+playwright-report
+test-results
+.claude

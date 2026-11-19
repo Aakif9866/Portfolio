@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 /**
- * Share links for an article: plain intent URLs (no third-party scripts or trackers), the
+ * Share links for an article or project: plain intent URLs (no third-party scripts or trackers), the
  * native share sheet where the browser has one, and copy-link.
  */
 export function ShareBar({ url, title }: { url: string; title: string }) {

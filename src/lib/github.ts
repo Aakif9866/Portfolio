@@ -1,7 +1,8 @@
 /**
- * Read-only GitHub data for the About page: public profile counts and recently pushed
- * repositories, from the unauthenticated public API (60 requests/hour per IP — plenty,
- * because responses are cached for an hour and pages are static).
+ * Read-only GitHub data for the home and About pages: public profile counts and recently
+ * pushed repositories. Works without a token (60 requests/hour per IP; responses are cached
+ * for an hour). Build machines share IPs, so an optional read-only GITHUB_TOKEN (server-only,
+ * never NEXT_PUBLIC_) raises that to 5,000/hour and keeps the section from dropping out.
  *
  * Non-essential, like the visit count: any failure (rate limit, timeout, renamed account)
  * returns null and the section is left out. It never fails the page, and it is not a
@@ -50,7 +51,10 @@ export function pickRepos(raw: unknown, limit = 6): GitHubRepo[] {
 
 async function get(path: string): Promise<unknown> {
   const res = await fetch(`https://api.github.com${path}`, {
-    headers: { accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28", "user-agent": "portfolio-site" },
+    headers: {
+      accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28", "user-agent": "portfolio-site",
+      ...(process.env.GITHUB_TOKEN ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
+    },
     signal: AbortSignal.timeout(5000),
     next: { revalidate: 3600 },
   });

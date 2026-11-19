@@ -6,6 +6,7 @@ import { StatusPill } from "@/components/project-card";
 import { SECTION_ORDER, SECTION_LABEL } from "@/lib/types";
 import type { Project, ProjectSection, Diagram, Technology } from "@/lib/types";
 import { fetchOrThrow } from "@/lib/db";
+import { ShareBar } from "@/components/share-bar";
 
 /**
  * Loads one case study. Sections are always published-only — that is what a
@@ -43,8 +44,11 @@ const fmt = (s: string | null) =>
 
 export type CaseStudyData = NonNullable<Awaited<ReturnType<typeof loadCaseStudy>>>;
 
-/** The full case-study page body. Used by the public route and the admin preview. */
-export function CaseStudyView({ data }: { data: CaseStudyData }) {
+/**
+ * The full case-study page body. Used by the public route and the admin preview. `shareUrl`
+ * (public route only: drafts have no card) adds the shareable project card at the end.
+ */
+export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUrl?: string }) {
   const { project, sections, diagrams, tech, milestones } = data;
 
   // Render sections in canonical order, not insert order.
@@ -59,6 +63,7 @@ export function CaseStudyView({ data }: { data: CaseStudyData }) {
     ...ordered.map((s) => ({ id: s.kind, label: s.heading ?? SECTION_LABEL[s.kind] ?? s.kind })),
     ...(archIndex === -1 && diagrams.length > 0 ? [{ id: "architecture", label: "Architecture" }] : []),
     ...(milestones.length > 0 ? [{ id: "milestones", label: "Milestones" }] : []),
+    ...(shareUrl ? [{ id: "share", label: "Share" }] : []),
   ];
   const tocLinks = (
     <ol className="space-y-1 text-[14.5px]">
@@ -210,6 +215,25 @@ export function CaseStudyView({ data }: { data: CaseStudyData }) {
                 </li>
               ))}
             </ol>
+          </section>
+        )}
+
+        {shareUrl && (
+          <section id="share" aria-labelledby="share-heading" className="mb-14 scroll-mt-24 border-t border-line pt-10">
+            <h2 id="share-heading" className="mb-5 flex items-baseline gap-3 text-[14px] font-semibold uppercase tracking-[0.14em] text-faint">
+              <span className="h-px w-8 bg-line-strong" />
+              Share this project
+            </h2>
+            <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
+              {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG, already 1200×630 */}
+              <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={630} loading="lazy" className="block h-auto w-full" />
+            </a>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a href={`/projects/${project.slug}/card`} download={`${project.slug}-card.png`} className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85">Download card</a>
+              {tech.length > 0 && <a href="#built-with" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Stack</a>}
+              <Link href="/system" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Full tech stack</Link>
+            </div>
+            <div className="mt-5"><ShareBar url={shareUrl} title={project.title} /></div>
           </section>
         )}
       </div>

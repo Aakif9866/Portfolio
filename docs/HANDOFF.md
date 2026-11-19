@@ -36,18 +36,23 @@ Last updated: 2026-11-19 (session 5).
 | v2-6 CI workflow + Playwright visitor smoke tests | `26e0dda`, `4d2c005` | ✅ done |
 | Apply all 6 migrations + app switch-over (RPC reorder, trigger revisions, no visit fallback) | `4924bcf` | ✅ done, check-rls passed |
 | v2-6 SECURITY.md, 4 ADRs, README screenshots | `ca045bb`, next | ✅ done |
+| Separate v2 deployment (Vercel project `portfolio-v2`), GitHub section on home + About | this session | ✅ live |
+| Shareable project card (`/projects/[slug]/card`) + share block + og image; docs/features.md | this session | ✅ done · not yet redeployed |
+
+**Nothing in the workspace
 
 **Nothing in the workspace (`/admin` inbox, resources, logs, ideas, jobs, career, skills, resume) works on a
 real database until the migrations are applied.** Pages show "the workspace tables don't exist yet" until then.
 
 ## Next steps (in order)
 
-### 1. Deploy v2 — needs the user's OK
-Migrations are applied (2026-11-19) and the app is switched over, so `v2` is ready to release. The live site is
-still v1 and is the measured cause of the sluggish navigation. Merge `v2` into `main` and push only when the user
-says so (a push to `main` deploys). Before that: set `NEXT_PUBLIC_SITE_URL` in Vercel (feed/sitemap/share links),
-optionally `DEEPSEEK_API_KEY`. After the deploy: click through the workspace (capture, edit, export, upload/delete a
-file, resume master) and check Vercel logs.
+### 1. Deployments
+v2 is its own Vercel project, `portfolio-v2`: https://portfolio-v2-iota-ochre.vercel.app (`NEXT_PUBLIC_SITE_URL`
+set there). v1 stays at https://portfolio-pi-weld-92.vercel.app (project `portfolio`, which this folder is still
+linked to, and which a push to `main` deploys). Redeploy v2 from branch `v2` with:
+`VERCEL_ORG_ID=team_5S8p37bdz33SKj2xanpfvQcl VERCEL_PROJECT_ID=prj_fWi1loEvat4oedWjx0ODiFxhnY7G vercel deploy --prod`.
+Only when the user asks. The user keeps the existing data (don't wipe it). Optional: `GITHUB_TOKEN` (read-only)
+in Vercel if the GitHub section ever drops out from rate limits; `DEEPSEEK_API_KEY` for AI help.
 
 DB access for future checks: IPv4 pooler `aws-0-ap-south-1.pooler.supabase.com:5432`, user
 `postgres.yajgzliiwwkvqvsfqtfs`, password `SUPABASE_DB_PASSWORD` in `.env` via `PGPASSWORD` (never echo it).

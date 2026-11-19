@@ -58,11 +58,13 @@ Create `.env.local` with:
 
 ## What's on the site
 
+A plain-language list of every public and admin feature is in [docs/features.md](docs/features.md).
+
 | Route | Shows | Source |
 | --- | --- | --- |
 | `/` | Introduction, featured projects, technologies by category, recent experiments, contact | several tables |
 | `/projects` | All projects, filterable by technology (`?tech=`) | `projects`, `project_technologies` |
-| `/projects/[slug]` | Full case study: summary, facts, technologies, write-up sections, architecture diagrams, milestones, with an "On this page" contents list | `projects`, `project_sections`, `architecture_diagrams`, `project_milestones` |
+| `/projects/[slug]` | Full case study: summary, facts, technologies, write-up sections, architecture diagrams, milestones, with an "On this page" contents list, and a shareable project card (`/projects/[slug]/card`, 1200×630: name, summary, status, role and years, stack, case-study/code/demo links) shown at the end with Download card and share links, also used as the social preview | `projects`, `project_sections`, `architecture_diagrams`, `project_milestones` |
 | `/system` | **Tech Stack** — every technology, grouped, each linked to the projects that use it | `technologies` |
 | `/lab`, `/lab/[slug]` | **Experiments** — hypothesis and outcome; failed and abandoned ones stay published | `experiments` |
 | `/articles`, `/articles/[slug]`, `/articles/tag/[tag]` | **Writing**, the written companion to the YouTube channel: a companion video per post (YouTube links play in a privacy-enhanced player at the top; a YouTube link alone on a line embeds another one in the text), tags with a page each and a tag filter, related posts by shared tags, cover images, share links (X, LinkedIn, Reddit, WhatsApp, copy link), an "On this page" contents list, linkable headings, reading time, code blocks with a copy button, `> [!NOTE]` callouts, image captions, a reading-progress bar and previous/next links. Each post has BlogPosting structured data (with the video) and a social preview: the cover, else the video thumbnail, else a generated card (`/articles/[slug]/og`). RSS at `/feed.xml` (tags as categories), plus `/sitemap.xml` and `/robots.txt` | `articles` (tags, cover and video columns need migration `20261119000003`) |
@@ -281,6 +283,10 @@ The site is deployed on Vercel. The project `portfolio` is connected to this Git
 
 - **A push to `main`** deploys to production.
 - **Other branches** get preview deployments, which are protected by Vercel login.
+
+**v2** is a separate Vercel project, `portfolio-v2` (https://portfolio-v2-iota-ochre.vercel.app), deployed
+from branch `v2` with the CLI: `VERCEL_ORG_ID=… VERCEL_PROJECT_ID=… vercel deploy --prod` (IDs in
+`docs/HANDOFF.md`). `.vercelignore` keeps `.env` files and backups out of the upload.
 
 Environment variables are set in Vercel for production and preview (the service-role key is
 marked sensitive). The Supabase project is hosted separately; deploying the app never changes

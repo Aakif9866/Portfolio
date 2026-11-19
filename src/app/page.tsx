@@ -8,6 +8,8 @@ import type { Experiment } from "@/lib/types";
 import { EXPERIMENT_STATUS } from "@/lib/labels";
 import { StatusPill } from "@/components/project-card";
 import { getContact } from "@/lib/contact";
+import { getGitHub } from "@/lib/github";
+import { GitHubRepos } from "@/components/github-section";
 import { fetchOrThrow } from "@/lib/db";
 
 export const revalidate = 300;
@@ -20,7 +22,7 @@ export default async function Home() {
     fetchOrThrow("experiments", (s) => sb.from("experiments").select("*", { count: "exact" }).abortSignal(s).eq("state", "published").order("position").limit(3)),
     getContact(),
   ]);
-  const techMap = await techByProject(projects.map((p) => p.id));
+  const [techMap, github] = await Promise.all([techByProject(projects.map((p) => p.id)), getGitHub(contact.github)]);
   const lab = (labRes.data ?? []) as Experiment[];
   const labCount = labRes.count ?? lab.length;
 
@@ -151,12 +153,27 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── github (live, left out if GitHub can't be reached) ── */}
+      {github && (
+        <section id="github" className="scroll-mt-20 border-t border-line py-24">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="rv">
+              <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">03 — On GitHub</p>
+              <h2 className="mb-3 mt-3 text-[clamp(30px,4.4vw,44px)] font-semibold tracking-tightest">
+                What I&apos;m <span className="grad-text">pushing lately</span>
+              </h2>
+            </div>
+            <GitHubRepos gh={github} columns={3} />
+          </div>
+        </section>
+      )}
+
       {/* ── experiments + contact ── */}
       <section className="border-t border-line bg-surface py-24">
           <div className="mx-auto grid max-w-6xl gap-14 px-6 lg:grid-cols-2">
             {lab.length > 0 && (
               <div className="rv">
-                <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">03 — Experiments</p>
+                <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">04 — Experiments</p>
                 <h2 className="mt-3 text-[30px] font-semibold tracking-tightest">Recent experiments</h2>
                 <p className="mt-3 text-[16px] leading-relaxed text-muted">Smaller tests with a hypothesis written down first — including the ones that failed.</p>
                 <ul className="mt-7 space-y-3">
@@ -180,7 +197,7 @@ export default async function Home() {
             )}
 
             <div className="rv">
-              <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">04 — Contact</p>
+              <p className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">05 — Contact</p>
               <h2 className="mt-3 text-[30px] font-semibold tracking-tightest">
                 Hiring, or <span className="grad-text">curious how it works?</span>
               </h2>
