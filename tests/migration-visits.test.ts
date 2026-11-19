@@ -1,6 +1,7 @@
 /**
  * Runs the visit-counter migration against an in-process Postgres (PGlite). The table
- * is a stub with only the columns the function touches, not the production schema.
+ * is a stub with only the columns the function touches; `value` is jsonb, as in production
+ * (the count is a JSON string, e.g. "771").
  */
 import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
@@ -13,13 +14,13 @@ const MIGRATION = readFileSync(
 
 let db: PGlite;
 const count = async () =>
-  (await db.query<{ value: string }>("select value from public.site_config where key = 'visit_count'")).rows[0]?.value;
+  (await db.query<{ value: string }>("select value #>> '{}' as value from public.site_config where key = 'visit_count'")).rows[0]?.value;
 
 beforeEach(async () => {
   db = new PGlite();
   await db.exec(`
     create role anon; create role authenticated; create role service_role;
-    create table public.site_config (key text primary key, value text, label text not null, "group" text);
+    create table public.site_config (key text primary key, value jsonb, label text not null, "group" text);
     grant select, insert, update on public.site_config to service_role;
   `);
   await db.exec(MIGRATION);
@@ -27,7 +28,7 @@ beforeEach(async () => {
 
 describe("increment_visit_count()", () => {
   it("adds exactly one per call", async () => {
-    await db.exec(`insert into public.site_config values ('visit_count', '771', 'Visit count', 'internal')`);
+    await db.exec(`insert into public.site_config values ('visit_count', '"771"', 'Visit count', 'internal')`);
     for (let i = 0; i < 5; i++) await db.exec("select public.increment_visit_count()");
     expect(await count()).toBe("776");
   });
@@ -38,7 +39,7 @@ describe("increment_visit_count()", () => {
   });
 
   it("treats an empty value as zero", async () => {
-    await db.exec(`insert into public.site_config values ('visit_count', '', 'Visit count', 'internal')`);
+    await db.exec(`insert into public.site_config values ('visit_count', '""', 'Visit count', 'internal')`);
     await db.exec("select public.increment_visit_count()");
     expect(await count()).toBe("1");
   });

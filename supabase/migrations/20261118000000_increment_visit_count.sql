@@ -14,9 +14,10 @@ security invoker
 set search_path = ''
 as $$
   insert into public.site_config (key, value, label, "group")
-  values ('visit_count', '1', 'Visit count', 'internal')
+  -- value is jsonb; the count is stored as a JSON string ("771"), as the app writes it.
+  values ('visit_count', '"1"', 'Visit count', 'internal')
   on conflict (key) do update
-    set value = ((coalesce(nullif(public.site_config.value, ''), '0'))::bigint + 1)::text;
+    set value = to_jsonb(((coalesce(nullif(public.site_config.value #>> '{}', ''), '0'))::bigint + 1)::text);
 $$;
 
 revoke all on function public.increment_visit_count() from public, anon, authenticated;
