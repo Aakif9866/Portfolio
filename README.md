@@ -12,6 +12,12 @@ allowlisted admin can change anything.
 **Stack:** Next.js 15.5 (App Router) · React 19 · Supabase (Postgres + Auth) · Tailwind CSS v4 ·
 TypeScript · Vitest · Playwright · deployed on Vercel.
 
+| Home (light) | Home (dark) |
+| --- | --- |
+| ![Home page, light theme](docs/screenshots/home-light.png) | ![Home page, dark theme](docs/screenshots/home-dark.png) |
+| **Projects** | **A case study** |
+| ![Projects list](docs/screenshots/projects-light.png) | ![Project case study page](docs/screenshots/project-light.png) |
+
 ---
 
 ## Running locally
