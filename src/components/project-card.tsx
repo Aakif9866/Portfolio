@@ -26,9 +26,12 @@ export function ProjectCard({
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className={`card card-hover group relative flex flex-col overflow-hidden rounded-2xl ${featured ? "p-8" : "p-7"}`}
+      className={`card card-hover ring-grad group relative flex flex-col overflow-hidden rounded-2xl ${featured ? "p-8" : "p-7"}`}
     >
-      <div className="absolute inset-x-0 top-0 h-0.5" style={{ background: accent }} aria-hidden />
+      <div
+        className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full opacity-45 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
+        style={{ background: accent }}
+      />
       <div className="relative flex items-center gap-2">
         <StatusPill status={project.status} />
         {project.featured && (

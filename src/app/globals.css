@@ -34,9 +34,14 @@
   --faint: #6e6e78; /* ≥4.5:1 on white (WCAG AA) */
   --accent: #7c3aed;
 
-  /* the brand gradient (same as the favicon). Used sparingly: brand mark, top strip, active nav, one CTA.
-     -600 stops so white text on it passes AA. */
-  --grad: linear-gradient(100deg, #7c3aed, #9333ea 50%, #db2777);
+  --glow: 0.2;
+  --grain: 0.025;
+  --spot: rgba(124, 58, 237, 0.07);
+  --sheen: rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.1);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.04), 0 24px 48px -20px rgba(0, 0, 0, 0.18);
+  /* v1's rose → violet (the logo mark). rose-600, not -500, so white text on it passes AA. */
+  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
   color-scheme: light;
 }
 
@@ -53,7 +58,13 @@
   --faint: #7d7d8a; /* ≥4.5:1 on black (WCAG AA) */
   --accent: #a78bfa;
 
-  --grad: linear-gradient(100deg, #7c3aed, #a855f7 50%, #ec4899);
+  --glow: 0.42;
+  --grain: 0.05;
+  --spot: rgba(167, 139, 250, 0.1);
+  --sheen: rgba(255, 255, 255, 0.07);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.9);
+  --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 32px 64px -24px rgba(0, 0, 0, 1);
+  --grad: linear-gradient(135deg, #e11d48, #7c3aed);
   color-scheme: dark;
 }
 
@@ -75,15 +86,15 @@
   ::selection { background: var(--accent); color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
-  /* signature 2px brand strip along the top of every page */
+  /* film grain — the single cheapest trick that kills flat-black banding */
   body::before {
     content: "";
     position: fixed;
-    inset: 0 0 auto;
-    height: 2px;
-    z-index: 60;
+    inset: 0;
+    z-index: 9999;
     pointer-events: none;
-    background: var(--grad);
+    opacity: var(--grain);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: var(--page); }
@@ -92,25 +103,58 @@
 }
 
 @layer utilities {
-  /* sticky bars: near-opaque page colour, light blur. Borders give the edge, not shadows. */
+  /* glass panel with a lit top edge — reads as depth, not as a border */
   .glass {
-    background: color-mix(in oklab, var(--page) 88%, transparent);
-    backdrop-filter: blur(12px);
+    background: color-mix(in oklab, var(--card) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: var(--shadow-card), 0 1px 0 0 var(--sheen) inset;
   }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
-    transition: border-color 0.2s, background-color 0.2s;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.4s var(--ease-out-soft), border-color 0.3s, box-shadow 0.4s var(--ease-out-soft);
   }
   .card-hover:hover {
+    transform: translateY(-3px);
     border-color: var(--line-strong);
-    background: var(--raised);
+    box-shadow: var(--shadow-lift);
   }
   .grad-text {
-    background-image: var(--grad);
+    background-image: linear-gradient(100deg, #fb923c, #f43f5e 36%, #a855f7 66%, #38bdf8);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  /* 1px gradient ring, drawn with mask so it works on any background */
+  .ring-grad { position: relative; }
+  .ring-grad::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(140deg, var(--sheen), transparent 40%, transparent 60%, var(--sheen));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .spotlight {
+    background: radial-gradient(ellipse 70% 55% at 50% -10%, var(--spot), transparent 70%);
+  }
+  .grid-bg {
+    background-image: linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 68px 68px;
+    -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 15%, transparent 72%);
+    mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 15%, transparent 72%);
+  }
+  .aurora {
+    filter: blur(100px);
+    opacity: var(--glow);
+    animation: drift 26s ease-in-out infinite alternate;
   }
   /* the SA mark: favicon shape (opposite corners rounded more) on the brand gradient */
   .brand-mark {
@@ -146,13 +190,17 @@
     transition: transform 0.4s var(--ease-out-soft);
   }
   .ul:hover::after { transform: scaleX(1); }
-  /* current page: the underline stays, drawn in the brand gradient */
-  .nav-active::after { transform: scaleX(1); height: 2px; bottom: -4px; background: var(--grad); }
+  /* current page: the underline stays */
+  .nav-active::after { transform: scaleX(1); }
   /* admin sidebar: a gradient rail on the active link */
   .nav-rail { position: relative; }
   .nav-rail::before { content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--grad); }
 }
 
+@keyframes drift {
+  from { transform: translate3d(-4%, 0, 0) scale(1); }
+  to { transform: translate3d(4%, -3%, 0) scale(1.14); }
+}
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
@@ -167,7 +215,7 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rv { animation: none !important; }
-  .animate-fade-up { animation: none !important; }
+  .aurora, .animate-fade-up { animation: none !important; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 
@@ -227,8 +275,8 @@
 .prose-doc .callout-warning { --c: #d97706; }
 .prose-doc .callout-caution { --c: #e11d48; }
 
-/* reading progress under the brand strip, driven by the page's scroll (no JavaScript) */
-.read-progress { position: fixed; inset: 2px 0 auto; height: 2px; z-index: 59; background: var(--grad); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
+/* reading progress along the top, driven by the page's scroll (no JavaScript) */
+.read-progress { position: fixed; inset: 0 0 auto; height: 2px; z-index: 59; background: var(--grad); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
 @supports (animation-timeline: scroll()) {
   .read-progress { animation: read-grow linear both; animation-timeline: scroll(root); }
 }

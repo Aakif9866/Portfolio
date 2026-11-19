@@ -57,7 +57,7 @@ export default async function SystemPage() {
                   const projects = usedIn[t.id] ?? [];
                   return (
                     <div key={t.id} className="rv">
-                      <div id={t.slug} className="card card-hover h-full scroll-mt-32 rounded-2xl p-5">
+                      <div id={t.slug} className="card card-hover ring-grad h-full scroll-mt-32 rounded-2xl p-5">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-[15.5px] font-semibold" style={{ color: t.color ?? undefined }}>
                             {t.name}

@@ -7,7 +7,8 @@ import Link from "next/link";
  */
 export default function RouteError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <section role="alert" className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-6 text-center">
+    <section role="alert" className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden spotlight px-6 text-center">
+      <div className="pointer-events-none absolute inset-0 grid-bg opacity-40" />
       <p className="relative font-mono text-[12px] uppercase tracking-[0.2em] text-faint">Temporarily unavailable</p>
       <h1 className="relative mt-4 text-[clamp(30px,5vw,44px)] font-semibold tracking-tightest">This page couldn&apos;t load</h1>
       <p className="relative mt-4 max-w-md text-[15px] leading-relaxed text-muted">

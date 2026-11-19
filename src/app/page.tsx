@@ -29,11 +29,16 @@ export default async function Home() {
   return (
     <>
       {/* ── hero ── */}
-      <section className="relative pb-16 pt-28">
+      <section className="relative overflow-hidden spotlight pb-24 pt-36">
+        <div className="pointer-events-none absolute inset-0 grid-bg opacity-70" />
+        <div className="pointer-events-none absolute -top-48 left-1/2 h-[460px] w-[920px] -translate-x-1/2">
+          <div className="aurora h-full w-full rounded-full bg-[conic-gradient(from_210deg,#fb923c,#f43f5e,#a855f7,#38bdf8,#fb923c)]" />
+        </div>
 
         <div className="relative mx-auto max-w-6xl px-6">
           <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3 py-1 text-[12.5px] text-muted backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </span>
             Open to software engineering roles
@@ -52,7 +57,7 @@ export default async function Home() {
           </p>
 
           <div className="animate-fade-up mt-9 flex flex-wrap items-center gap-3">
-            <Link href="/projects" className="group inline-flex items-center gap-2 rounded-full btn-grad px-5 py-2.5 text-[14px] font-medium">
+            <Link href="/projects" className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-page transition-opacity hover:opacity-85">
               View projects
               <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
@@ -61,7 +66,7 @@ export default async function Home() {
             </a>
           </div>
 
-          <dl className="animate-fade-up mt-12 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
+          <dl className="animate-fade-up mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
             {[
               { k: "Projects", v: String(projects.length) },
               { k: "Technologies", v: String(tech.length) },
@@ -78,7 +83,7 @@ export default async function Home() {
       </section>
 
       {/* ── selected work ── */}
-      <section className="border-t border-line bg-surface py-16">
+      <section className="border-t border-line bg-surface py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="rv">
             <div className="flex items-end justify-between gap-6">
@@ -110,7 +115,7 @@ export default async function Home() {
       </section>
 
       {/* ── stack ── */}
-      <section className="border-t border-line py-16">
+      <section className="border-t border-line py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="rv">
             <p className="font-mono text-[12px] uppercase tracking-[0.18em] text-faint">02 — Tech stack</p>
@@ -124,7 +129,7 @@ export default async function Home() {
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {counts.map((g, i) => (
               <div key={g.key} className="rv">
-                <Link href={`/system#${g.key}`} className="card card-hover block h-full rounded-2xl p-6">
+                <Link href={`/system#${g.key}`} className="card card-hover ring-grad block h-full rounded-2xl p-6">
                   <div className="h-1 w-9 rounded-full" style={{ background: `linear-gradient(90deg, ${g.accent}, transparent)` }} />
                   <h3 className="mt-4 flex items-baseline justify-between text-[14.5px] font-semibold uppercase tracking-wider">
                     {g.label}
@@ -141,7 +146,7 @@ export default async function Home() {
       </section>
 
       {/* ── experiments + contact ── */}
-      <section className="border-t border-line bg-surface py-16">
+      <section className="border-t border-line bg-surface py-24">
           <div className="mx-auto grid max-w-6xl gap-14 px-6 lg:grid-cols-2">
             {lab.length > 0 && (
               <div className="rv">

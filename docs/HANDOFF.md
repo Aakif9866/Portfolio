@@ -21,6 +21,7 @@ Last updated: 2026-11-19 (session 4).
 | Phase | Commit | State |
 | --- | --- | --- |
 | v2-1 SA favicon, brand gradient, declutter | `0bc0c9f` | ✅ done |
+| v1 look restored (user preferred it): grain, aurora, spotlight+grid, glass, lifting cards, v1 text gradient; SA mark and accents in v1 rose→violet | see log | ✅ done |
 | v2-2 speed (non-blocking middleware, lazy search, static /projects) | `6ffb86d` | ✅ done |
 | v2-3 Supabase Storage uploads + Media page | `1c2b21d` | ✅ code done · ⏳ migration |
 | W0 private inbox + quick capture + export | `1dfad33` | ✅ code done · ⏳ migration |
@@ -94,6 +95,8 @@ If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks fi
   reminders, Excalidraw).
 
 ## Decisions already made (don't re-ask)
+
+- **Visual theme = v1** (tag `v1`): the user disliked the v2 declutter. Keep v1 effects; new UI should use them.
 
 - Nav keeps all 6 items; "Articles" is labelled **Writing** (URLs unchanged).
 - Keep the 9 unused tables and the admin Project builder pages. Remove the 9 obsolete `site_config` rows,
