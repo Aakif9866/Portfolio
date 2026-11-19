@@ -133,3 +133,7 @@ Before any change, record a Lighthouse baseline on `/`, `/projects`, one case st
 - After DB apply: `node --env-file=.env.local scripts/check-rls.mjs`. Visit count increments, and pages are no longer delayed by it (TTFB compared to baseline).
 - Lighthouse after each of Phase 1 and Phase 2, compared to the baseline.
 - Push `v2` to get a Vercel preview, and review it there before any merge to `main`.
+
+---
+
+**Next:** the private career workspace builds on this plan; see [workspace-plan.md](workspace-plan.md).
