@@ -46,6 +46,12 @@ real database until the migrations are applied.** Pages show "the workspace tabl
 
 ## Next steps (in order)
 
+### 0. Career OS scope (added 2026-11-19)
+The user added a large scope: [career-os-spec.md](career-os-spec.md) (verbatim) with the audit and phased plan in
+[career-os-roadmap.md](career-os-roadmap.md). Confidentiality comes first (Phase 0: visibility on entries,
+confidential-terms list, server-side check on publish and AI). Build phase by phase; each phase's migrations need
+explicit approval before they touch production.
+
 ### 1. Deployments
 v2 is its own Vercel project, `portfolio-v2`: https://portfolio-v2-iota-ochre.vercel.app (`NEXT_PUBLIC_SITE_URL`
 set there). v1 stays at https://portfolio-pi-weld-92.vercel.app (project `portfolio`, which this folder is still
