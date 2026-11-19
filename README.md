@@ -10,7 +10,7 @@ Projects, experiments, technologies, articles and work history are rows in a Sup
 allowlisted admin can change anything.
 
 **Stack:** Next.js 15.5 (App Router) · React 19 · Supabase (Postgres + Auth) · Tailwind CSS v4 ·
-TypeScript · Vitest · deployed on Vercel.
+TypeScript · Vitest · Playwright · deployed on Vercel.
 
 ---
 
@@ -45,6 +45,7 @@ Create `.env.local` with:
 | `npm run lint` | ESLint (`next lint`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm test` | Unit and migration tests (Vitest). No network or database needed |
+| `npm run test:e2e` | Visitor smoke tests (Playwright) against `next start`; run `npm run build` first. Reads the real database with the anon key only |
 | `node --env-file=.env.local scripts/check-rls.mjs` | Read-only security check against the real database (see [Security](#security)) |
 
 ---
@@ -316,6 +317,7 @@ src/
   middleware.ts         session refresh, /admin redirect, visit counter
 supabase/migrations/    pending migrations (not yet applied)
 scripts/check-rls.mjs   read-only security check
-tests/                  Vitest tests
+tests/                  Vitest tests; tests/e2e/ Playwright smoke tests
+.github/workflows/ci.yml lint, typecheck, test, build, e2e
 docs/maintenance.md     migration runbook, settings audit
 ```

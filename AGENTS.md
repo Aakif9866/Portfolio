@@ -65,6 +65,7 @@ npm run lint
 npm run typecheck
 npm test          # offline, no database
 npm run build     # when a public page or query changed
+npm run test:e2e  # after build, when a public page, route or middleware changed
 ```
 
 Report failures honestly, with the output. `node --env-file=.env.local scripts/check-rls.mjs` is

@@ -4,7 +4,7 @@
 keep going without re-asking anything listed under **Decisions already made**. Update this
 file (status table and next steps) at the end of every session.
 
-Last updated: 2026-11-19.
+Last updated: 2026-11-19 (session 2).
 
 ## Where things are
 
@@ -30,19 +30,23 @@ Last updated: 2026-11-19.
 | W4 AI help (DeepSeek, optional) | `96c814c` | ✅ code done · ⏳ API key |
 | W5 resume builder (PDF via print, .tex) | `0d93a7e` | ✅ code done · `.tex` not compile-tested |
 | v2-4 Markdown editor + article reader + RSS | `2acfe91` | ✅ done |
-| **Apply pending migrations** | — | ⏳ **blocked on the user** |
-| v2-5 removals | — | ⏳ todo |
-| v2-6 CI + Playwright | — | ⏳ todo |
+| Fix visit migration (value is jsonb) | `d838e1f` | ✅ done |
+| v2-5 removals (files + site_config migration) | `a0f3b13` | ✅ code done · ⏳ migration |
+| v2-6 CI workflow + Playwright visitor smoke tests | `26e0dda`, `4d2c005` | ✅ done · ⏳ repo secrets |
+| **Apply pending migrations (5)** | — | ⏳ **blocked on the user** |
+| v2-6 rest: SECURITY.md, ADRs, screenshots | — | ⏳ todo |
 
 **Nothing in the workspace (`/admin` inbox, resources, logs, ideas, jobs, career, skills, resume) works on a
 real database until the migrations are applied.** Pages show "the workspace tables don't exist yet" until then.
 
 ## Next steps (in order)
 
-### 1. Apply the 4 pending migrations — needs the user
+### 1. Apply the 5 pending migrations — needs the user
 Runbook: [`docs/maintenance.md` §0](maintenance.md). Files in `supabase/migrations/`:
 `20261017000000_atomic_reorder_and_revisions.sql`, `20261118000000_increment_visit_count.sql`,
-`20261119000000_media_storage_policies.sql`, `20261119000001_workspace_entries.sql`.
+`20261119000000_media_storage_policies.sql`, `20261119000001_workspace_entries.sql`,
+`20261119000002_remove_obsolete_site_config.sql` (data delete; rollback insert in the file).
+The visit migration was fixed on 2026-11-19: it assumed `site_config.value` was text, but it's jsonb.
 
 Ask the user to do the interactive parts. Never write to production without their explicit OK in that message.
 ```bash
@@ -63,18 +67,10 @@ Before pushing, inspect existing storage policies (the media migration notes the
 
 If the user authorizes the Supabase MCP (`/mcp`), use it for read-only checks first.
 
-### 2. v2-5 removals (code part needs no approval)
-- `git rm index.html info.txt` and remove their mentions in `AGENTS.md` ("Tooling notes") and `README.md`.
-- 9 obsolete `site_config` rows (list in `docs/maintenance.md` §2): write a migration with a backup `select`
-  and a rollback `insert` using values from the snapshot; apply it in the same approval window as step 1.
-- Decisions say **keep** the 9 unused tables and the admin "Project builder" pages. Don't remove them.
-
-### 3. v2-6 quality gates (from `portfolio_resume_ready_feature_roadmap.txt`)
-- `.github/workflows/ci.yml`: `npm ci`, lint, typecheck, test, build. Adapt `_refs/plos/.github/workflows/ci.yml`.
-  The build needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as repo secrets (read-only anon).
-- Playwright smoke tests (pattern: `_refs/plos/tests/e2e`): a visitor sees published pages only; `/admin/*`
-  redirects when signed out; `/feed.xml` is valid. Admin journeys need a test account, so ask the user.
-- Then `SECURITY.md` (threat model), 3–5 ADRs, and README screenshots.
+### 2. v2-6 remaining
+- Repo secrets for CI: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (user sets them; CI only runs once pushed).
+- Admin Playwright journeys need a test account — ask the user before adding any.
+- `SECURITY.md` (threat model), 3–5 ADRs in `docs/adr/`, README screenshots.
 
 ### Small follow-ups noticed
 - Vercel env: set `NEXT_PUBLIC_SITE_URL=https://portfolio-pi-weld-92.vercel.app` (local `.env.local` has
