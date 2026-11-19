@@ -171,3 +171,66 @@ export function urlTitle(raw: string) {
     return raw.slice(0, MAX_TITLE);
   }
 }
+
+/* ── views ────────────────────────────────────────────────────────────────── */
+
+const SOURCES: { key: string; label: string; test: (host: string, path: string) => boolean }[] = [
+  { key: "youtube", label: "YouTube", test: (h) => /(^|\.)youtube\.com$|^youtu\.be$/.test(h) },
+  { key: "github", label: "GitHub", test: (h) => /(^|\.)github\.(com|io)$/.test(h) },
+  { key: "linkedin", label: "LinkedIn", test: (h) => /(^|\.)linkedin\.com$/.test(h) },
+  { key: "instagram", label: "Instagram", test: (h) => /(^|\.)instagram\.com$/.test(h) },
+  { key: "x", label: "X", test: (h) => /(^|\.)(x|twitter)\.com$/.test(h) },
+  { key: "course", label: "Course", test: (h) => /(^|\.)(coursera\.org|udemy\.com|edx\.org|freecodecamp\.org|khanacademy\.org|nptel\.ac\.in)$/.test(h) },
+  { key: "paper", label: "Paper", test: (h) => /(^|\.)(arxiv\.org|acm\.org|ieee\.org|semanticscholar\.org)$/.test(h) },
+  { key: "docs", label: "Docs", test: (h, p) => h.startsWith("docs.") || h.startsWith("developer.") || /^\/(docs|documentation|reference)(\/|$)/.test(p) },
+  { key: "blog", label: "Blog", test: (h) => /(^|\.)(medium\.com|dev\.to|substack\.com|hashnode\.dev|hashnode\.com|blogspot\.com|wordpress\.com)$/.test(h) || h.startsWith("blog.") || h.startsWith("engineering.") },
+];
+
+/** Where a resource comes from, from its URL alone. Unknown hosts are "Web". */
+export function sourceOf(url: string | null): { key: string; label: string } {
+  if (!url) return { key: "web", label: "Web" };
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase().replace(/^www\.|^m\./, "");
+    const s = SOURCES.find((s) => s.test(host, u.pathname.toLowerCase()));
+    return s ? { key: s.key, label: s.label } : { key: "web", label: "Web" };
+  } catch {
+    return { key: "web", label: "Web" };
+  }
+}
+
+export const SOURCE_KEYS = [...SOURCES.map((s) => s.key), "web"];
+
+// Dates in the workspace are grouped in the owner's time zone, not the server's (UTC on Vercel).
+export const WORKSPACE_TZ = "Asia/Kolkata";
+
+/** YYYY-MM-DD of a moment, in WORKSPACE_TZ. */
+export function localDay(iso: string | Date, tz = WORKSPACE_TZ) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(iso));
+}
+
+/** The Monday (YYYY-MM-DD, in WORKSPACE_TZ) of the week a moment falls in. */
+export function weekOf(iso: string | Date, tz = WORKSPACE_TZ) {
+  const day = localDay(iso, tz);
+  const d = new Date(`${day}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
+}
+
+/** "18 Nov – 24 Nov 2026" for a week starting on `monday`. */
+export function weekLabel(monday: string) {
+  const start = new Date(`${monday}T00:00:00Z`);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 6);
+  const f = (d: Date, year: boolean) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: year ? "numeric" : undefined, timeZone: "UTC" });
+  return `${f(start, false)} – ${f(end, true)}`;
+}
+
+/** Ideas without a status sit in the first column. */
+export const IDEA_COLUMNS = ["someday", "next", "active", "dropped"] as const;
+export const ideaColumn = (status: string | null) => (status && (IDEA_COLUMNS as readonly string[]).includes(status) ? status : "someday");
+
+/** A URL slug for a new draft project from an idea's title. */
+export function slugify(title: string) {
+  return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60).replace(/-+$/, "") || "project";
+}

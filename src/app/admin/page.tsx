@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { cleanSearch, type Entry } from "@/lib/entries";
+import { cleanSearch, localDay, weekOf, type Entry } from "@/lib/entries";
 import { ENTRY_KIND, ENTRY_STATUS } from "@/lib/labels";
 import { Markdown } from "@/components/markdown";
 import { AdminHeader, BTN } from "./ui";
 import { EntryEditor, PinButton } from "./entry-editor";
+import { WorkspaceError } from "./workspace-error";
 
 /**
  * The private workspace inbox: everything captured, newest first (pinned on top), with
  * search, kind and tag filters, and an editor for the selected entry. Filters and the open
  * entry live in the URL, so the back button and links just work.
  */
-type Search = { q?: string; kind?: string; tag?: string; e?: string };
+type Search = { q?: string; kind?: string; tag?: string; due?: string; e?: string };
+const FINISHED = ["done", "achieved", "dropped", "closed", "rejected"];
 
 const LIMIT = 200;
+// Daily to-dos, habits and life tracking live in PLOS; the workspace only links to it.
+const PLOS_URL = "https://plos-plum.vercel.app";
 
 export default async function Inbox({ searchParams }: { searchParams: Promise<Search> }) {
   const { supabase } = await requireAdmin();
@@ -21,20 +25,24 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
   const q = cleanSearch(sp.q ?? "");
   const kind = sp.kind && ENTRY_KIND[sp.kind] ? sp.kind : undefined;
   const tag = sp.tag?.slice(0, 40);
+  const due = sp.due === "soon" ? "soon" : undefined;
+  const soon = localDay(new Date(Date.now() + 7 * 864e5));
 
   let list = supabase.from("entries").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(LIMIT);
   if (kind) list = list.eq("kind", kind);
   if (tag) list = list.contains("tags", [tag]);
+  if (due) list = list.not("due_on", "is", null).lte("due_on", soon);
   // Substring search over title, notes and link: finds partial words ("kube" → "kubernetes").
   if (q) list = list.or(["title", "body_md", "url"].map((c) => `${c}.ilike."%${q}%"`).join(","));
 
   // ponytail: counts read kind+tags of every entry; fine for thousands of rows, use a SQL view beyond that.
   const [{ data, error }, { data: facets }, selected] = await Promise.all([
     list,
-    supabase.from("entries").select("kind, tags"),
-    sp.e ? supabase.from("entries").select("*").eq("id", sp.e).maybeSingle() : Promise.resolve({ data: null }),
+    supabase.from("entries").select("kind, tags, status, due_on, created_at"),
+    sp.e && /^[0-9a-f-]{36}$/i.test(sp.e) ? supabase.from("entries").select("*").eq("id", sp.e).maybeSingle() : Promise.resolve({ data: null }),
   ]);
-  const entries = (data ?? []) as Entry[];
+  // Finished items drop out of "due soon" here, not in SQL: `status not in (…)` would also drop null statuses.
+  const entries = ((data ?? []) as Entry[]).filter((e) => !due || !FINISHED.includes(e.status ?? ""));
   const open = (selected.data ?? null) as Entry | null;
 
   const kindCount: Record<string, number> = {};
@@ -46,9 +54,18 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
   const topTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 15);
   const total = facets?.length ?? 0;
 
+  // At-a-glance counts for the strip above the filters. Each links to the view that explains it.
+  const thisWeek = weekOf(new Date());
+  const glance = [
+    { label: "To read", n: (facets ?? []).filter((f) => f.kind === "link" && f.status === "to_read").length, href: "/admin/resources" },
+    { label: "Logs this week", n: (facets ?? []).filter((f) => f.kind === "log" && weekOf(f.created_at) === thisWeek).length, href: "/admin/logs" },
+    { label: "Active ideas", n: (facets ?? []).filter((f) => f.kind === "idea" && f.status === "active").length, href: "/admin/ideas" },
+    { label: "Due in 7 days", n: (facets ?? []).filter((f) => f.due_on && f.due_on <= soon && !FINISHED.includes(f.status ?? "")).length, href: "/admin?due=soon" },
+  ];
+
   const href = (next: Partial<Search>) => {
     const p = new URLSearchParams();
-    const merged = { q: sp.q, kind, tag, ...next };
+    const merged = { q: sp.q, kind, tag, due, ...next };
     for (const [k, v] of Object.entries(merged)) if (v) p.set(k, v);
     const s = p.toString();
     return s ? `/admin?${s}` : "/admin";
@@ -70,19 +87,32 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
       />
 
       {error ? (
-        <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3.5 py-2.5 text-[13.5px] text-rose-700 dark:text-rose-300">
-          {error.code === "PGRST205" || error.code === "42P01" ? "The workspace tables don't exist yet: the migration hasn't been applied." : `Couldn't load entries: ${error.message}`}
-        </p>
+        <WorkspaceError error={error} />
       ) : (
         <>
+          {!q && !kind && !tag && !due && total > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              {glance.map((g) => (
+                <Link key={g.label} href={g.href} className="card card-hover rounded-xl px-3.5 py-2.5">
+                  <span className="block text-[20px] font-semibold leading-tight">{g.n}</span>
+                  <span className="text-[12px] text-muted">{g.label}</span>
+                </Link>
+              ))}
+              <a href={PLOS_URL} target="_blank" rel="noopener noreferrer" className="card card-hover col-span-2 rounded-xl px-3.5 py-2.5 sm:col-span-1">
+                <span className="block text-[14px] font-semibold leading-tight">PLOS ↗</span>
+                <span className="text-[12px] text-muted">Daily to-dos and habits</span>
+              </a>
+            </div>
+          )}
           <div className="space-y-3">
             <form action="/admin" className="flex gap-2">
               {kind && <input type="hidden" name="kind" value={kind} />}
               {tag && <input type="hidden" name="tag" value={tag} />}
+              {due && <input type="hidden" name="due" value="soon" />}
               <label htmlFor="inbox-q" className="sr-only">Search entries</label>
               <input id="inbox-q" name="q" defaultValue={sp.q} placeholder="Search titles, notes and links…" className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] outline-none focus:border-accent" />
               <button className={BTN.secondary}>Search</button>
-              {(q || kind || tag) && <Link href="/admin" className={BTN.quiet}>Clear</Link>}
+              {(q || kind || tag || due) && <Link href="/admin" className={BTN.quiet}>Clear</Link>}
             </form>
             <nav aria-label="Filter by kind" className="flex flex-wrap gap-1.5">
               <Link href={href({ kind: undefined, e: undefined })} aria-current={!kind ? "page" : undefined} className={chip(!kind)}>All {total}</Link>
@@ -118,7 +148,7 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<Se
 
             {entries.length === 0 ? (
               <p className="card rounded-2xl px-6 py-12 text-center text-[14px] text-muted">
-                {q || kind || tag ? "Nothing matches. Try fewer filters." : "Nothing captured yet. Paste a link or type a thought in the box above."}
+                {q || kind || tag || due ? "Nothing matches. Try fewer filters." : "Nothing captured yet. Paste a link or type a thought in the box above."}
               </p>
             ) : (
               <ul className="divide-y divide-line rounded-2xl border border-line bg-card">

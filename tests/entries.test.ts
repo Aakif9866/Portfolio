@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanSearch, isFetchableUrl, normalizeTags, parseCapture, parsePreview, urlTitle, validateEntry } from "@/lib/entries";
+import { cleanSearch, ideaColumn, isFetchableUrl, localDay, normalizeTags, parseCapture, parsePreview, slugify, sourceOf, urlTitle, validateEntry, weekLabel, weekOf } from "@/lib/entries";
 
 describe("parseCapture", () => {
   it("a bare URL becomes a resource with no title yet", () => {
@@ -105,5 +105,38 @@ describe("entriesToMarkdown", () => {
     expect(md).toContain("## Notes\n\n### A thought\n\nsaved 2026-11-19\n\nmore");
     expect(md).toContain("### Raft Paper\n\n<https://raft.github.io> · status: to_read · #ds · saved 2026-11-19");
     expect(md.indexOf("## Notes")).toBeLessThan(md.indexOf("## Resources"));
+  });
+});
+
+describe("view helpers", () => {
+
+  it("sourceOf recognises common hosts", () => {
+    expect(sourceOf("https://www.youtube.com/watch?v=1").key).toBe("youtube");
+    expect(sourceOf("https://youtu.be/1").key).toBe("youtube");
+    expect(sourceOf("https://github.com/a/b").key).toBe("github");
+    expect(sourceOf("https://m.linkedin.com/posts/x").key).toBe("linkedin");
+    expect(sourceOf("https://docs.python.org/3/").key).toBe("docs");
+    expect(sourceOf("https://nextjs.org/docs/app").key).toBe("docs");
+    expect(sourceOf("https://arxiv.org/abs/1").key).toBe("paper");
+    expect(sourceOf("https://someone.substack.com/p/x").key).toBe("blog");
+    expect(sourceOf("https://example.com").key).toBe("web");
+    expect(sourceOf(null).key).toBe("web");
+    expect(sourceOf("not a url").key).toBe("web");
+  });
+
+  it("days and weeks are in IST, weeks start on Monday", () => {
+    // 20:00 UTC on Sunday 22 Nov is 01:30 IST on Monday 23 Nov → next week
+    expect(localDay("2026-11-22T20:00:00Z")).toBe("2026-11-23");
+    expect(weekOf("2026-11-22T20:00:00Z")).toBe("2026-11-23");
+    expect(weekOf("2026-11-22T10:00:00Z")).toBe("2026-11-16");
+    expect(weekLabel("2026-11-16")).toBe("16 Nov – 22 Nov 2026");
+  });
+
+  it("ideas without a known status are Someday; slugs are safe", () => {
+    expect(ideaColumn(null)).toBe("someday");
+    expect(ideaColumn("active")).toBe("active");
+    expect(ideaColumn("weird")).toBe("someday");
+    expect(slugify("A CLI for pgvector benchmarks!")).toBe("a-cli-for-pgvector-benchmarks");
+    expect(slugify("¿¿")).toBe("project");
   });
 });

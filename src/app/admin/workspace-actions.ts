@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { isFetchableUrl, parseCapture, parsePreview, urlTitle, validateEntry, type LinkPreview } from "@/lib/entries";
+import { isFetchableUrl, parseCapture, parsePreview, slugify, statusesFor, urlTitle, validateEntry, type LinkPreview } from "@/lib/entries";
+import { validateRow } from "@/lib/admin-fields";
 import type { ActionResult } from "./actions";
 
 /**
@@ -65,7 +66,7 @@ export async function captureEntry(formData: FormData): Promise<ActionResult> {
     .select("id")
     .single();
   if (error) return { ok: false, message: friendly(error) };
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Saved.", id: data.id };
 }
 
@@ -79,7 +80,7 @@ export async function saveEntry(formData: FormData): Promise<ActionResult> {
 
   const { error } = await supabase.from("entries").update(parsed.row).eq("id", id);
   if (error) return { ok: false, message: friendly(error) };
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Saved." };
 }
 
@@ -90,7 +91,7 @@ export async function deleteEntry(formData: FormData): Promise<ActionResult> {
   const { error, count } = await supabase.from("entries").delete({ count: "exact" }).eq("id", id);
   if (error) return { ok: false, message: friendly(error) };
   if (!count) return { ok: false, message: "Nothing was deleted. It may already be gone." };
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Deleted." };
 }
 
@@ -100,6 +101,60 @@ export async function togglePin(formData: FormData): Promise<ActionResult> {
   if (!UUID_RE.test(id)) return { ok: false, message: "Invalid entry." };
   const { error } = await supabase.from("entries").update({ pinned: formData.get("pinned") === "true" }).eq("id", id);
   if (error) return { ok: false, message: friendly(error) };
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Saved." };
+}
+
+/** One-click status change from a view (resources, ideas board). The status must fit the entry's kind. */
+export async function setEntryStatus(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "") || null;
+  if (!UUID_RE.test(id)) return { ok: false, message: "Invalid entry." };
+
+  const { data: entry, error: readErr } = await supabase.from("entries").select("kind").eq("id", id).maybeSingle();
+  if (readErr) return { ok: false, message: friendly(readErr) };
+  if (!entry) return { ok: false, message: "That entry no longer exists." };
+  if (status && !statusesFor(entry.kind).includes(status)) return { ok: false, message: "That status doesn't apply to this kind of entry." };
+
+  const { error } = await supabase.from("entries").update({ status }).eq("id", id);
+  if (error) return { ok: false, message: friendly(error) };
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: "Saved." };
+}
+
+/**
+ * Idea → draft public project. The project is created as a draft (the table's default state),
+ * so nothing appears on the site until it's published from the project workspace. The idea
+ * moves to "Active" and remembers the project it became.
+ */
+export async function startProject(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  if (!UUID_RE.test(id)) return { ok: false, message: "Invalid entry." };
+
+  const { data: idea, error: readErr } = await supabase.from("entries").select("title, body_md, url, meta").eq("id", id).maybeSingle();
+  if (readErr) return { ok: false, message: friendly(readErr) };
+  if (!idea) return { ok: false, message: "That idea no longer exists." };
+  const existing = (idea.meta as Record<string, unknown>)?.project_id;
+  if (typeof existing === "string") return { ok: true, message: "Already a project.", id: existing };
+
+  const title = (idea.title || "Untitled project").slice(0, 200);
+  const thesis = (idea.body_md.split("\n").find((l: string) => l.trim()) ?? title).replace(/^#+\s*/, "").slice(0, 280);
+  const base = slugify(title);
+
+  // Same allowlist and validation as the project form; a slug clash gets a short suffix once.
+  for (const slug of [base, `${base}-${crypto.randomUUID().slice(0, 4)}`]) {
+    const row = { title, thesis, status: "exploring", slug };
+    const invalid = validateRow("projects", row, true);
+    if (invalid) return { ok: false, message: invalid };
+    const { data, error } = await supabase.from("projects").insert(row).select("id").single();
+    if (error?.code === "23505") continue;
+    if (error) return { ok: false, message: friendly(error) };
+
+    await supabase.from("entries").update({ status: "active", meta: { ...(idea.meta as object), project_id: data.id } }).eq("id", id);
+    revalidatePath("/admin", "layout");
+    return { ok: true, message: "Draft project created.", id: data.id };
+  }
+  return { ok: false, message: "A project with that name already exists. Rename the idea and try again." };
 }

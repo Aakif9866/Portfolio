@@ -4,7 +4,16 @@ import { usePathname } from "next/navigation";
 
 const GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
   // Private workspace first: it's the everyday part. Links appear here only once the page exists.
-  { label: "Workspace", links: [{ href: "/admin", label: "Inbox" }] },
+  {
+    label: "Workspace",
+    links: [
+      { href: "/admin", label: "Inbox" },
+      { href: "/admin/resources", label: "Resources" },
+      { href: "/admin/logs", label: "Logs" },
+      { href: "/admin/ideas", label: "Ideas" },
+      { href: "/admin/recap", label: "Weekly recap" },
+    ],
+  },
   {
     label: "Site content",
     links: [

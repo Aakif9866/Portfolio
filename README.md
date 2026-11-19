@@ -100,6 +100,7 @@ A single admin account; there is no public sign-up. Sign in at `/login`.
 | Area | Screens |
 | --- | --- |
 | **Inbox** (private workspace, the `/admin` home) | A quick-capture box on every admin page (⌘J): paste a link (its title, site and image are fetched) or type a note; `log:` `idea:` `goal:` `job:` set the kind and `#tags` are pulled out. The inbox lists everything with search, kind and tag filters, pinning, and an editor where every field is optional. Export as JSON or Markdown. **Never shown on the public site** |
+| **Workspace views** | **Resources**: links by source (YouTube, GitHub, docs, …), a learning queue and one-click status. **Logs**: a timeline by week (IST), filterable by area tag. **Ideas**: a Someday → Next → Active → Dropped board; *Start project* creates a draft project. **Weekly recap**: what was logged, saved, finished and achieved that week. The Inbox also shows at-a-glance counts and links to PLOS for daily to-dos |
 | **Site dashboard** (`/admin/site`) | Published / draft / archived counts per content type, a "needs attention" list (drafts, case studies missing key pieces), recent changes, quick actions, total page views |
 | **Content** | Projects · Articles · Experiments · Experience |
 | **Project builder** | Case-study sections · Architecture diagrams · Milestones · Technologies, across all projects |
@@ -207,7 +208,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 163 tests, offline:
+`npm test` runs 166 tests, offline:
 
 | File | Covers |
 | --- | --- |
