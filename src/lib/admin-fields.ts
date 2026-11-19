@@ -20,6 +20,8 @@ export type Field = {
   advanced?: boolean;
   rows?: number;
   options?: readonly Option[];
+  /** url fields only: show an Upload button that stores the file in Supabase Storage and fills in its link. */
+  upload?: boolean;
 };
 
 const opts = (map: Record<string, { label: string }>): Option[] =>
@@ -49,7 +51,7 @@ export const FIELDS = {
     SLUG,
     { name: "kind", label: "Type", type: "select", advanced: true, options: ["project", "experiment", "research", "learning", "prototype"].map((v) => ({ value: v, label: v[0].toUpperCase() + v.slice(1) })) },
     { name: "team_size", label: "Team size", type: "number", advanced: true },
-    { name: "hero_image_url", label: "Hero image link", type: "url", advanced: true },
+    { name: "hero_image_url", label: "Hero image", type: "url", advanced: true, upload: true, help: "Upload an image or paste a link." },
     POSITION,
   ],
   project_sections: [
@@ -72,7 +74,7 @@ export const FIELDS = {
     { name: "project_id", label: "Project", type: "project", required: true },
     { name: "title", label: "Diagram title", type: "text", required: true, placeholder: "Request flow" },
     { name: "description", label: "Description", type: "textarea", rows: 2, help: "One or two sentences shown above the diagram." },
-    { name: "image_url", label: "Diagram image link", type: "url", help: "A hosted screenshot of the diagram. Enough on its own — the interactive boxes below are optional." },
+    { name: "image_url", label: "Diagram image", type: "url", upload: true, help: "Upload a screenshot of the diagram or paste a link. Enough on its own — the interactive boxes below are optional." },
     { name: "nodes", label: "Boxes (JSON)", type: "json", rows: 8, advanced: true, help: 'Interactive diagram boxes: [{"id":"api","label":"API","tech":"Node.js","x":0,"y":0,"explanation":"…"}]' },
     { name: "edges", label: "Connections (JSON)", type: "json", rows: 5, advanced: true, help: 'Arrows between boxes: [{"from":"api","to":"db","label":"writes"}]' },
     POSITION,

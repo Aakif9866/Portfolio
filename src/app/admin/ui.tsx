@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { deleteRow, reorder, setState, type ActionResult } from "./actions";
+import { deleteRow, reorder, setState, uploadMedia, type ActionResult } from "./actions";
+import { ACCEPT, MAX_BYTES } from "@/lib/media";
 import type { Field, Option } from "@/lib/admin-fields";
 import { stateActions } from "@/lib/form";
 import { PUBLISH_STATE, statusLabel } from "@/lib/labels";
@@ -115,6 +116,8 @@ function FieldInput({ f, value, projects }: { f: Field; value: unknown; projects
           spellCheck={f.type === "markdown" || f.type === "textarea"}
           className={`${INPUT} mt-1.5 ${f.type === "json" || f.type === "markdown" ? "font-mono text-[13px]" : ""}`}
         />
+      ) : f.upload ? (
+        <UploadableUrl common={common} defaultValue={asText} required={f.required} placeholder={f.placeholder} />
       ) : (
         <input
           {...common}
@@ -129,6 +132,68 @@ function FieldInput({ f, value, projects }: { f: Field; value: unknown; projects
         />
       )}
       {f.help && <p id={helpId} className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{f.help}</p>}
+    </div>
+  );
+}
+
+/* ── upload button: stores a file in the media bucket and hands back its public URL ── */
+export function UploadButton({ onUploaded, label = "Upload" }: { onUploaded: (url: string) => void; label?: string }) {
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function send(file: File) {
+    setError(null);
+    // Checked again on the server; this just avoids a pointless round trip.
+    if (file.size > MAX_BYTES) return setError("Files can be at most 4 MB.");
+    setBusy(true);
+    const fd = new FormData();
+    fd.set("file", file);
+    try {
+      const res = await uploadMedia(fd);
+      if (res.ok) onUploaded(res.url);
+      else setError(res.message);
+    } catch {
+      setError("Upload failed. Check your connection and try again.");
+    } finally {
+      setBusy(false);
+      if (input.current) input.current.value = "";
+    }
+  }
+
+  return (
+    <span className="inline-flex flex-col">
+      <input ref={input} type="file" accept={ACCEPT} hidden onChange={(e) => e.target.files?.[0] && send(e.target.files[0])} />
+      <button type="button" onClick={() => input.current?.click()} disabled={busy} className={BTN.secondary}>
+        {busy ? "Uploading…" : label}
+      </button>
+      {error && <span role="alert" className="mt-1 text-[12.5px] text-rose-600 dark:text-rose-400">{error}</span>}
+    </span>
+  );
+}
+
+/** A url input with an Upload button beside it. Upload fills the input and marks the form dirty. */
+function UploadableUrl({ common, defaultValue, required, placeholder }: {
+  common: { id: string; name: string; "aria-describedby"?: string }; defaultValue: string; required?: boolean; placeholder?: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState(defaultValue);
+  const fill = (next: string) => {
+    if (!ref.current) return;
+    ref.current.value = next;
+    ref.current.dispatchEvent(new Event("input", { bubbles: true })); // the unsaved-changes guard listens for input
+    setUrl(next);
+  };
+  return (
+    <div className="mt-1.5">
+      <div className="flex gap-2">
+        <input ref={ref} {...common} type="url" defaultValue={defaultValue} required={required} placeholder={placeholder ?? "https://…"} onChange={(e) => setUrl(e.target.value)} className={INPUT} />
+        <UploadButton onUploaded={fill} />
+      </div>
+      {/^https:\/\//.test(url) && !url.endsWith(".pdf") && (
+        // eslint-disable-next-line @next/next/no-img-element -- admin preview of an arbitrary hosted image
+        <img src={url} alt="" className="mt-2 max-h-32 rounded-lg border border-line object-contain" />
+      )}
     </div>
   );
 }

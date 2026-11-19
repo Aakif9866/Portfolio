@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 import { validateRow, type EditableTable } from "@/lib/admin-fields";
 import { assertTable, canTransition, parseRowForm } from "@/lib/form";
 import { isSiteKey } from "@/lib/site-content";
+import { MEDIA_BUCKET, checkUpload, isMediaPath, mediaPath } from "@/lib/media";
 
 export type ActionResult = { ok: true; message: string; id?: string } | { ok: false; message: string };
 
@@ -236,6 +237,38 @@ export async function removeProjectTech(formData: FormData): Promise<ActionResul
   revalidatePath("/projects");
   revalidatePath("/system");
   return { ok: true, message: "Removed." };
+}
+
+/**
+ * Upload one file to Storage. Runs as the signed-in admin (supabaseServer), so storage RLS
+ * decides; the service role is never used.
+ */
+export async function uploadMedia(formData: FormData): Promise<{ ok: true; message: string; url: string } | { ok: false; message: string }> {
+  const { supabase } = await requireAdmin();
+  const file = formData.get("file");
+  if (!(file instanceof File)) return { ok: false, message: "Choose a file to upload." };
+
+  const check = checkUpload(file.size, new Uint8Array(await file.slice(0, 16).arrayBuffer()));
+  if (!check.ok) return check;
+
+  const path = mediaPath(file.name, check.ext);
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, file, { contentType: check.mime, upsert: false });
+  if (error) return { ok: false, message: error.message.includes("row-level security") ? "Not permitted. Your session may have expired — sign in again." : `Upload failed: ${error.message}` };
+
+  revalidatePath("/admin/media");
+  return { ok: true, message: "Uploaded.", url: supabase.storage.from(MEDIA_BUCKET).getPublicUrl(path).data.publicUrl };
+}
+
+export async function deleteMedia(formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const path = String(formData.get("path") ?? "");
+  if (!isMediaPath(path)) return { ok: false, message: "Invalid file." };
+  const { data, error } = await supabase.storage.from(MEDIA_BUCKET).remove([path]);
+  if (error) return { ok: false, message: `Delete failed: ${error.message}` };
+  // Storage returns an empty list (not an error) when RLS hides the object.
+  if (!data?.length) return { ok: false, message: "Nothing was deleted. The file may already be gone, or your session expired." };
+  revalidatePath("/admin/media");
+  return { ok: true, message: "Deleted." };
 }
 
 export async function signOut() {

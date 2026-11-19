@@ -102,6 +102,7 @@ A single admin account; there is no public sign-up. Sign in at `/login`.
 | **Dashboard** | Published / draft / archived counts per content type, a "needs attention" list (drafts, case studies missing key pieces), recent changes, quick actions, total page views |
 | **Content** | Projects · Articles · Experiments · Experience |
 | **Project builder** | Case-study sections · Architecture diagrams · Milestones · Technologies, across all projects |
+| **Media** | Upload, copy the link of, and delete files in Supabase Storage |
 | **Settings** | The site content the public pages read (About text, contact email, GitHub, LinkedIn), and account and access information |
 
 **Project workspace** (`/admin/projects/[id]`) puts everything for one project in tabs:
@@ -162,6 +163,7 @@ change.
 - no unpublished rows are visible in any table with a state
 - children of unpublished projects are hidden
 - `admin_allowlist`, `article_revisions` and `profiles` are private
+- signed-out users can't list files in the `media` storage bucket
 
 It never inserts, updates or signs in. Some checks are skipped when the database has no draft
 projects to test against.
@@ -204,7 +206,7 @@ as 0.
 
 ## Tests
 
-`npm test` runs 83 tests, offline:
+`npm test` runs 95 tests, offline:
 
 | File | Covers |
 | --- | --- |
@@ -213,6 +215,7 @@ as 0.
 | `tests/settings-usage.test.ts` | The site only reads settings the admin can edit, and every editable setting is used |
 | `tests/migration-atomic.test.ts` | The pending migration's SQL, run against a real Postgres engine (PGlite) with simplified tables |
 | `tests/migration-visits.test.ts` | The visit-counter migration: one per call, first-use insert, service-role only |
+| `tests/media.test.ts` | Upload checks: type from magic bytes (no SVG), size limit, generated paths, path validation |
 
 There are no browser end-to-end tests and no CI workflow yet. The admin flows are verified by
 hand.
@@ -269,7 +272,10 @@ Details for all of these are in [docs/maintenance.md](docs/maintenance.md).
   is applied (needs approval). Until then it falls back to read-then-write.
 - **20 unused `site_config` settings** from an earlier design remain in the database, shown
   read-only in Admin → Settings. The audit and cleanup plan are in `docs/maintenance.md`.
-- **Image uploads:** diagram and hero images are pasted links; there is no upload widget.
+- **Uploads** (Admin → Media, and an Upload button on the hero and diagram image fields) store
+  files in the public `media` bucket: PNG, JPEG, GIF, WebP, AVIF or PDF, up to 4 MB, type checked
+  from the file's bytes. Admin-only write policies are in
+  `supabase/migrations/20261119000000_media_storage_policies.sql`, pending approval.
 - **Not built:**
   - live GitHub data
   - browser end-to-end tests

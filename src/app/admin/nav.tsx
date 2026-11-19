@@ -22,7 +22,7 @@ const GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
       { href: "/admin/technologies", label: "Technologies" },
     ],
   },
-  { label: "Settings", links: [{ href: "/admin/settings", label: "Site content & access" }] },
+  { label: "Settings", links: [{ href: "/admin/media", label: "Media" }, { href: "/admin/settings", label: "Site content & access" }] },
 ];
 
 const isActive = (pathname: string, href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));

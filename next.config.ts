@@ -13,6 +13,8 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Uploads go through a Server Action (default limit 1 MB). The app caps files at 4 MB; Vercel at 4.5 MB.
+  experimental: { serverActions: { bodySizeLimit: "5mb" } },
   images: { remotePatterns: [{ protocol: "https", hostname: "**.githubusercontent.com" }] },
   async headers() {
     return [

@@ -65,5 +65,11 @@ for (const table of ["admin_allowlist", "article_revisions", "profiles"]) {
   check(`anon cannot read ${table}`, !!error || (data ?? []).length === 0, error?.code ?? "0 rows");
 }
 
+// 5. storage: anon can't list the media bucket (files are still served by public URL)
+{
+  const { data, error } = await anon.storage.from("media").list("", { limit: 10 });
+  check("anon cannot list media files", !!error || (data ?? []).length === 0, error?.message ?? `${data?.length ?? 0} entries`);
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}\n`);
 process.exit(failures === 0 ? 0 : 1);
