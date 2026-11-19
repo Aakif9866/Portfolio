@@ -23,6 +23,17 @@ export function AdminNav({ account }: { account: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
+  // Collapsed sections, remembered on this device (a convenience; nothing breaks without it).
+  const [collapsed, setCollapsed] = useState<string[]>([]);
+  useEffect(() => {
+    try { setCollapsed(JSON.parse(localStorage.getItem("admin.collapsed") ?? "[]")); } catch {}
+  }, []);
+  const toggle = (label: string) =>
+    setCollapsed((c) => {
+      const next = c.includes(label) ? c.filter((x) => x !== label) : [...c, label];
+      try { localStorage.setItem("admin.collapsed", JSON.stringify(next)); } catch {}
+      return next;
+    });
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -69,28 +80,42 @@ export function AdminNav({ account }: { account: React.ReactNode }) {
           </button>
         </div>
 
-        <nav aria-label="Admin" className="flex-1 space-y-5 overflow-y-auto px-3 py-5">
-          {ADMIN_GROUPS.map((g) => (
-            <div key={g.label}>
-              <p className="px-3 font-mono text-[11px] uppercase tracking-wider text-faint">{g.label}</p>
-              <ul className="mt-1.5 space-y-0.5">
-                {g.links.map((l) => {
-                  const active = isActive(pathname, l.href);
-                  return (
-                    <li key={l.href}>
-                      <Link
-                        href={l.href}
-                        aria-current={active ? "page" : undefined}
-                        className={`block rounded-lg px-3 py-2 text-[14px] transition-colors ${active ? "nav-rail bg-raised font-medium text-ink" : "text-muted hover:bg-raised/60 hover:text-ink"}`}
-                      >
-                        {l.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+        <nav aria-label="Admin" className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+          {ADMIN_GROUPS.map((g) => {
+            const here = g.links.some((l) => isActive(pathname, l.href));
+            const shut = collapsed.includes(g.label) && !here; // the section you're in always stays open
+            return (
+              <div key={g.label} className="py-1">
+                <button
+                  type="button"
+                  onClick={() => toggle(g.label)}
+                  aria-expanded={!shut}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[14.5px] font-semibold tracking-[-0.01em] text-ink transition-colors hover:bg-raised/60"
+                >
+                  {g.label}
+                  <svg className={`h-3.5 w-3.5 text-faint transition-transform duration-200 ${shut ? "-rotate-90" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 9l6 6 6-6" /></svg>
+                </button>
+                {!shut && (
+                  <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-line pl-2">
+                    {g.links.map((l) => {
+                      const active = isActive(pathname, l.href);
+                      return (
+                        <li key={l.href}>
+                          <Link
+                            href={l.href}
+                            aria-current={active ? "page" : undefined}
+                            className={`block rounded-lg px-3 py-1.5 text-[14px] transition-colors ${active ? "nav-rail bg-raised font-medium text-ink" : "text-muted hover:bg-raised/60 hover:text-ink"}`}
+                          >
+                            {l.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="shrink-0 border-t border-line p-4">{account}</div>

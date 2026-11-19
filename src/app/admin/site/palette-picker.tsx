@@ -8,6 +8,7 @@ export function PalettePicker({ current }: { current: PaletteId }) {
   const [selected, setSelected] = useState<PaletteId>(current);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
+  const active = PALETTES.find((p) => p.id === selected) ?? PALETTES[0];
 
   function choose(id: PaletteId) {
     if (id === selected || pending) return;
@@ -22,14 +23,18 @@ export function PalettePicker({ current }: { current: PaletteId }) {
   }
 
   return (
-    <section aria-labelledby="palette-heading" className="card rounded-2xl p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="palette-heading" className="text-[16px] font-semibold">Colour scheme</h2>
-        <p role="status" className={`text-[13px] ${msg && !msg.ok ? "text-rose-500" : "text-muted"}`}>
-          {pending ? "Saving…" : msg?.text ?? "Changes the highlight, glow, logo and accent across the site."}
-        </p>
-      </div>
-      <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <details className="card group rounded-2xl">
+      <summary className="flex cursor-pointer list-none items-center gap-4 rounded-2xl p-5 [&::-webkit-details-marker]:hidden">
+        <span aria-hidden className="h-9 w-9 shrink-0 rounded-[8px_11px_8px_11px]" style={{ background: `conic-gradient(from 210deg, ${active.swatch.join(", ")}, ${active.swatch[0]})` }} />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold tracking-[-0.01em]">Colour scheme</span>
+          <span role="status" className={`block truncate text-[13px] ${msg && !msg.ok ? "text-rose-500" : "text-muted"}`}>
+            {pending ? "Saving…" : msg?.text ?? `${active.name} · changes the highlight, glow, logo and accent across the site`}
+          </span>
+        </span>
+        <svg className="h-4 w-4 shrink-0 text-faint transition-transform duration-200 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden><path d="M6 9l6 6 6-6" /></svg>
+      </summary>
+      <ul className="grid gap-3 px-5 pb-5 sm:grid-cols-2 xl:grid-cols-3">
         {PALETTES.map((p) => {
           const on = p.id === selected;
           return (
@@ -56,6 +61,6 @@ export function PalettePicker({ current }: { current: PaletteId }) {
           );
         })}
       </ul>
-    </section>
+    </details>
   );
 }
