@@ -64,3 +64,36 @@ export function emailPrompt(kind: EmailKind, job: { role?: string; company?: str
     { role: "user", content: `${facts || "No details given."}\n<material>\n${clip(job.notes ?? "")}\n</material>` },
   ];
 }
+
+/**
+ * Tailor a resume to a job description. Only the resume's sections are sent: the name and
+ * contact line stay on the server and are put back afterwards.
+ */
+export function tailorPrompt(resumeBody: string, jd: string): ChatMessage[] {
+  return [
+    { role: "system", content: `You tailor a software engineer's resume to one job description. ${UNTRUSTED}
+Rules:
+- Keep the exact text format: "## Section", "### A | B | C | D" entries, "- " bullets, **bold** only.
+- Reorder sections' entries and bullets by relevance to the job; rephrase bullets to use the job's terminology only where the original supports it.
+- You may drop weak or irrelevant bullets and shorten the summary.
+- NEVER invent employers, titles, dates, skills, tools, metrics or achievements. Keep [bracketed placeholders] as they are.
+After the resume, output a line containing only "---", then "Missing keywords:" followed by a comma-separated list of important skills or terms from the job description that the resume doesn't support. Output nothing else.` },
+    { role: "user", content: `Job description:\n<material>\n${clip(jd)}\n</material>\n\nResume:\n<material>\n${clip(resumeBody)}\n</material>` },
+  ];
+}
+
+/** Splits a resume into its header (name + contact, kept private) and body (the sections). */
+export function splitResume(text: string) {
+  const i = text.search(/^##\s/m);
+  return i < 0 ? { header: text, body: "" } : { header: text.slice(0, i), body: text.slice(i) };
+}
+
+/** The model's answer → tailored body and the missing-keywords list. */
+export function parseTailored(answer: string) {
+  const cleaned = answer.replace(/^```[a-z]*\n?|```\s*$/g, "").trim();
+  const cut = cleaned.lastIndexOf("\n---");
+  const body = (cut >= 0 ? cleaned.slice(0, cut) : cleaned).trim();
+  const tail = cut >= 0 ? cleaned.slice(cut + 4) : "";
+  const missing = (tail.match(/Missing keywords:\s*([\s\S]*)/i)?.[1] ?? "").split(/,|\n/).map((s) => s.replace(/^[-*]\s*/, "").trim()).filter(Boolean);
+  return { body, missing };
+}

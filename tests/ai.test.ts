@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { addUsage, aiConfig, chat, currentUsage } from "@/lib/ai";
-import { emailPrompt, htmlToText, structureLogPrompt, summarizePrompt } from "@/lib/ai-prompts";
+import { emailPrompt, htmlToText, parseTailored, splitResume, structureLogPrompt, summarizePrompt, tailorPrompt } from "@/lib/ai-prompts";
 
 const env = { AI_API_KEY: "sk-test" };
 const reply = (status: number, body: unknown) => vi.fn(async () => new Response(JSON.stringify(body), { status }));
@@ -76,5 +76,25 @@ describe("prompts", () => {
     const all = msgs.map((m) => m.content).join("\n");
     expect(all).toContain("Acme");
     expect(all).not.toContain("9 LPA");
+  });
+});
+
+describe("resume tailoring", () => {
+  const resume = "# Jane Dev\njane@dev.io | +91 99999\n\n## Experience\n### Acme | SWE | Hyd | 2025\n- Built APIs\n";
+
+  it("splitResume keeps the name and contact out of the body", () => {
+    const { header, body } = splitResume(resume);
+    expect(header).toContain("jane@dev.io");
+    expect(body.startsWith("## Experience")).toBe(true);
+    expect(tailorPrompt(body, "Need Go").map((m) => m.content).join()).not.toContain("jane@dev.io");
+  });
+
+  it("the prompt forbids inventing and keeps the format", () => {
+    expect(tailorPrompt("## X", "jd")[0].content).toMatch(/NEVER invent/);
+  });
+
+  it("parseTailored separates body and missing keywords, tolerating code fences", () => {
+    expect(parseTailored("```markdown\n## Experience\n- a\n---\nMissing keywords: Go, Kafka,\nKubernetes\n```")).toEqual({ body: "## Experience\n- a", missing: ["Go", "Kafka", "Kubernetes"] });
+    expect(parseTailored("## Only body")).toEqual({ body: "## Only body", missing: [] });
   });
 });

@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { AI_USAGE_KEY, addUsage, aiConfig, chat, currentUsage, type ChatMessage } from "@/lib/ai";
-import { emailPrompt, htmlToText, improvePrompt, structureLogPrompt, summarizePrompt, type EmailKind } from "@/lib/ai-prompts";
+import { emailPrompt, htmlToText, improvePrompt, parseTailored, splitResume, structureLogPrompt, summarizePrompt, tailorPrompt, type EmailKind } from "@/lib/ai-prompts";
+import { resumeKey, type StoredResume } from "@/lib/resume";
 import { MAX_BODY } from "@/lib/entries";
 import { fetchPage } from "@/lib/fetch-page";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -100,4 +101,29 @@ export async function acceptNotes(id: string, body: string): Promise<{ ok: boole
   if (error) return { ok: false, message: error.message };
   revalidatePath("/admin", "layout");
   return { ok: true, message: "Notes replaced." };
+}
+
+/**
+ * Tailor a resume version to its linked job's description (a suggestion, not saved). Only the
+ * resume's sections and the job description are sent; the name and contact line are not.
+ */
+export async function aiTailorResume(param: string): Promise<AiResult & { missing?: string[] }> {
+  const { supabase } = await requireAdmin();
+  const key = resumeKey(param);
+  if (!key) return { ok: false, message: "Invalid resume." };
+  const { data } = await supabase.from("private_config").select("value").eq("key", key).maybeSingle();
+  const resume = data?.value as StoredResume | undefined;
+  if (!resume) return { ok: false, message: "That resume no longer exists." };
+  if (!resume.job_id) return { ok: false, message: "Link this version to a job first." };
+
+  const { data: job } = await supabase.from("entries").select("meta").eq("id", resume.job_id).maybeSingle();
+  const jd = typeof job?.meta?.jd === "string" ? (job.meta.jd as string) : "";
+  if (jd.trim().length < 100) return { ok: false, message: "Paste the job description into the job (Job details → Job description) first." };
+
+  const { header, body } = splitResume(resume.text);
+  if (!body.trim()) return { ok: false, message: "This resume has no sections to tailor." };
+  const res = await run(supabase, tailorPrompt(body, jd), 2500);
+  if (!res.ok) return res;
+  const { body: tailored, missing } = parseTailored(res.text);
+  return { ...res, text: `${header.trimEnd()}\n\n${tailored}\n`, missing };
 }

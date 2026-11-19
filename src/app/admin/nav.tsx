@@ -14,6 +14,7 @@ const GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
       { href: "/admin/jobs", label: "Jobs" },
       { href: "/admin/career", label: "Career" },
       { href: "/admin/skills", label: "Skills" },
+      { href: "/admin/resume", label: "Resume" },
       { href: "/admin/recap", label: "Weekly recap" },
     ],
   },
@@ -46,7 +47,7 @@ export function AdminNav() {
   return (
     <>
       {/* desktop: grouped sidebar */}
-      <nav aria-label="Admin" className="hidden w-52 shrink-0 lg:block">
+      <nav aria-label="Admin" className="hidden w-52 shrink-0 lg:block print:hidden">
         <div className="sticky top-24 space-y-6">
           {GROUPS.map((g) => (
             <div key={g.label}>
@@ -75,7 +76,7 @@ export function AdminNav() {
       </nav>
 
       {/* mobile / tablet: one scrollable row */}
-      <nav aria-label="Admin" className="-mx-5 mb-6 overflow-x-auto border-b border-line px-5 pb-3 lg:hidden">
+      <nav aria-label="Admin" className="-mx-5 mb-6 overflow-x-auto border-b border-line px-5 pb-3 lg:hidden print:hidden">
         <ul className="flex w-max gap-1.5">
           {GROUPS.flatMap((g) => g.links).map((l) => {
             const active = isActive(pathname, l.href);

@@ -12,8 +12,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { user } = await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-page">
-      <header className="sticky top-0 z-40 border-b border-line glass">
+    <div className="min-h-screen bg-page print:bg-white">
+      <header className="sticky top-0 z-40 border-b border-line glass print:hidden">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-[14.5px] font-semibold tracking-tight">
@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:flex lg:gap-8">
+      <div className="mx-auto max-w-7xl px-5 py-8 lg:flex lg:gap-8 print:block print:max-w-none print:p-0">
         <AdminNav />
         <div className="min-w-0 flex-1">
           <QuickCapture />

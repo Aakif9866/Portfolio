@@ -33,7 +33,7 @@ export function QuickCapture() {
 
   return (
     <form
-      className="mb-6"
+      className="mb-6 print:hidden"
       action={(fd) => start(async () => {
         const res = await captureEntry(fd);
         setMsg({ ok: res.ok, text: res.ok ? "Saved to Inbox." : res.message });
