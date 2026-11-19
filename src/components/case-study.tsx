@@ -226,7 +226,7 @@ export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUr
             </h2>
             <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
               {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG, already 1200×630 */}
-              <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={630} loading="lazy" className="block h-auto w-full" />
+              <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={600} loading="lazy" className="block h-auto w-full" />
             </a>
             <div className="mt-4 flex flex-wrap gap-2">
               <a href={`/projects/${project.slug}/card`} download={`${project.slug}-card.png`} className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85">Download card</a>

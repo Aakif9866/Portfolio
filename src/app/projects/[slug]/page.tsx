@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!d) return { title: "Not found" };
   const { title, slug: s } = d.project;
   const description = d.project.thesis ?? d.project.summary ?? undefined;
-  const image = { url: `/projects/${s}/card`, width: 1200, height: 630, alt: title };
+  const image = { url: `/projects/${s}/card`, width: 1200, height: 600, alt: title };
   return {
     title, description,
     alternates: { canonical: `/projects/${s}` },
