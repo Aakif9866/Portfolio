@@ -1,0 +1,31 @@
+export const meta = {
+  title: "Reading a Postgres query plan",
+  summary: "How to read EXPLAIN ANALYZE output and spot the usual causes of slow queries.",
+  date: "2025-12-10",
+  category: "Database Internals",
+  tags: ["postgres", "performance", "sql"],
+  placeholder: true,
+};
+
+## Start with EXPLAIN ANALYZE
+
+`EXPLAIN` shows the plan the planner chose. `EXPLAIN ANALYZE` actually runs the query and adds real timings and row counts.
+
+```sql
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE customer_id = 42 ORDER BY created_at DESC LIMIT 20;
+```
+
+## What to look for
+
+- **Seq Scan on a large table** where you expected an index.
+- **Estimated vs actual rows** far apart: stale statistics, so run `ANALYZE`.
+- **Sort** nodes spilling to disk.
+
+### Composite indexes
+
+For the query above, an index on `(customer_id, created_at DESC)` lets Postgres filter and return rows already in order, skipping the sort entirely.
+
+## Takeaway
+
+Read the plan before adding indexes. The fix is usually one well-chosen index, not five speculative ones.

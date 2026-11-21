@@ -1,0 +1,39 @@
+export const meta = {
+  title: "Cache-aside with Redis, and where it goes wrong",
+  summary: "The simplest caching pattern, the stale-data and stampede problems it brings, and the small fixes for each.",
+  date: "2026-01-02",
+  category: "Backend Engineering",
+  tags: ["caching", "redis", "performance"],
+  placeholder: true,
+};
+
+## The pattern
+
+Read from the cache; on a miss, read from the database and populate the cache.
+
+```ts
+async function getProduct(id: string) {
+  const key = `product:${id}`;
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const product = await db.product.findUnique({ where: { id } });
+  if (product) await redis.set(key, JSON.stringify(product), { EX: 300 });
+  return product;
+}
+```
+
+## Stale data
+
+Writes must invalidate the key. Delete it after the database write commits, and keep the TTL as a safety net for the invalidations you forget.
+
+## Cache stampede
+
+When a hot key expires, many requests miss at once and all hit the database. Options:
+
+- Add jitter to TTLs so keys don't expire together.
+- Let one request rebuild the value while others wait or serve the stale value.
+
+### When not to cache
+
+If the database query is already fast and the data changes constantly, the cache adds complexity without much benefit. Measure first.

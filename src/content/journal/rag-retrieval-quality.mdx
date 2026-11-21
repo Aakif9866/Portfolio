@@ -1,0 +1,42 @@
+export const meta = {
+  title: "Why retrieval quality caps RAG answer quality",
+  summary: "A RAG system can't answer correctly from context it never retrieved. Notes on measuring retrieval separately from generation.",
+  date: "2026-01-15",
+  category: "RAG Architectures",
+  tags: ["rag", "evaluation", "retrieval"],
+  placeholder: true,
+};
+
+## The ceiling
+
+In a RAG pipeline the LLM only sees what retrieval hands it. If the chunk containing the answer isn't in the top K, the model has two options: say it doesn't know, or guess. Neither is a correct answer.
+
+That makes retrieval recall an upper bound on answer correctness for questions that depend on your documents.
+
+## Measure the two halves separately
+
+A single end-to-end score hides where things break. Split it:
+
+- **Retrieval**: Recall@K and MRR against a set of questions with known relevant chunks.
+- **Generation**: answer correctness and faithfulness, given the retrieved context.
+
+```python
+def recall_at_k(results: list[list[str]], relevant: list[set[str]], k: int) -> float:
+    hits = sum(1 for got, rel in zip(results, relevant) if rel & set(got[:k]))
+    return hits / len(results)
+
+def mrr(results: list[list[str]], relevant: list[set[str]]) -> float:
+    total = 0.0
+    for got, rel in zip(results, relevant):
+        rank = next((i + 1 for i, doc in enumerate(got) if doc in rel), None)
+        total += 1 / rank if rank else 0
+    return total / len(results)
+```
+
+### Reading the numbers
+
+Low recall means fix chunking, embeddings or add hybrid search. High recall with low correctness means the problem is context construction or the prompt.
+
+## Takeaway
+
+Improve retrieval first. A better prompt can't recover information that never reached it.
