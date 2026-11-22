@@ -69,6 +69,16 @@ export async function saveRow(formData: FormData): Promise<ActionResult> {
     return { ok: true, message: "Saved." };
   }
 
+  // position is NOT NULL and an explicit NULL skips any column default: an empty "Sort order"
+  // keeps the current value on edit, and puts a new item last.
+  if ("position" in row && row.position === null) {
+    if (id) delete row.position;
+    else {
+      const { data: last } = await supabase.from(table).select("position").order("position", { ascending: false }).limit(1).maybeSingle();
+      row.position = ((last as { position: number } | null)?.position ?? -1) + 1;
+    }
+  }
+
   const cols = SLUGGED.includes(table) ? "id, slug" : "id";
   const { data, error } = id
     ? await supabase.from(table).update(row).eq("id", id).select(cols).maybeSingle()

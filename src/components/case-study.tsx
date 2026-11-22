@@ -115,6 +115,15 @@ export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUr
         </div>
       </header>
 
+      {project.hero_image_url && (
+        <div className="mx-auto max-w-6xl px-6 pt-10">
+          <a href={project.demo_url ?? project.hero_image_url} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
+            {/* eslint-disable-next-line @next/next/no-img-element -- hero images can be hosted anywhere */}
+            <img src={project.hero_image_url} alt={`${project.title} landing page`} className="block h-auto w-full" />
+          </a>
+        </div>
+      )}
+
       <div className="mx-auto max-w-6xl px-6 py-14 lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
         {toc.length > 2 && (
           <nav aria-label="On this page" className="hidden lg:block">
