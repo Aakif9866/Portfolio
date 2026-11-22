@@ -32,6 +32,13 @@ export function ProjectCard({
         className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full opacity-45 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
         style={{ background: accent }}
       />
+      {project.hero_image_url && (
+        // Bleeds to the card edges by cancelling the card's padding.
+        <div className={`relative mb-6 overflow-hidden border-b border-line ${featured ? "-mx-8 -mt-8" : "-mx-7 -mt-7"}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- hero images can be hosted anywhere */}
+          <img src={project.hero_image_url} alt={`${project.title} landing page`} loading="lazy" decoding="async" className="aspect-video w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />
+        </div>
+      )}
       <div className="relative flex items-center gap-2">
         <StatusPill status={project.status} />
         {project.featured && (
