@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { TimelineEntry } from "@/lib/types";
@@ -63,6 +64,7 @@ export default async function ExperiencePage() {
         eyebrow="Experience"
         title="Experience"
         lede="Work history and education, most recent first. Personal projects and experiments are listed separately under Projects and Experiments."
+        visual={<SystemGraph name="experience" />}
       />
       <div className="mx-auto max-w-4xl space-y-16 px-6 py-16">
         {entries.length === 0 && (

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
+import { PalettePicker } from "./palette-picker";
 import { CommandPalette } from "./command-palette";
 import { NAV } from "@/lib/labels";
 import type { Contact } from "@/lib/contact";
@@ -85,6 +86,7 @@ export function Nav({ contact }: { contact: Contact }) {
             </details>
           )}
           <CommandPalette />
+          <PalettePicker />
           <ThemeToggle />
           <a
             href={contact.github}

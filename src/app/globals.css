@@ -327,6 +327,16 @@
 @keyframes hs-down { 0% { transform: translateY(0); opacity: 0; } 5% { opacity: 1; } 45% { transform: translateY(276px); opacity: 1; } 50%, 100% { transform: translateY(276px); opacity: 0; } }
 @keyframes hs-up { 0%, 50% { transform: translateY(0); opacity: 0; } 55% { opacity: 1; } 95% { transform: translateY(-276px); opacity: 1; } 100% { transform: translateY(-276px); opacity: 0; } }
 
+/* header graphs (system-graph.tsx): raised boxes that float gently; packets glow along the wires.
+   Colours are the selected scheme's (--h1…--h4, --accent), so they change with it; one colour per kind of component. */
+.system-graph { --sg-1: var(--h1); --sg-2: var(--accent); --sg-3: var(--h2); --sg-4: var(--h3); --sg-5: var(--h4);
+  margin: 0; width: 410px; /* xl+: the column is 1104px, the lede 672px → 432px free */ animation: fade-up 0.7s 0.25s var(--ease-out-soft) both; }
+.system-graph svg { display: block; width: 100%; height: auto; overflow: visible; }
+.system-graph .sg-plane { animation: sg-float 7s ease-in-out infinite alternate; filter: drop-shadow(0 14px 20px rgb(0 0 0 / 0.22)); }
+.system-graph .sg-label { font: 500 15px var(--font-mono); }
+@keyframes sg-float { from { transform: translateY(0); } to { transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .system-graph, .system-graph .sg-plane { animation: none; } .system-graph .sg-packet { display: none; } }
+
 @keyframes drift {
   from { transform: translate3d(-4%, 0, 0) scale(1); }
   to { transform: translate3d(4%, -3%, 0) scale(1.14); }

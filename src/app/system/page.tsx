@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { TECH_GROUPS } from "@/lib/types";
@@ -32,6 +33,7 @@ export default async function SystemPage() {
         eyebrow="Tech Stack"
         title="Tech Stack"
         lede={`${tech.length} technologies I've used, grouped by where they sit in a system. Each one lists the projects it was used in — select a project to see how.`}
+        visual={<SystemGraph name="system" />}
       />
 
       <div className="mx-auto max-w-6xl px-6 py-14">

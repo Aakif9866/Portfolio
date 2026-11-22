@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { Empty } from "@/components/empty";
 import { supabasePublic } from "@/lib/supabase/server";
 import type { Experiment } from "@/lib/types";
@@ -23,6 +24,7 @@ export default async function LabPage() {
         eyebrow="Experiments"
         title="Experiments"
         lede="Smaller technical tests, each with a hypothesis written down before the result. Failed and abandoned experiments stay published, because the reason they didn't work is usually the useful part."
+        visual={<SystemGraph name="lab" />}
       />
       <section className="mx-auto max-w-5xl px-6 py-16">
         {experiments.length === 0 ? (

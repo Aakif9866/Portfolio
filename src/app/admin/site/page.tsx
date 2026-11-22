@@ -4,8 +4,6 @@ import { getVisitCount } from "@/lib/visits";
 import type { Project, ProjectSection } from "@/lib/types";
 import { AdminHeader, BTN, StateChip } from "../ui";
 import { projectChecks } from "../checks";
-import { getPalette } from "@/lib/contact";
-import { PalettePicker } from "./palette-picker";
 
 type Row = { id: string; title: string; state: string; updated_at: string };
 
@@ -23,8 +21,7 @@ const ago = (iso: string) => {
 
 export default async function Dashboard() {
   const { supabase } = await requireAdmin();
-  const [palette, visits, projectsRes, sectionsRes, articlesRes, experimentsRes, timelineRes, diagramsRes, techRes] = await Promise.all([
-    getPalette(),
+  const [visits, projectsRes, sectionsRes, articlesRes, experimentsRes, timelineRes, diagramsRes, techRes] = await Promise.all([
     getVisitCount(),
     supabase.from("projects").select("*").order("position"),
     supabase.from("project_sections").select("id, project_id, kind, state, body_md, heading, updated_at"),
@@ -166,7 +163,6 @@ export default async function Dashboard() {
         </section>
       </div>
 
-      <PalettePicker current={palette} />
     </div>
   );
 }

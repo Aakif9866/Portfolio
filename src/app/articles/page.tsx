@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { Empty } from "@/components/empty";
 import { ArticleList, TagCloud } from "@/components/article-list";
 import { publishedArticles } from "@/lib/queries";
@@ -21,6 +22,7 @@ export default async function ArticlesPage() {
         eyebrow="Writing"
         title="Writing"
         lede="Technical write-ups on things I've had to work out properly, with what each was tested against so you can judge whether it still applies."
+        visual={<SystemGraph name="articles" />}
       />
       <section className="mx-auto max-w-4xl px-6 py-16">
         {articles.length === 0 ? (

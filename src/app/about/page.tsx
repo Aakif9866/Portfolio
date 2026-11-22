@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { Markdown } from "@/components/markdown";
 import { supabasePublic } from "@/lib/supabase/server";
 import { getContact } from "@/lib/contact";
@@ -20,7 +21,9 @@ export default async function AboutPage() {
 
   return (
     <>
-      <PageHeader eyebrow="About" title="About me" lede="Who I am, what I'm looking for, and how to reach me." />
+      <PageHeader eyebrow="About" title="About me" lede="Who I am, what I'm looking for, and how to reach me."
+        visual={<SystemGraph name="about" />}
+      />
       <div className="mx-auto grid max-w-5xl gap-12 px-6 py-14 lg:grid-cols-[1fr_280px]">
         <div>
           {body ? (

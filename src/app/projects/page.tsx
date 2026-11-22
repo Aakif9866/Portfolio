@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
+import { SystemGraph } from "@/components/system-graph";
 import { ProjectCard } from "@/components/project-card";
 import { Empty } from "@/components/empty";
 import { TechFilter } from "@/components/tech-filter";
@@ -22,6 +23,7 @@ export default async function ProjectsPage() {
         eyebrow="Projects"
         title="Projects"
         lede="Detailed case studies of things I've built: the problem, the architecture, the decisions and what I'd change. Open any project for the full write-up, diagrams and code links."
+        visual={<SystemGraph name="projects" />}
       />
       <section className="mx-auto max-w-6xl px-6 py-16">
         {projects.length === 0 ? (
