@@ -93,6 +93,8 @@ Confirmed from the database's own record (read-only check):
 | `20261119000001_workspace_entries` | The private workspace tables (`entries`, `private_config`), visible to the admin only |
 | `20261119000002_remove_obsolete_site_config` | Removed 9 old, unused settings rows (the file includes how to restore them) |
 | `20261119000003_article_media` | Blog columns: `tags`, `cover_image_url`, `video_url` |
+| `20261122000000_project_card` | Share-card columns on `projects` (applied 2026-11-22) |
+| `20261122000001_drop_project_card` | Drops them again after the card was removed (applied 2026-11-22) |
 
 ### How they were applied
 

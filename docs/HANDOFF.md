@@ -49,11 +49,6 @@ real database until the migrations are applied.** Pages show "the workspace tabl
 
 ## Next steps (in order)
 
-### Leftover from session 6
-Migration `20261122000000_project_card` (applied 2026-11-22) added `projects.card_enabled`, `card_used_for`,
-`card_features`. The card was then removed; the columns are unused. Drop them with a new migration only if the
-user asks (production write, needs approval). Don't bring the share card back unasked.
-
 ### 0. Career OS scope (added 2026-11-19)
 The user added a large scope: [career-os-spec.md](career-os-spec.md) (verbatim) with the audit and phased plan in
 [career-os-roadmap.md](career-os-roadmap.md). Confidentiality comes first (Phase 0: visibility on entries,
