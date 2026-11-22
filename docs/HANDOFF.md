@@ -4,7 +4,7 @@
 keep going without re-asking anything listed under **Decisions already made**. Update this
 file (status table and next steps) at the end of every session.
 
-Last updated: 2026-11-19 (session 5).
+Last updated: 2026-11-22 (session 6).
 
 ## Where things are
 
@@ -40,6 +40,7 @@ Last updated: 2026-11-19 (session 5).
 | Shareable project card (`/projects/[slug]/card`) + share block + og image; docs/features.md | `d640ae2` | ✅ live |
 | Recruiter view, GitHub stats, admin sidebar + Admin menu, v1 scroll reveal, Apple design pass, faster admin auth, sign-in card | `8fdda53`…`cec3fcc` | ✅ live (2026-11-19) |
 | Six colour schemes picked on the dashboard (`theme.palette` in site_config); graphite favicon; calmer dashboard; project card v2 (1200×600, home-page view via hero image → Microlink screenshot → mock-up) | `4c7a554`…`9c12f79` | ✅ live (2026-11-19) |
+| Session 6: empty Sort order no longer fails; hero image (landing page) shown on the case study; dev-only `unsafe-eval` in the CSP; header graphs on inner pages (`system-graph.tsx`, scheme-coloured); colour-scheme picker moved from the dashboard to a nav palette icon (per visitor, localStorage); **project share card removed entirely** (route, admin fields, og image) | `70f2099`…this commit | ✅ live (2026-11-22) |
 
 **Nothing in the workspace
 
@@ -47,6 +48,11 @@ Last updated: 2026-11-19 (session 5).
 real database until the migrations are applied.** Pages show "the workspace tables don't exist yet" until then.
 
 ## Next steps (in order)
+
+### Leftover from session 6
+Migration `20261122000000_project_card` (applied 2026-11-22) added `projects.card_enabled`, `card_used_for`,
+`card_features`. The card was then removed; the columns are unused. Drop them with a new migration only if the
+user asks (production write, needs approval). Don't bring the share card back unasked.
 
 ### 0. Career OS scope (added 2026-11-19)
 The user added a large scope: [career-os-spec.md](career-os-spec.md) (verbatim) with the audit and phased plan in

@@ -19,11 +19,8 @@ detail (tables, routes, how each part works).
   buttons, facts (role, team, dates, type), the tech stack (each linked to the Tech Stack page),
   up to 17 kinds of write-up section, architecture diagrams (an image, an interactive diagram,
   or both), milestones, and an "On this page" list
-- **Shareable project card**: each published project gets an image card (`/projects/<name>/card`)
-  with its name, summary, status, role and years, tech stack and links (case study, code, live
-  demo). It shows at the end of the case study with **Download card**, links to the stack, and
-  share buttons (X, LinkedIn, Reddit, WhatsApp, copy link). It is also the preview picture when
-  the project's link is posted on social media or in chat apps.
+- **Share links** at the end of the case study: X, LinkedIn, Reddit, WhatsApp and copy link,
+  plus links to the project's stack
 
 **Tech Stack (`/system`)**: every technology, grouped, each linked to the projects that use it.
 

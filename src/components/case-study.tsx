@@ -46,7 +46,7 @@ export type CaseStudyData = NonNullable<Awaited<ReturnType<typeof loadCaseStudy>
 
 /**
  * The full case-study page body. Used by the public route and the admin preview. `shareUrl`
- * (public route only: drafts have no card) adds the shareable project card at the end.
+ * (public route only) adds the share links at the end.
  */
 export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUrl?: string }) {
   const { project, sections, diagrams, tech, milestones } = data;
@@ -155,7 +155,7 @@ export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUr
         {tech.length > 0 && (
           <section id="built-with" className="mb-14 scroll-mt-24">
             <h2 className="font-mono text-[13px] uppercase tracking-[0.18em] text-faint">Built with</h2>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {tech.map((t) => (
                 <Link
                   key={t.id}
@@ -233,15 +233,7 @@ export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUr
               <span className="h-px w-8 bg-line-strong" />
               Share this project
             </h2>
-            {/* the card exists only when it was switched on in the admin */}
-            {project.card_enabled && (
-              <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
-                {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG, already 1200×630 */}
-                <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={600} loading="lazy" className="block h-auto w-full" />
-              </a>
-            )}
             <div className="mt-4 flex flex-wrap gap-2">
-              {project.card_enabled && <a href={`/projects/${project.slug}/card`} download={`${project.slug}-card.png`} className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85">Download card</a>}
               {tech.length > 0 && <a href="#built-with" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Stack</a>}
               <Link href="/system" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Full tech stack</Link>
             </div>

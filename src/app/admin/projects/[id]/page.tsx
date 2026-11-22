@@ -69,7 +69,6 @@ export default async function ProjectWorkspace({
           <>
             <Link href={`${base}/preview`} className={BTN.secondary}>Preview</Link>
             {project.state === "published" && <a href={`/projects/${project.slug}`} target="_blank" rel="noopener" className={BTN.secondary}>View live ↗</a>}
-            {project.state === "published" && <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className={BTN.secondary}>Share card ↗</a>}
           </>
         }
       />
