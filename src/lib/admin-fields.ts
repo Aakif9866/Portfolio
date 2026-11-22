@@ -52,6 +52,9 @@ export const FIELDS = {
     { name: "kind", label: "Type", type: "select", advanced: true, options: ["project", "experiment", "research", "learning", "prototype"].map((v) => ({ value: v, label: v[0].toUpperCase() + v.slice(1) })) },
     { name: "team_size", label: "Team size", type: "number", advanced: true },
     { name: "hero_image_url", label: "Hero image", type: "url", advanced: true, upload: true, help: "Upload an image or paste a link." },
+    { name: "card_enabled", label: "Create a share card", type: "checkbox", help: "Off until you switch it on. The card shows the hero image as the landing page, the project's technologies as the stack, and the two fields below." },
+    { name: "card_used_for", label: "Card · used for", type: "textarea", rows: 2, help: "What the project is used for, in one sentence." },
+    { name: "card_features", label: "Card · key features", type: "lines", rows: 3, help: "One per line. The first three are shown." },
     POSITION,
   ],
   project_sections: [

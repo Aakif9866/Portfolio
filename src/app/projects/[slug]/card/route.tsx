@@ -3,17 +3,12 @@ import { supabasePublic } from "@/lib/supabase/server";
 import { loadCaseStudy } from "@/components/case-study";
 import { fetchOrThrow } from "@/lib/db";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
-import { focusAreas, keyFeatures } from "@/lib/project-card";
+import { stackChips } from "@/lib/project-card";
 
 /**
- * A 1200×600 shareable project card: name, summary, focus areas, key features and links on the
- * left; a mini view of the project's home page on the right. Built only from the project's own
- * published fields. It is the project's social preview and can be downloaded from the case study.
- *
- * Home-page view, in order: the uploaded hero image, else a screenshot of the live demo link
- * (Microlink's free screenshot API, which only ever sees the public demo URL; cached a day, so one call
- * per project per day, inside its free 50/day),
- * else a drawn mock-up of the page. Any failure falls through to the next, so the card always renders.
+ * A 1200×600 shareable project card, opt-in per project (card_enabled). It says only what the admin
+ * gave it: name, summary, "used for", key features and the project's technologies on the left; the
+ * hero image (the landing page) on the right, or "No landing page yet". 404 when the card is off.
  */
 export const revalidate = 300;
 
@@ -26,7 +21,7 @@ export async function generateStaticParams() {
 const short = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/+$/, "");
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
 
-/** An image as a data URL (PNG/JPEG only, ≤3 MB, 8 s, cached a day), or null. */
+/** An image as a data URL (PNG/JPEG only, ≤8 MB, 8 s), or null. */
 async function imageData(url: string | null | undefined): Promise<string | null> {
   if (!url || !/^https:\/\//.test(url)) return null;
   try {
@@ -34,7 +29,7 @@ async function imageData(url: string | null | undefined): Promise<string | null>
     const type = res.headers.get("content-type")?.split(";")[0] ?? "";
     if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return null;
     const buf = await res.arrayBuffer();
-    if (buf.byteLength > 3_000_000) return null;
+    if (buf.byteLength > 8_000_000) return null;
     return `data:${type};base64,${Buffer.from(buf).toString("base64")}`;
   } catch {
     return null;
@@ -44,19 +39,14 @@ async function imageData(url: string | null | undefined): Promise<string | null>
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const d = await loadCaseStudy(supabasePublic(), { slug, publishedOnly: true });
-  if (!d) return new Response("Not found", { status: 404 });
-  const { project: p, tech, sections } = d;
+  if (!d || !d.project.card_enabled) return new Response("Not found", { status: 404 });
+  const { project: p, tech } = d;
 
   const summary = p.thesis ?? p.summary;
-  const focus = focusAreas(tech, [summary, ...sections.map((s) => s.body_md)].join(" "));
-  const features = keyFeatures(sections);
-  const shot = (await imageData(p.hero_image_url)) ??
-    (p.demo_url ? await imageData(`https://api.microlink.io/?url=${encodeURIComponent(p.demo_url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=1240`) : null);
-  const links = [
-    { k: "Case study", v: short(`${SITE_URL}/projects/${p.slug}`) },
-    p.repo_url ? { k: "Code", v: short(p.repo_url) } : null,
-    p.demo_url ? { k: "Live", v: short(p.demo_url) } : null,
-  ].filter(Boolean) as { k: string; v: string }[];
+  const stack = stackChips(tech);
+  const features = (p.card_features ?? []).filter(Boolean).slice(0, 3);
+  const usedFor = p.card_used_for?.trim() || null;
+  const shot = await imageData(p.hero_image_url);
   const label = { color: "#6b6b78", fontSize: 14, letterSpacing: 2, textTransform: "uppercase" as const };
 
   return new ImageResponse(
@@ -73,13 +63,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
             </div>
             <div style={{ marginTop: 18, fontSize: p.title.length > 26 ? 44 : 54, fontWeight: 700, lineHeight: 1.04, letterSpacing: -1.5 }}>{clip(p.title, 48)}</div>
             {summary && <div style={{ marginTop: 12, fontSize: 21, lineHeight: 1.35, color: "#a1a1ab" }}>{clip(summary, 118)}</div>}
-            {focus.length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
-                {focus.slice(0, 7).map((f) => (
-                  <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "4px 11px", borderRadius: 999, border: "1px solid #2a2a33", background: "#0d0d12", fontSize: 15.5 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: 99, background: f.color }} />{f.label}
-                  </div>
-                ))}
+            {usedFor && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 20 }}>
+                <span style={label}>Used for</span>
+                <span style={{ fontSize: 18, lineHeight: 1.35, color: "#d4d4d8" }}>{clip(usedFor, 96)}</span>
               </div>
             )}
             {features.length > 0 && (
@@ -92,20 +79,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
                 ))}
               </div>
             )}
-            {tech.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 18 }}>
-                <span style={label}>Built with</span>
-                <span style={{ fontSize: 17, color: "#a1a1ab" }}>{clip(tech.slice(0, 7).map((t) => t.name).join(" · "), 62)}</span>
+            {stack.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 20 }}>
+                <span style={label}>Stack</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {stack.map((t) => (
+                    <div key={t.label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "4px 11px", borderRadius: 999, border: "1px solid #2a2a33", background: "#0d0d12", fontSize: 15.5 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: 99, background: t.color }} />{t.label}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-          </div>
-          <div style={{ display: "flex", gap: 22, borderTop: "1px solid #24242c", paddingTop: 14 }}>
-            {links.map((l) => (
-              <div key={l.k} style={{ display: "flex", flexDirection: "column", gap: 3, maxWidth: links.length > 2 ? 172 : 260, overflow: "hidden", whiteSpace: "nowrap" }}>
-                <span style={{ ...label, fontSize: 12 }}>{l.k}</span>
-                <span style={{ fontSize: 14, color: "#c4b5fd" }}>{clip(l.v, links.length > 2 ? 21 : 30)}</span>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -121,23 +106,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
             // eslint-disable-next-line @next/next/no-img-element -- rendered by ImageResponse, not the browser
             <img src={shot} alt="" width={548} height={464} style={{ width: "100%", flex: 1, objectFit: "cover", objectPosition: "top" }} />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: 28, background: "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(168,85,247,0.22), transparent 70%)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 18, height: 18, borderRadius: 5, background: "linear-gradient(135deg, #fb923c, #a855f7)" }} />
-                  <span style={{ fontSize: 15, fontWeight: 600 }}>{clip(p.title, 22)}</span>
-                </div>
-                <div style={{ display: "flex", gap: 10 }}>{[44, 36, 40].map((w, i) => <div key={i} style={{ width: w, height: 7, borderRadius: 9, background: "#2a2a33" }} />)}</div>
-              </div>
-              <div style={{ marginTop: 48, fontSize: 30, fontWeight: 700, lineHeight: 1.1, letterSpacing: -0.8 }}>{clip(p.title, 30)}</div>
-              <div style={{ marginTop: 12, fontSize: 15, lineHeight: 1.4, color: "#8a8a96" }}>{clip(summary ?? "", 90)}</div>
-              <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-                <div style={{ width: 110, height: 32, borderRadius: 99, background: "#f2f2f5" }} />
-                <div style={{ width: 96, height: 32, borderRadius: 99, border: "1px solid #2a2a33" }} />
-              </div>
-              <div style={{ display: "flex", gap: 10, marginTop: "auto" }}>
-                {[0, 1, 2].map((i) => <div key={i} style={{ flex: 1, height: 74, borderRadius: 12, border: "1px solid #24242c", background: "#101015" }} />)}
-              </div>
+            <div style={{ display: "flex", flex: 1, flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, color: "#6b6b78" }}>
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#3f3f4a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M8 14l2.5 2.5L16 11" /></svg>
+              <span style={{ fontSize: 22, color: "#9494a1" }}>No landing page yet</span>
             </div>
           )}
         </div>

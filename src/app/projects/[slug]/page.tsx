@@ -20,12 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!d) return { title: "Not found" };
   const { title, slug: s } = d.project;
   const description = d.project.thesis ?? d.project.summary ?? undefined;
-  const image = { url: `/projects/${s}/card`, width: 1200, height: 600, alt: title };
+  // The share card is the preview only when it was switched on; otherwise the site default applies.
+  const image = d.project.card_enabled ? { url: `/projects/${s}/card`, width: 1200, height: 600, alt: title } : null;
   return {
     title, description,
     alternates: { canonical: `/projects/${s}` },
-    openGraph: { type: "website", title, description, url: `/projects/${s}`, images: [image] },
-    twitter: { card: "summary_large_image", title, description, images: [image.url] },
+    openGraph: { type: "website", title, description, url: `/projects/${s}`, ...(image && { images: [image] }) },
+    twitter: { card: "summary_large_image", title, description, ...(image && { images: [image.url] }) },
   };
 }
 

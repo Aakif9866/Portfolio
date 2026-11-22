@@ -9,6 +9,7 @@ export type Project = {
   kind: string; status: string; state: PublishState; role: string | null; team_size: number | null;
   started_on: string | null; ended_on: string | null; featured: boolean; position: number;
   hero_image_url: string | null; demo_url: string | null; repo_url: string | null;
+  card_enabled: boolean; card_used_for: string | null; card_features: string[];
   published_at: string | null; updated_at: string;
 };
 

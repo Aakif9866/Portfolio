@@ -233,12 +233,15 @@ export function CaseStudyView({ data, shareUrl }: { data: CaseStudyData; shareUr
               <span className="h-px w-8 bg-line-strong" />
               Share this project
             </h2>
-            <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
-              {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG, already 1200×630 */}
-              <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={600} loading="lazy" className="block h-auto w-full" />
-            </a>
+            {/* the card exists only when it was switched on in the admin */}
+            {project.card_enabled && (
+              <a href={`/projects/${project.slug}/card`} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line">
+                {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG, already 1200×630 */}
+                <img src={`/projects/${project.slug}/card`} alt={`Project card for ${project.title}`} width={1200} height={600} loading="lazy" className="block h-auto w-full" />
+              </a>
+            )}
             <div className="mt-4 flex flex-wrap gap-2">
-              <a href={`/projects/${project.slug}/card`} download={`${project.slug}-card.png`} className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85">Download card</a>
+              {project.card_enabled && <a href={`/projects/${project.slug}/card`} download={`${project.slug}-card.png`} className="rounded-full bg-ink px-4 py-2 text-[14px] font-medium text-page transition-opacity hover:opacity-85">Download card</a>}
               {tech.length > 0 && <a href="#built-with" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Stack</a>}
               <Link href="/system" className="rounded-full border border-line px-4 py-2 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink">Full tech stack</Link>
             </div>
